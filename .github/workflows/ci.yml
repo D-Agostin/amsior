@@ -1,0 +1,68 @@
+# Amsior — integração contínua da fase 1A
+# Testes do motor em Windows e Linux, Python 3.12 e 3.13, mais o protótipo de
+# empacotamento no Windows (risco da seção 10.2 da especificação).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  motor:
+    name: Motor (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: motor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Instalar dependências travadas
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-lock.txt
+          python -m pip install -e . --no-deps
+      - name: Tipos (mypy estrito)
+        run: python -m mypy
+      - name: Testes (unidade, corpus, ataque, propriedades)
+        run: python -m pytest -q
+      - name: Relatório de aceite da fase 1A
+        run: python ../ferramentas/aceite_1a.py
+
+  empacotamento-windows:
+    name: Protótipo de empacotamento (Windows)
+    runs-on: windows-latest
+    needs: motor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependências travadas
+        working-directory: ferramentas/empacotamento
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-empacotamento.txt
+          python -m pip install -e ../../motor --no-deps
+          python -m pip freeze > versoes-windows.txt
+      - name: Gerar executável
+        working-directory: ferramentas/empacotamento
+        run: pyinstaller --noconfirm ola_amsior.spec
+      - name: Rodar o executável
+        working-directory: ferramentas/empacotamento
+        run: .\dist\ola_amsior.exe > relatorio.json; Get-Content relatorio.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ola-amsior-windows
+          path: |
+            ferramentas/empacotamento/dist/ola_amsior.exe
+            ferramentas/empacotamento/relatorio.json
+            ferramentas/empacotamento/versoes-windows.txt

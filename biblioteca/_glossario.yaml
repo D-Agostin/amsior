@@ -1,0 +1,285 @@
+# Amsior — Glossário de grandezas
+# Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+#
+# O glossário identifica a GRANDEZA, não a letra. Cada ficha diz qual letra
+# usa para cada grandeza (seção 8.2 da especificação).
+#
+# Campos:
+#   unidade_si   unidade SI coerente, na sintaxe do pint ("1" = adimensional)
+#   suposicoes   real | positivo | nao_negativo | nao_nulo | inteiro
+#   temperatura  absoluta | diferenca (só para grandezas de temperatura)
+#   pressao      absoluta | manometrica (só para grandezas de pressão)
+#   exibicao     unidades oferecidas na interface
+formato: 1
+grandezas:
+  adimensional:
+    nome: Grandeza adimensional
+    unidade_si: "1"
+    suposicoes: [real]
+  numero_adimensional:
+    nome: Número adimensional (Re, Nu, Pr, Bi...)
+    unidade_si: "1"
+    suposicoes: [positivo]
+  fracao:
+    nome: Fração (molar, mássica ou volumétrica)
+    unidade_si: "1"
+    suposicoes: [nao_negativo]
+    exibicao: ["1", "%"]
+  conversao:
+    nome: Conversão
+    unidade_si: "1"
+    suposicoes: [nao_negativo]
+    exibicao: ["1", "%"]
+  fator_compressibilidade:
+    nome: Fator de compressibilidade
+    unidade_si: "1"
+    suposicoes: [positivo]
+  fator_acentrico:
+    nome: Fator acêntrico
+    unidade_si: "1"
+    suposicoes: [real]
+  coeficiente_atividade:
+    nome: Coeficiente de atividade
+    unidade_si: "1"
+    suposicoes: [positivo]
+  constante_equilibrio:
+    nome: Constante de equilíbrio
+    unidade_si: "1"
+    suposicoes: [positivo]
+  volatilidade_relativa:
+    nome: Volatilidade relativa
+    unidade_si: "1"
+    suposicoes: [positivo]
+  emissividade:
+    nome: Emissividade
+    unidade_si: "1"
+    suposicoes: [positivo]
+  eficiencia:
+    nome: Eficiência ou efetividade
+    unidade_si: "1"
+    suposicoes: [nao_negativo]
+  expoente:
+    nome: Expoente (ordem de reação, índice politrópico)
+    unidade_si: "1"
+    suposicoes: [real]
+
+  temperatura_absoluta:
+    nome: Temperatura absoluta
+    unidade_si: K
+    suposicoes: [positivo]
+    temperatura: absoluta
+    exibicao: [K, degC, degF, degR]
+  diferenca_temperatura:
+    nome: Diferença de temperatura
+    unidade_si: K
+    suposicoes: [real]
+    temperatura: diferenca
+    exibicao: [K, delta_degC, delta_degF]
+  pressao_absoluta:
+    nome: Pressão absoluta
+    unidade_si: Pa
+    suposicoes: [positivo]
+    pressao: absoluta
+    exibicao: [Pa, kPa, MPa, bar, atm, mmHg, psi]
+  pressao_saturacao:
+    nome: Pressão de saturação
+    unidade_si: Pa
+    suposicoes: [positivo]
+    pressao: absoluta
+    exibicao: [Pa, kPa, bar, atm, mmHg]
+  pressao_manometrica:
+    nome: Pressão manométrica
+    unidade_si: Pa
+    suposicoes: [real]
+    pressao: manometrica
+    exibicao: [Pa, kPa, bar, psi]
+  diferenca_pressao:
+    nome: Diferença de pressão
+    unidade_si: Pa
+    suposicoes: [real]
+
+  massa:
+    nome: Massa
+    unidade_si: kg
+    suposicoes: [positivo]
+  quantidade_materia:
+    nome: Quantidade de matéria
+    unidade_si: mol
+    suposicoes: [positivo]
+    exibicao: [mol, kmol]
+  massa_molar:
+    nome: Massa molar
+    unidade_si: kg/mol
+    suposicoes: [positivo]
+    exibicao: [kg/mol, g/mol, kg/kmol]
+  massa_especifica:
+    nome: Massa específica
+    unidade_si: kg/m**3
+    suposicoes: [positivo]
+  concentracao_molar:
+    nome: Concentração molar
+    unidade_si: mol/m**3
+    suposicoes: [nao_negativo]
+    exibicao: [mol/m**3, mol/L, kmol/m**3]
+  volume:
+    nome: Volume
+    unidade_si: m**3
+    suposicoes: [positivo]
+    exibicao: [m**3, L, mL, cm**3]
+  volume_molar:
+    nome: Volume molar
+    unidade_si: m**3/mol
+    suposicoes: [positivo]
+  volume_especifico:
+    nome: Volume específico
+    unidade_si: m**3/kg
+    suposicoes: [positivo]
+
+  comprimento:
+    nome: Comprimento
+    unidade_si: m
+    suposicoes: [positivo]
+  area:
+    nome: Área
+    unidade_si: m**2
+    suposicoes: [positivo]
+  tempo:
+    nome: Tempo
+    unidade_si: s
+    suposicoes: [nao_negativo]
+    exibicao: [s, min, h]
+  tempo_espacial:
+    nome: Tempo espacial ou de residência
+    unidade_si: s
+    suposicoes: [positivo]
+  velocidade:
+    nome: Velocidade
+    unidade_si: m/s
+    suposicoes: [real]
+  aceleracao:
+    nome: Aceleração
+    unidade_si: m/s**2
+    suposicoes: [positivo]
+
+  vazao_volumetrica:
+    nome: Vazão volumétrica
+    unidade_si: m**3/s
+    suposicoes: [positivo]
+  vazao_molar:
+    nome: Vazão molar
+    unidade_si: mol/s
+    suposicoes: [positivo]
+  vazao_massica:
+    nome: Vazão mássica
+    unidade_si: kg/s
+    suposicoes: [positivo]
+  fluxo_molar:
+    nome: Fluxo molar
+    unidade_si: mol/(m**2*s)
+    suposicoes: [real]
+
+  energia:
+    nome: Energia (calor, trabalho, energia interna, entalpia)
+    unidade_si: J
+    suposicoes: [real]
+    exibicao: [J, kJ, MJ, cal, kcal, BTU]
+  energia_molar:
+    nome: Energia molar (entalpia, energia interna, Gibbs)
+    unidade_si: J/mol
+    suposicoes: [real]
+    exibicao: [J/mol, kJ/mol, kJ/kmol]
+  energia_especifica:
+    nome: Energia específica
+    unidade_si: J/kg
+    suposicoes: [real]
+    exibicao: [J/kg, kJ/kg]
+  entalpia_vaporizacao_molar:
+    nome: Entalpia molar de vaporização
+    unidade_si: J/mol
+    suposicoes: [positivo]
+    exibicao: [J/mol, kJ/mol]
+  energia_ativacao:
+    nome: Energia de ativação
+    unidade_si: J/mol
+    suposicoes: [positivo]
+    exibicao: [J/mol, kJ/mol, kcal/mol]
+  entropia:
+    nome: Entropia
+    unidade_si: J/K
+    suposicoes: [real]
+  entropia_molar:
+    nome: Entropia molar
+    unidade_si: J/(mol*K)
+    suposicoes: [real]
+  capacidade_calorifica_molar:
+    nome: Capacidade calorífica molar
+    unidade_si: J/(mol*K)
+    suposicoes: [positivo]
+  calor_especifico:
+    nome: Calor específico
+    unidade_si: J/(kg*K)
+    suposicoes: [positivo]
+  constante_gases:
+    nome: Constante dos gases
+    unidade_si: J/(mol*K)
+    suposicoes: [positivo]
+  potencia:
+    nome: Potência ou taxa de calor
+    unidade_si: W
+    suposicoes: [real]
+    exibicao: [W, kW]
+  fluxo_calor:
+    nome: Fluxo de calor
+    unidade_si: W/m**2
+    suposicoes: [real]
+
+  condutividade_termica:
+    nome: Condutividade térmica
+    unidade_si: W/(m*K)
+    suposicoes: [positivo]
+  coeficiente_conveccao:
+    nome: Coeficiente de transferência de calor por convecção
+    unidade_si: W/(m**2*K)
+    suposicoes: [positivo]
+  coeficiente_global:
+    nome: Coeficiente global de transferência de calor
+    unidade_si: W/(m**2*K)
+    suposicoes: [positivo]
+  resistencia_termica:
+    nome: Resistência térmica
+    unidade_si: K/W
+    suposicoes: [positivo]
+  constante_stefan_boltzmann:
+    nome: Constante de Stefan-Boltzmann
+    unidade_si: W/(m**2*K**4)
+    suposicoes: [positivo]
+  difusividade:
+    nome: Difusividade (mássica, térmica ou de momento)
+    unidade_si: m**2/s
+    suposicoes: [positivo]
+  viscosidade_dinamica:
+    nome: Viscosidade dinâmica
+    unidade_si: Pa*s
+    suposicoes: [positivo]
+    exibicao: [Pa*s, cP]
+  coeficiente_transferencia_massa:
+    nome: Coeficiente de transferência de massa
+    unidade_si: m/s
+    suposicoes: [positivo]
+
+  constante_velocidade_primeira_ordem:
+    nome: Constante de velocidade de 1ª ordem
+    unidade_si: 1/s
+    suposicoes: [positivo]
+  frequencia:
+    nome: Frequência ou fator pré-exponencial de 1ª ordem
+    unidade_si: 1/s
+    suposicoes: [positivo]
+  taxa_reacao:
+    nome: Taxa de reação por volume
+    unidade_si: mol/(m**3*s)
+    suposicoes: [real]
+  aceleracao_gravidade:
+    nome: Aceleração da gravidade
+    unidade_si: m/s**2
+    suposicoes: [positivo]

@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+build/
+dist/
+*.spec.bak
+relatorio.json
+versoes-windows.txt
+.DS_Store
+Thumbs.db
