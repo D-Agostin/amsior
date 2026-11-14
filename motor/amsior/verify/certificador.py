@@ -26,21 +26,24 @@ import mpmath
 import sympy as sp
 
 from amsior.expr.latex import para_latex
-from amsior.expr.nos import Eq, Expr, Ge, Gt, Integral, Le, Lt, Ne, Sym
-from amsior.expr.ponte_sympy import ParaSympy
+from amsior.expr.nos import Eq, Expr, Ge, Gt, Integral, Le, Lt, Ne, Num, Sym
+from amsior.expr.ponte_sympy import ParaSympy, de_sympy
 from amsior.expr.simbolos import TabelaDeSimbolos
 from amsior.units.glossario import Glossario
 from amsior.units.homogeneidade import verificar_homogeneidade
 from amsior.verify.amostragem import satisfaziveis
 from amsior.verify.arvore import (
-    chave, livres, percorrer, sem_dependencia, substituir, tem_funcao_de, variaveis_ligadas,
+    chave, livres, percorrer, sem_dependencia, substituir, tem_funcao_de, trocar_subarvore,
+    variaveis_ligadas,
 )
 from amsior.verify.avaliador import _semente
 from amsior.verify.dominio import (
     Exigido, Obrigacao, ObrigacaoIntegral, Predicado, obrigacoes, opacificar,
 )
 from amsior.verify.identidade import Comparador, ResultadoIdentidade
-from amsior.verify.logica import BaseDeFatos, base, por_suposicao, refutado_por_suposicao
+from amsior.verify.logica import (
+    BaseDeFatos, base, normalizar, por_suposicao, refutado_por_suposicao,
+)
 from amsior.verify.modelo import (
     RELACOES, Certificado, Condicao, Contexto, EstadoCert, MetodoCert, Motivo, Operacao, Passo,
     Relacao,
@@ -441,12 +444,35 @@ class Verificador:
             registrar(o, "equivalencia", r)
             if r is None:
                 st.equivalencia_perdida = True
-        # 3. o que "antes" exige e "depois" não: o passo alargou o domínio
+        # 3. o que "antes" exige e "depois" não: o passo alargou o domínio.
+        # Se "depois" é s = E (E sem s), nas soluções de "depois" vale s = E, e a
+        # obrigação de "antes" pode ser conferida com s trocado por E.
         for o in o_a:
             r = self._provar(o, com_depois, int_d, "depois")
+            if r is None and isinstance(o, Obrigacao) and isinstance(passo.depois, Eq):
+                for a, b in ((passo.depois.esq, passo.depois.dir),
+                             (passo.depois.dir, passo.depois.esq)):
+                    trocada = trocar_subarvore(o.expr, a, b)
+                    if trocada != o.expr:
+                        r = self._provar(Obrigacao(trocada, o.predicado), com_depois, int_d,
+                                         "depois")
+                        if r is not None:
+                            break
             registrar(o, "dominio_antes", r)
             if r is None:
                 st.equivalencia_perdida = True
+
+    def _condicoes_faltantes(self, o: Exigido, fatos: BaseDeFatos) -> list[Condicao]:
+        """As partes da obrigação que não têm prova, como condições legíveis."""
+        if not isinstance(o, Obrigacao):
+            return [Condicao(Ne(Num("0"), Num("0")))]  # integral: sem forma simples; reprova
+        comps = normalizar(self.conv(o.expr), o.predicado) or [(self.conv(o.expr), o.predicado)]
+        out: list[Condicao] = []
+        rel = {"nao_nulo": Ne, "positivo": Gt, "nao_negativo": Ge}
+        for q, pred in comps:
+            if fatos.provar(q, pred) is None:
+                out.append(Condicao(rel[pred](de_sympy(q, self.tabela), Num("0"))))
+        return out
 
     def _v5(self, passo: Passo, st: _Estado) -> str:
         r = verificar_homogeneidade(passo.depois, self.tabela, self.glossario)
@@ -495,18 +521,27 @@ class Verificador:
             return ResultadoIdentidade(False, None, "verif.passo_sem_equacao")
         eq = substituir(equacao, alvo.id, solucao)
         assert isinstance(eq, Eq)
+        condicoes = tuple(Condicao(substituir(c.expr, alvo.id, solucao), c.origem, c.satisfeita)
+                          for c in condicoes)
         st = _Estado()
         conds = self._conferir_condicoes(
             Passo(equacao, equacao, OPERACOES_FALSA, condicoes=condicoes), st,
             Comparador(self.tabela))
         if st.reprovado:
             return ResultadoIdentidade(False, None, st.motivos[0].chave)
-        fatos = base([(c.q, c.predicado, c.rotulo) for c in conds])
+        dominio = [o for o in obrigacoes(equacao)
+                   if isinstance(o, Obrigacao) and alvo.id not in livres(o.expr)]
+        fatos = base([(c.q, c.predicado, c.rotulo) for c in conds]
+                     + self._fatos(list(dominio), "dominio"))
+        faltam: list[Condicao] = []
         for o in obrigacoes(eq):
             if isinstance(o, Obrigacao) and refutado_por_suposicao(self.conv(o.expr), o.predicado):
                 return ResultadoIdentidade(False, None, "verif.solucao_fora_do_dominio")
             if self._provar(o, fatos, [], "") is None:
-                return ResultadoIdentidade(False, None, "verif.solucao_condicao_ausente")
+                faltam += self._condicoes_faltantes(o, fatos)
+        if faltam:
+            return ResultadoIdentidade(False, None, "verif.solucao_condicao_ausente",
+                                       faltam=faltam)
         comp = Comparador(self.tabela, _semente(chave(eq)))
         r = comp.comparar(eq.esq, eq.dir)
         if not r.aprovado and conds:

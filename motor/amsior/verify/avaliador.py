@@ -49,6 +49,19 @@ class Estouro(Exception):
     """Valor grande demais para calcular com precisão em tempo útil (ex.: exp(exp(10⁹)))."""
 
 
+class Instavel(Estouro):
+    """Soma cujo resultado ficou abaixo da precisão das parcelas (absorção):
+    o valor não decide nada, e o ponto é descartado."""
+
+
+def _somar(valores: list[Any]) -> Any:
+    s = mp.fsum(valores)
+    maior = max((abs(v) for v in valores), default=mp.mpf(0))
+    if maior != 0 and abs(s) <= maior * mp.mpf(10) ** (-(mp.mp.dps - 12)):
+        raise Instavel
+    return s
+
+
 LIMITE_ARGUMENTO = mp.mpf(10) ** 7  # |argumento| de exp e de potência real
 LIMITE_TRIG = mp.mpf(10) ** 20
 
@@ -137,9 +150,9 @@ class Avaliador:
                 return self.funcao(e.id, len(args))(*args)
             return env[e.id]
         if isinstance(e, Add):
-            return mp.fsum(_num(v(t, env)) for t in e.termos)
+            return _somar([_num(v(t, env)) for t in e.termos])
         if isinstance(e, Sub):
-            return _num(v(e.a, env)) - _num(v(e.b, env))
+            return _somar([_num(v(e.a, env)), -_num(v(e.b, env))])
         if isinstance(e, Neg):
             return -_num(v(e.a, env))
         if isinstance(e, Mul):

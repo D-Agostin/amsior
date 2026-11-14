@@ -49,6 +49,13 @@ def substituir(e: Expr, id_: str, novo: Expr) -> Expr:
     return mapear(e, lambda c: substituir(c, id_, novo))
 
 
+def trocar_subarvore(e: Expr, velha: Expr, nova: Expr) -> Expr:
+    """Troca cada ocorrência estrutural de ``velha`` por ``nova``."""
+    if e == velha:
+        return nova
+    return mapear(e, lambda c: trocar_subarvore(c, velha, nova))
+
+
 def chave(e: Expr) -> str:
     """Identificador estável de uma subárvore (sua forma LaTeX canônica)."""
     return para_latex(e)

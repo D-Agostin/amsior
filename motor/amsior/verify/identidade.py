@@ -48,6 +48,7 @@ class ResultadoIdentidade:
     residuo: float | None = None
     numerico: ResultadoNumerico | None = None
     opacos: dict[str, Opaco] = field(default_factory=dict)
+    faltam: list[Any] = field(default_factory=list)  # V2: condições que a solução precisaria
 
 
 def _eh_zero(x: Any) -> bool:

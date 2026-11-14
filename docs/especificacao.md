@@ -82,9 +82,9 @@ O módulo em destaque é o verificador: nada gerado pelo motor de passos volta �
 | --- | --- | --- |
 | `expr` | Árvore AmsiorExpr, analisador de LaTeX restrito, conversão para LaTeX e SymPy, símbolos e suposições | SymPy |
 | `units` | Dimensões, conversão, homogeneidade dimensional, tipos de temperatura e pressão | `expr`, pint |
-| `rules` | Catálogo de regras de transformação, cada uma com justificativa e condições | `expr` |
-| `steps` | Estratégias: isolar, integrar, derivar, resolver EDO; produz a lista de passos | `rules`, `units` |
 | `verify` | Certificados por passo e verificações de ponta a ponta | `expr`, `units`, SymPy, mpmath |
+| `rules` | Catálogo de regras de transformação, cada uma com justificativa e condições | `expr`, `verify` (modelo do passo e provas de suposição) |
+| `steps` | Estratégias: isolar, integrar, derivar, resolver EDO; produz a lista de passos e só a entrega certificada | `rules`, `units`, `verify` |
 | `numerics` | Avaliação numérica, algarismos significativos, formatação pt-BR | `expr`, `units` |
 | `props` | Propriedades de fluidos puros e correlações com faixa de validade; pacotes de propriedades dos livros (subpacote props.livros) | `units`, CoolProp, chemicals |
 | `interp` | Interpolação linear, bilinear e spline com passos e avisos | `numerics` |
@@ -93,7 +93,7 @@ O módulo em destaque é o verificador: nada gerado pelo motor de passos volta �
 | `i18n` | Catálogo de textos e modelos de justificativa por idioma | nenhum |
 | `api` | Rotas HTTP, esquemas de entrada e saída, pool de trabalhadores | todos |
 
-Regra de dependência: cada módulo só depende dos que estão acima dele na tabela. `steps` não conhece `sheet` nem `api`; `verify` não conhece `steps` (ele recebe passos prontos e os julga de forma independente).
+Regra de dependência: cada módulo só depende dos que estão acima dele na tabela. `steps` não conhece `sheet` nem `api`; `verify` não conhece `rules` nem `steps` (ele recebe passos prontos e os julga de forma independente). O motor chama o verificador para entregar só passos certificados (decisão 0004).
 
 ### Pilha tecnológica
 
@@ -712,4 +712,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | --- | --- | --- |
 | 1.0 | 13/11/2026 | Versão inicial, com as decisões D-01 a D-08 e T-01 a T-06; revisada no mesmo dia (ordem de dependência dos módulos, licenças, campos de símbolo e de passo, critério numérico e independência do verificador, etapa automática de V6). Versão 1.1, na mesma data: D-09 (última edição de cada fonte, seção 8.1) e D-10 (biblioteca de propriedades dos livros, seção 7.5). Versão 1.2, na mesma data, ao fechar a fase 1A: analisador próprio no lugar do Lark; operação declarada no passo; Lt e Le na árvore; substituições limitadas a restringe até a fase 2; zero compatível com qualquer dimensão (decisões 0001 e 0002 do repositório) |
 | 1.3 | 14/11/2026 | Revisão do verificador pelo Fable (revisão 0001) e correções (decisão 0003): verificador sobre a árvore do Amsior, obrigações de domínio, avaliador numérico próprio e contraprova sempre, estratos de magnitude e cobertura de ramos, objetos opacos, relação reduzida a `equivalente` e `implica` com `sob_hipotese` calculado, certificado auditável, verificação de cadeia, `sympy.ask` retirado (seções 3.2, 5.1 e 5.3) |
-| 1.4 | 14/11/2026 | D-11 (design visual como requisito, modos claro e escuro, seção 9.4); critério visual na fase 1B |
+| 1.4 | 14/11/2026 | D-11 (design visual como requisito, modos claro e escuro, seção 9.4); critério visual na fase 1B; `verify` antes de `rules` e `steps` na ordem de dependência (decisão 0004) |
