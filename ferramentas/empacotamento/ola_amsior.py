@@ -70,8 +70,10 @@ def checar_chemicals() -> str:
 
 
 def checar_fastapi() -> str:
+    """Chama o aplicativo ASGI diretamente, sem cliente HTTP de testes."""
+    import asyncio
+
     import fastapi
-    from fastapi.testclient import TestClient
 
     app = fastapi.FastAPI()
 
@@ -79,9 +81,25 @@ def checar_fastapi() -> str:
     def saude() -> dict[str, str]:
         return {"estado": "ok"}
 
-    resp = TestClient(app).get("/saude")
-    assert resp.json() == {"estado": "ok"}
-    return f"fastapi {fastapi.__version__}: rota local respondeu"
+    enviados: list[dict[str, Any]] = []
+
+    async def receber() -> dict[str, Any]:
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    async def enviar(msg: dict[str, Any]) -> None:
+        enviados.append(msg)
+
+    escopo = {
+        "type": "http", "asgi": {"version": "3.0"}, "http_version": "1.1",
+        "method": "GET", "scheme": "http", "path": "/saude", "raw_path": b"/saude",
+        "query_string": b"", "root_path": "", "headers": [],
+        "server": ("127.0.0.1", 8000), "client": ("127.0.0.1", 50000),
+    }
+    asyncio.run(app(escopo, receber, enviar))
+    status = next(m["status"] for m in enviados if m["type"] == "http.response.start")
+    corpo = b"".join(m.get("body", b"") for m in enviados if m["type"] == "http.response.body")
+    assert status == 200 and json.loads(corpo) == {"estado": "ok"}, (status, corpo)
+    return f"fastapi {fastapi.__version__}: rota local respondeu 200"
 
 
 def checar_uvicorn() -> str:
