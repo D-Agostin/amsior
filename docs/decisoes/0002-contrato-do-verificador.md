@@ -1,7 +1,7 @@
 # 0002 — Contrato entre o passo e o verificador
 
 - Data: 13/11/2026 (fase 1A)
-- Estado: aceita
+- Estado: aceita; revisada em `docs/revisoes/0001-verificador-fase-1a.md` (correções pendentes)
 - Detalha: especificação, seções 3.2, 4.1 e 5; para revisão do Fable ao fim da 1A
 
 ## Decisões
