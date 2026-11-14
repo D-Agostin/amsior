@@ -26,6 +26,12 @@ Duas decisões foram acrescentadas por Ruan no mesmo dia, depois da primeira ver
 | D-09 | Edições | A referência é sempre a última edição de cada fonte (seção 8.1); edição nova reabre a conferência das citações |
 | D-10 | Propriedades dos livros | Biblioteca própria de propriedades físicas e químicas transcritas dos livros, separada da de equações, com uso opcional (seção 7.5) |
 
+Uma decisão foi acrescentada por Ruan em 14/11/2026, na abertura da fase 1B:
+
+| ID | Tema | Decisão |
+| --- | --- | --- |
+| D-11 | Design visual | O design é requisito, não acabamento: um visual excelente cansa menos e favorece a aprendizagem, e é onde os softwares da área costumam falhar. Modos claro e escuro com o mesmo cuidado (seção 9.4); nenhuma tela entra numa versão sem a revisão visual de Ruan nos dois modos |
+
 ### Decisões técnicas derivadas
 
 Estas decorrem das decisões acima e ficam fechadas por esta especificação.
@@ -649,6 +655,15 @@ Metas de desempenho numa máquina de aluno comum: isolar em equação típica de
 - **Demonstrações em vídeo**: uma cena Manim é gerada automaticamente a partir dos passos da ficha, transformando a equação de cada passo na do seguinte e exibindo a justificativa. Os vídeos são produzidos na máquina de desenvolvimento e distribuídos como arquivos; o aplicativo do aluno não precisa do Manim. Só fichas `verificada` ganham vídeo, e o vídeo guarda a versão da ficha que o gerou.
 - **Gráficos interativos**: o bloco `grafico` e o campo `animacao` da ficha descrevem, de forma declarativa, a expressão, a variável do eixo e os parâmetros com controle deslizante. Os pontos são calculados pelo motor em lote e desenhados em Canvas.
 
+### 9.4 Design visual (D-11)
+
+- **Princípio**: a tela serve à leitura da matemática. Pouco ruído, hierarquia clara, espaço generoso, nada que compita com a equação.
+- **Sistema de design próprio**: cores, tipografia, espaçamento, raios e componentes definidos como *tokens* num só lugar e usados por toda a interface; nenhuma cor ou medida solta no código das telas.
+- **Claro e escuro**: os dois temas são projetados juntos, com a mesma hierarquia, e não um derivado do outro. O padrão segue o tema do Windows, com troca manual; impressão e PDF usam sempre o claro.
+- **Tipografia**: fonte de interface legível em tamanhos pequenos; matemática em KaTeX com a fonte que combina com o texto; algarismos tabulares nas tabelas de valores.
+- **Contraste e acessibilidade**: texto com contraste mínimo de 4,5:1 (WCAG AA) nos dois temas, 3:1 para elementos gráficos; selos e estados nunca só por cor; foco de teclado sempre visível; animações reduzidas quando o Windows pede.
+- **Revisão**: cada tela nova passa por revisão visual de Ruan nos dois modos antes de entrar numa versão.
+
 ## 10. Roteiro, riscos e pontos em aberto
 
 Cada fase termina quando seus critérios de aceite passam na integração contínua; nenhuma fase começa com a anterior em vermelho.
@@ -658,7 +673,7 @@ Cada fase termina quando seus critérios de aceite passam na integração contí
 | Fase | Entrega | Critérios de aceite |
 | --- | --- | --- |
 | 1A · Fundação | `expr`, `units`, `verify`, `i18n`; analisador de LaTeX restrito; versões travadas | Ida e volta LaTeX → árvore → LaTeX estável em 200 expressões; suíte “verificador sob ataque” reprova 100% dos passos errados e aprova 100% dos certos |
-| 1B · Isolar | `rules`, `steps` (isolar), API, folha mínima com equação, resolução e tabela de variáveis | Corpus de 60 equações: toda variável isolada com passos ou recusada corretamente; zero passo exibido sem certificado; testes de propriedade com 10 000 casos sem falha de V2 |
+| 1B · Isolar | `rules`, `steps` (isolar), API, sistema de design (D-11), folha mínima com equação, resolução e tabela de variáveis, primeiro executável | Corpus de 60 equações: toda variável isolada com passos ou recusada corretamente; zero passo exibido sem certificado; testes de propriedade com 10 000 casos sem falha de V2; folha aprovada por Ruan nos modos claro e escuro |
 | 2 · Biblioteca | Esquema de ficha, glossário, hipóteses, fontes; as 5 fichas-modelo; depois as demais | 5 fichas-modelo em `verificada`; corpus da biblioteca verde; cada ficha nova só entra com V1 a V6 aprovadas |
 | 3A · Cálculo | Integrais, derivadas e EDOs com passos | Os 6 padrões da seção 4.3 e os 3 casos de EDO da 4.5 com passos e V3/V4 aprovadas; checagem de dependências cobre os casos de C\_p e de ∫V dP |
 | 3B · Propriedades | `props`, `interp`, blocos de propriedade e interpolação; biblioteca de propriedades dos livros (esquema, importador, seletor de origem e primeiro pacote) | Pontos de verificação da IAPWS reproduzidos; avisos de fase, faixa e extrapolação testados; comparação interpolado × calculado funcionando; um pacote de livro completo transcrito, conferido e comparado com a origem calculada |
@@ -697,3 +712,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | --- | --- | --- |
 | 1.0 | 13/11/2026 | Versão inicial, com as decisões D-01 a D-08 e T-01 a T-06; revisada no mesmo dia (ordem de dependência dos módulos, licenças, campos de símbolo e de passo, critério numérico e independência do verificador, etapa automática de V6). Versão 1.1, na mesma data: D-09 (última edição de cada fonte, seção 8.1) e D-10 (biblioteca de propriedades dos livros, seção 7.5). Versão 1.2, na mesma data, ao fechar a fase 1A: analisador próprio no lugar do Lark; operação declarada no passo; Lt e Le na árvore; substituições limitadas a restringe até a fase 2; zero compatível com qualquer dimensão (decisões 0001 e 0002 do repositório) |
 | 1.3 | 14/11/2026 | Revisão do verificador pelo Fable (revisão 0001) e correções (decisão 0003): verificador sobre a árvore do Amsior, obrigações de domínio, avaliador numérico próprio e contraprova sempre, estratos de magnitude e cobertura de ramos, objetos opacos, relação reduzida a `equivalente` e `implica` com `sob_hipotese` calculado, certificado auditável, verificação de cadeia, `sympy.ask` retirado (seções 3.2, 5.1 e 5.3) |
+| 1.4 | 14/11/2026 | D-11 (design visual como requisito, modos claro e escuro, seção 9.4); critério visual na fase 1B |
