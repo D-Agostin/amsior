@@ -1,41 +1,53 @@
 # Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
 """Teste de identidade entre duas expressões (seção 5.1).
 
-1. Simbólico: a diferença simplifica a zero sob as suposições dos símbolos.
-   Usa só transformações que provam; ``sympy.equals`` não é usado porque decide
-   por amostragem.
-2. Numérico: se o simbólico não concluir, avalia a diferença com mpmath a 50
-   dígitos em 20 pontos sorteados no domínio (suposições e condições). Resíduo
-   relativo abaixo de 1e-30 em todos os pontos aprova; um ponto acima reprova.
-   Um ponto em que só um dos lados existe nos reais também reprova: o passo
-   mudou o domínio. É evidência forte, não prova, e recebe selo próprio.
-3. Inconclusivo equivale a reprovado.
+Duas vias independentes, que rodam sempre:
+
+1. **Simbólica** (SymPy): a diferença simplifica a zero sob as suposições,
+   só com transformações que provam (``sympy.equals`` decide por amostragem e
+   não é usado). Uma diferença que simplifica a uma constante não nula é
+   refutação imediata.
+2. **Numérica** (avaliador próprio, ``amostragem.py``): não passa pelo SymPy.
+
+Decisão:
+
+* simbólica prova e a numérica não acha divergência → ``simbolico``;
+* simbólica prova e a numérica acha divergência → reprova
+  (``contraprova_divergente``: indica erro de conversão, como a variável
+  mantida constante perdida no SymPy);
+* simbólica não conclui → vale a numérica, com selo ``numerico``.
+
+Com condições declaradas, a via simbólica é pulada: ela só conhece as
+suposições dos símbolos, e a identidade depende das condições.
+
+Antes de tudo, os objetos que o verificador não calcula (``dominio.opacificar``)
+viram símbolos opacos dos dois lados.
 """
 
 from __future__ import annotations
 
-import hashlib
-import random
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
-import mpmath
 import sympy as sp
-from sympy.core.function import AppliedUndef
 
-DIGITOS = 50
-PONTOS = 20
-TENTATIVAS = 600
-LIMITE_RESIDUO = mpmath.mpf("1e-30")
+from amsior.expr.nos import Expr
+from amsior.expr.ponte_sympy import ParaSympy
+from amsior.expr.simbolos import TabelaDeSimbolos
+from amsior.verify.amostragem import ResultadoNumerico, comparar_numerico
+from amsior.verify.avaliador import Avaliador
+from amsior.verify.dominio import Opaco, opacificar
 
 
 @dataclass
 class ResultadoIdentidade:
     aprovado: bool
-    metodo: Literal["simbolico", "numerico"] | None
+    metodo: Literal["simbolico", "numerico", "estrutural"] | None
     motivo: str = ""
     residuo: float | None = None
+    numerico: ResultadoNumerico | None = None
+    opacos: dict[str, Opaco] = field(default_factory=dict)
 
 
 def _eh_zero(x: Any) -> bool:
@@ -57,134 +69,71 @@ _TRANSFORMACOES: tuple[Callable[[Any], Any], ...] = (
 )
 
 
-def identidade_simbolica(a: Any, b: Any) -> bool:
+def identidade_simbolica(a: Any, b: Any) -> Literal["prova", "refuta"] | None:
+    """'prova' se a − b ≡ 0; 'refuta' se a − b é uma constante não nula."""
     try:
         dif = sp.sympify(a - b).doit()
     except Exception:
-        return False
+        return None
     for f in _TRANSFORMACOES:
         try:
-            if _eh_zero(f(dif)):
-                return True
+            d = f(dif)
         except Exception:
             continue
-    return False
-
-
-# ---------------------------------------------------------------- numérico
-
-
-def _semente(*partes: Any) -> int:
-    h = hashlib.sha256("|".join(sp.srepr(p) for p in partes).encode()).hexdigest()
-    return int(h[:16], 16)
-
-
-def _atomizar(exprs: Sequence[Any]) -> tuple[list[Any], dict[Any, Any]]:
-    """Troca funções incógnitas e derivadas por símbolos fictícios consistentes."""
-    trocas: dict[Any, Any] = {}
-    contador = 0
-    for e in exprs:
-        alvos = sorted(
-            e.atoms(sp.Derivative) | e.atoms(AppliedUndef), key=sp.default_sort_key, reverse=True
-        )
-        for at in alvos:
-            if at not in trocas:
-                sup = {}
-                if isinstance(at, AppliedUndef):
-                    sup = {k: v for k, v in at._assumptions.items() if v is True and k in (
-                        "positive", "nonnegative", "nonzero", "real", "integer")}
-                trocas[at] = sp.Symbol(f"_amsior_{contador}", **(sup or {"real": True}))
-                contador += 1
-    return [e.xreplace(trocas) for e in exprs], trocas
-
-
-def _sortear(s: Any, rng: random.Random) -> mpmath.mpf:
-    mag = mpmath.mpf(10) ** mpmath.mpf(rng.uniform(-2, 2))
-    if s.is_integer:
-        n = rng.randint(1, 6)
-        return mpmath.mpf(n if s.is_nonnegative or s.is_positive else rng.choice([-1, 1]) * n)
-    if s.is_positive or s.is_nonnegative:
-        return mag
-    return mag * rng.choice([-1, 1])
-
-
-def _real_finito(v: Any) -> mpmath.mpf | None:
-    try:
-        if isinstance(v, mpmath.mpc):
-            if abs(v.imag) > mpmath.mpf(10) ** (-DIGITOS + 10) * max(1, abs(v.real)):
-                return None
-            v = v.real
-        v = mpmath.mpf(v)
-        if mpmath.isnan(v) or mpmath.isinf(v):
-            return None
-        return v
-    except Exception:
-        return None
-
-
-def _avaliar(f: Callable[..., Any], valores: list[mpmath.mpf]) -> mpmath.mpf | None:
-    try:
-        return _real_finito(f(*valores))
-    except (ZeroDivisionError, ValueError, OverflowError, TypeError):
-        return None
-
-
-def _condicao_ok(c: Callable[..., Any], valores: list[mpmath.mpf]) -> bool:
-    try:
-        return bool(c(*valores))
-    except Exception:
-        return False
-
-
-def identidade_numerica(a: Any, b: Any, condicoes: Sequence[Any] = ()) -> ResultadoIdentidade:
-    try:
-        (a2, b2, *conds), _ = _atomizar([sp.sympify(a).doit(), sp.sympify(b).doit(),
-                                         *[sp.sympify(c) for c in condicoes]])
-    except Exception:
-        return ResultadoIdentidade(False, None, "verif.identidade.nao_avaliavel")
-    if a2.atoms(sp.Integral) or b2.atoms(sp.Integral):
-        return ResultadoIdentidade(False, None, "verif.identidade.integral_nao_avaliada")
-    livres = sorted(a2.free_symbols | b2.free_symbols | set().union(
-        *[c.free_symbols for c in conds]), key=sp.default_sort_key)
-    with mpmath.workdps(DIGITOS):
+        if _eh_zero(d):
+            return "prova"
         try:
-            fa = sp.lambdify(livres, a2, modules="mpmath")
-            fb = sp.lambdify(livres, b2, modules="mpmath")
-            fc = [sp.lambdify(livres, c, modules="mpmath") for c in conds]
+            if d.is_number and not d.free_symbols and abs(sp.N(d, 80)) > sp.Float("1e-60", 80):
+                return "refuta"
         except Exception:
-            return ResultadoIdentidade(False, None, "verif.identidade.nao_avaliavel")
-        rng = random.Random(_semente(a2, b2, *conds))
-        validos = 0
-        pior = mpmath.mpf(0)
-        for _ in range(TENTATIVAS):
-            if validos >= PONTOS:
-                break
-            valores = [_sortear(s, rng) for s in livres]
-            if not all(_condicao_ok(c, valores) for c in fc):
-                continue
-            va, vb = _avaliar(fa, valores), _avaliar(fb, valores)
-            if va is None and vb is None:
-                continue
-            if va is None or vb is None:
-                return ResultadoIdentidade(False, None, "verif.identidade.dominio_diferente")
-            escala = max(abs(va), abs(vb), mpmath.mpf(1))
-            residuo = abs(va - vb) / escala
-            if residuo > LIMITE_RESIDUO:
-                return ResultadoIdentidade(
-                    False, None, "verif.identidade.residuo", float(residuo))
-            pior = max(pior, residuo)
-            validos += 1
-        if validos < PONTOS:
-            return ResultadoIdentidade(False, None, "verif.identidade.amostras_insuficientes")
-        return ResultadoIdentidade(True, "numerico", residuo=float(pior))
+            continue
+    return None
 
 
-def identicas(a: Any, b: Any, condicoes: Sequence[Any] = ()) -> ResultadoIdentidade:
-    """Identidade entre expressões SymPy: simbólica, senão numérica.
+@dataclass
+class Comparador:
+    """Compara expressões AmsiorExpr de um passo com uma tabela e um avaliador fixos."""
 
-    Com condições, a prova simbólica (que só usa as suposições dos símbolos) é
-    pulada: a identidade depende das condições e só a amostragem as respeita.
-    """
-    if not condicoes and identidade_simbolica(a, b):
-        return ResultadoIdentidade(True, "simbolico")
-    return identidade_numerica(a, b, condicoes)
+    tabela: TabelaDeSimbolos
+    semente: int = 0
+    avaliador: Avaliador = field(init=False)
+    conv: ParaSympy = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.avaliador = Avaliador(self.tabela, self.semente)
+        self.conv = ParaSympy(self.tabela)
+
+    def comparar(self, esperado: Expr, obtido: Expr,
+                 condicoes: Sequence[Expr] = ()) -> ResultadoIdentidade:
+        if esperado == obtido:
+            return ResultadoIdentidade(True, "estrutural")
+        oe, oo = opacificar(esperado, self.tabela), opacificar(obtido, self.tabela)
+        opacos = {**oe.opacos, **oo.opacos}
+        simb = None
+        if not condicoes:
+            try:
+                simb = identidade_simbolica(self.conv(oe.expr), self.conv(oo.expr))
+            except Exception:
+                simb = None
+        if simb == "refuta":
+            return ResultadoIdentidade(False, None, "verif.identidade.diferenca_constante",
+                                       opacos=opacos)
+        num = comparar_numerico(oe.expr, oo.expr, self.tabela, self.avaliador, list(condicoes),
+                                originais=(esperado, obtido))
+        if simb == "prova":
+            if not num.aprovado and num.motivo in ("verif.identidade.residuo",
+                                                   "verif.identidade.dominio_inconsistente"):
+                return ResultadoIdentidade(False, None, "verif.identidade.contraprova_divergente",
+                                           num.pior_residuo, num, opacos)
+            return ResultadoIdentidade(True, "simbolico", residuo=num.pior_residuo,
+                                       numerico=num, opacos=opacos)
+        if num.aprovado:
+            return ResultadoIdentidade(True, "numerico", residuo=num.pior_residuo, numerico=num,
+                                       opacos=opacos)
+        return ResultadoIdentidade(False, None, num.motivo, num.pior_residuo, num, opacos)
+
+
+def identicas(a: Expr, b: Expr, tabela: TabelaDeSimbolos,
+              condicoes: Sequence[Expr] = ()) -> ResultadoIdentidade:
+    """Atalho: identidade entre duas AmsiorExpr."""
+    return Comparador(tabela).comparar(a, b, condicoes)

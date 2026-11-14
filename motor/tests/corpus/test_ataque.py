@@ -38,12 +38,14 @@ def test_passos_certos_sao_aprovados(caso: Caso, tabs: dict[str, TabelaDeSimbolo
                                      glossario: Glossario) -> None:
     cert = certificar(montar(caso, tabs[caso.tabela]), tabs[caso.tabela], glossario)
     assert cert.estado == "aprovado", [m.texto() for m in cert.motivos]
+    assert cert.sob_hipotese == caso.sob_hipotese, [h.texto() for h in cert.hipoteses]
 
 
 @pytest.mark.parametrize("caso", ERRADOS, ids=_ids(ERRADOS))
 def test_passos_errados_sao_reprovados_pelo_motivo_certo(
         caso: Caso, tabs: dict[str, TabelaDeSimbolos], glossario: Glossario) -> None:
-    cert = certificar(montar(caso, tabs[caso.tabela]), tabs[caso.tabela], glossario)
+    cert = certificar(montar(caso, tabs[caso.tabela]), tabs[caso.tabela], glossario,
+                      caso.contexto)  # type: ignore[arg-type]
     assert cert.estado == "reprovado"
     chaves = [m.chave for m in cert.motivos]
     assert caso.motivo in chaves, [m.texto() for m in cert.motivos]
@@ -54,7 +56,8 @@ def test_passos_errados_sao_reprovados_pelo_motivo_certo(
 @pytest.mark.parametrize("caso", PENDENTES, ids=_ids(PENDENTES))
 def test_passos_de_principio_ficam_pendentes(caso: Caso, tabs: dict[str, TabelaDeSimbolos],
                                              glossario: Glossario) -> None:
-    cert = certificar(montar(caso, tabs[caso.tabela]), tabs[caso.tabela], glossario)
+    cert = certificar(montar(caso, tabs[caso.tabela]), tabs[caso.tabela], glossario,
+                      caso.contexto)  # type: ignore[arg-type]
     assert cert.estado == "pendente"
     assert cert.metodo == "revisao_humana"
 
@@ -67,6 +70,6 @@ def test_resumo_da_suite(tabs: dict[str, TabelaDeSimbolos], glossario: Glossario
     errados = sum(
         certificar(montar(c, tabs[c.tabela]), tabs[c.tabela], glossario).estado == "reprovado"
         for c in ERRADOS)
-    assert len(CERTOS) >= 40 and len(ERRADOS) >= 30
+    assert len(CERTOS) >= 40 and len(ERRADOS) >= 60
     assert certos == len(CERTOS)
     assert errados == len(ERRADOS)

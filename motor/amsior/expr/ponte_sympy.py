@@ -70,7 +70,10 @@ class ParaSympy:
         if isinstance(e, Sqrt):
             return sp.sqrt(c(e.a))
         if isinstance(e, Root):
-            return sp.Pow(c(e.a), 1 / c(e.n))
+            n = c(e.n)
+            if n.is_integer and n.is_odd:  # raiz de índice ímpar é a real: ∛(−8) = −2
+                return sp.real_root(c(e.a), n)
+            return sp.Pow(c(e.a), 1 / n)
         if isinstance(e, Exp):
             return sp.exp(c(e.a))
         if isinstance(e, Ln):
@@ -89,6 +92,11 @@ class ParaSympy:
             s = self.tabela.obter(e.nome)
             sup = suposicoes_sympy(s.suposicoes) if s else {"real": True}
             return sp.Function(e.nome, **sup)(*[c(a) for a in e.args])
+        if isinstance(e, PDeriv) and e.mantidas:
+            # (∂H/∂T)_P não é Derivative(H, T): sem modelo da função de estado,
+            # vira um objeto opaco identificado pela própria notação
+            from amsior.expr.latex import para_latex
+            return sp.Symbol(para_latex(e), real=True)
         if isinstance(e, Deriv | PDeriv):
             return sp.Derivative(c(e.f), (self.simbolo(e.var.id), e.ordem))
         if isinstance(e, Integral):

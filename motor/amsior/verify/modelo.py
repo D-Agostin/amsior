@@ -10,13 +10,14 @@ from amsior.expr.json_io import de_json, para_json
 from amsior.expr.nos import Expr, Sym
 
 TipoPasso = Literal["algebra", "calculo", "substituicao", "principio", "aproximacao", "numerico"]
-Relacao = Literal["equivalente", "implica", "restringe"]
+Relacao = Literal["equivalente", "implica"]
 OrigemCondicao = Literal["suposicao", "hipotese"]
 Lado = Literal["esquerdo", "direito", "ambos"]
 MetodoCert = Literal["simbolico", "numerico", "revisao_humana"]
 EstadoCert = Literal["aprovado", "reprovado", "pendente"]
 
-RELACOES: tuple[Relacao, ...] = ("equivalente", "restringe", "implica")
+RELACOES: tuple[Relacao, ...] = ("equivalente", "implica")
+Contexto = Literal["motor", "ficha"]
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,8 @@ class Operacao:
     lado: Lado | None = None
     simbolo: Sym | None = None
     origem: Literal["definicao", "hipotese"] | None = None
+    identidade: bool = False
+    """Derivar ou integrar: a equação vale para todo valor da variável (hipótese exibida)."""
 
     def para_json(self) -> dict[str, Any]:
         return {
@@ -57,6 +60,7 @@ class Operacao:
             "lado": self.lado,
             "simbolo": None if self.simbolo is None else para_json(self.simbolo),
             "origem": self.origem,
+            "identidade": self.identidade,
         }
 
     @staticmethod
@@ -66,7 +70,7 @@ class Operacao:
         return Operacao(
             d["nome"],
             None if d.get("argumento") is None else de_json(d["argumento"]),
-            d.get("lado"), simb, d.get("origem"),
+            d.get("lado"), simb, d.get("origem"), bool(d.get("identidade", False)),
         )
 
 
@@ -88,12 +92,26 @@ class Motivo:
 
 @dataclass
 class Certificado:
+    """Resultado da verificação de um passo, com o que foi provado e como.
+
+    ``sob_hipotese`` é calculado pelo verificador, nunca declarado pelo passo:
+    vale quando a conta só fecha com alguma das ``hipoteses`` (condição
+    declarada, igualdade substituída, independência de variáveis assumida na
+    integral, equação declarada identidade). A relação do passo é lida sob
+    essas hipóteses, e o selo "Sob hipótese" as mostra.
+    """
+
     metodo: MetodoCert
     estado: EstadoCert
     motivos: list[Motivo] = field(default_factory=list)
     v1: str = "pendente"
     v5: str = "pendente"
     relacoes_permitidas: tuple[Relacao, ...] = ()
+    sob_hipotese: bool = False
+    hipoteses: list[Motivo] = field(default_factory=list)
+    exigencias: list[dict[str, str]] = field(default_factory=list)
+    amostragem: list[dict[str, Any]] = field(default_factory=list)
+    versoes: dict[str, str] = field(default_factory=dict)
 
     def para_json(self) -> dict[str, Any]:
         return {
@@ -101,6 +119,10 @@ class Certificado:
             "motivos": [{"chave": m.chave, "args": m.args} for m in self.motivos],
             "v1": self.v1, "v5": self.v5,
             "relacoes_permitidas": list(self.relacoes_permitidas),
+            "sob_hipotese": self.sob_hipotese,
+            "hipoteses": [{"chave": m.chave, "args": m.args} for m in self.hipoteses],
+            "exigencias": self.exigencias, "amostragem": self.amostragem,
+            "versoes": self.versoes,
         }
 
 

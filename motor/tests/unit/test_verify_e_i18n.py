@@ -17,33 +17,47 @@ from amsior.verify import Condicao, Operacao, Passo, Verificador, certificar, id
 PACOTE = Path(__file__).resolve().parents[2] / "amsior"
 
 
-def test_identidade_simbolica_e_numerica() -> None:
-    a, b = sp.symbols("a b", positive=True)
-    x = sp.Symbol("x", real=True)
-    assert identicas(sp.log(a * b), sp.log(a) + sp.log(b)).metodo == "simbolico"
-    r = identicas(sp.sqrt(x**2), x, [sp.Ge(x, 0)])
+def _tab_geral(g: Glossario) -> TabelaDeSimbolos:
+    return TabelaDeSimbolos.de([g.simbolo(s, "numero_adimensional") for s in "ab"]
+                               + [g.simbolo(s, "adimensional") for s in "xy"])
+
+
+def test_identidade_simbolica_e_numerica(glossario: Glossario) -> None:
+    tab = _tab_geral(glossario)
+    A = lambda s: analisar(s, tab)  # noqa: E731
+    assert identicas(A(r"\ln(ab)"), A(r"\ln a + \ln b"), tab).metodo == "simbolico"
+    r = identicas(A(r"\sqrt{x^2}"), A("x"), tab, [A(r"x \geq 0")])
     assert r.aprovado and r.metodo == "numerico"
-    assert not identicas(sp.sqrt(x**2), x).aprovado
-    assert not identicas(a + b, a * b).aprovado
+    assert not identicas(A(r"\sqrt{x^2}"), A("x"), tab).aprovado
+    assert not identicas(A("a + b"), A("ab"), tab).aprovado
 
 
-def test_mudanca_de_dominio_reprova() -> None:
-    x, y = sp.symbols("x y", real=True)
-    r = identicas(sp.log(x * y), sp.log(x) + sp.log(y))
-    assert not r.aprovado
+def test_contraprova_numerica_roda_mesmo_com_prova_simbolica(glossario: Glossario) -> None:
+    tab = _tab_geral(glossario)
+    r = identicas(analisar(r"\ln(ab)", tab), analisar(r"\ln a + \ln b", tab), tab)
+    assert r.numerico is not None and r.numerico.pontos >= 20
 
 
-def test_semente_fixa_resultado_reprodutivel() -> None:
-    x = sp.Symbol("x", real=True)
-    r1 = identicas(sp.sqrt(x**2), x, [sp.Ge(x, 0)])
-    r2 = identicas(sp.sqrt(x**2), x, [sp.Ge(x, 0)])
-    assert r1.residuo == r2.residuo
+def test_diferenca_constante_e_refutada_sem_amostragem(glossario: Glossario) -> None:
+    tab = _tab_geral(glossario)
+    r = identicas(analisar("x", tab), analisar("x + 10^{-31}", tab), tab)
+    assert not r.aprovado and r.motivo == "verif.identidade.diferenca_constante"
+
+
+def test_semente_fixa_resultado_reprodutivel(glossario: Glossario) -> None:
+    tab = _tab_geral(glossario)
+    A = lambda s: analisar(s, tab)  # noqa: E731
+    r1 = identicas(A(r"\sqrt{x^2}"), A("x"), tab, [A(r"x \geq 0")])
+    r2 = identicas(A(r"\sqrt{x^2}"), A("x"), tab, [A(r"x \geq 0")])
+    assert r1.numerico is not None and r2.numerico is not None
+    assert r1.numerico.auditoria() == r2.numerico.auditoria()
 
 
 def _tab_reator(g: Glossario) -> TabelaDeSimbolos:
     return TabelaDeSimbolos.de([
         g.simbolo("C_{A}", "concentracao_molar", depende_de=("t",)),
-        g.simbolo("C_{A0}", "concentracao_molar"), g.simbolo("k", "frequencia"),
+        g.simbolo("C_{A0}", "concentracao_molar", papel="parametro"),
+        g.simbolo("k", "frequencia", papel="parametro"),
         g.simbolo("t", "tempo"),
     ])
 
@@ -69,7 +83,7 @@ def test_v2_isolamento_algebrico(glossario: Glossario) -> None:
 def test_passo_serializa_e_volta(glossario: Glossario) -> None:
     tab = TabelaDeSimbolos.de([glossario.simbolo(s, "adimensional") for s in "xz"])
     passo = Passo(analisar("(x-1)z = x-1", tab), analisar("z = 1", tab),
-                  Operacao("dividir_ambos", analisar("x - 1", tab)), "restringe",
+                  Operacao("dividir_ambos", analisar("x - 1", tab)),
                   condicoes=(Condicao(analisar(r"x \neq 1", tab)),))
     certificar(passo, tab, glossario)
     dado = json.loads(json.dumps(passo.para_json()))
@@ -77,11 +91,15 @@ def test_passo_serializa_e_volta(glossario: Glossario) -> None:
     assert volta.antes == passo.antes and volta.depois == passo.depois
     assert volta.condicoes == passo.condicoes and volta.operacao == passo.operacao
     assert dado["certificado"]["estado"] == "aprovado"
+    assert dado["certificado"]["sob_hipotese"] is True
+    assert dado["certificado"]["versoes"]["sympy"] == sp.__version__
+    assert {"tipo": "dominio", "expressao": "x - 1", "predicado": "nao_nulo",
+            "atendida_por": "condicao"} in dado["certificado"]["exigencias"]
 
 
 # ------------------------------------------------------------ catálogo de textos
 
-_CHAVE = re.compile(r"""["']((?:erro|verif|predicado)\.[a-z_.]+)["']""")
+_CHAVE = re.compile(r"""["']((?:erro|verif|predicado|hipotese|origem)\.[a-z_.]+)["']""")
 
 
 def _chaves_usadas() -> set[str]:
@@ -94,14 +112,14 @@ def _chaves_usadas() -> set[str]:
 def test_toda_chave_usada_no_codigo_existe_em_pt_br() -> None:
     cat = catalogo(IDIOMA_PADRAO)
     faltando = {c for c in _chaves_usadas() if c not in cat and not c.endswith(".")}
-    faltando -= {"predicado."}
+    faltando -= {"predicado.", "origem."}
     assert not faltando, sorted(faltando)
 
 
 def test_catalogo_sem_chaves_orfas_de_erro() -> None:
     usadas = _chaves_usadas()
     cat = catalogo(IDIOMA_PADRAO)
-    orfas = {c for c in cat if c.startswith(("erro.", "verif.")) and c not in usadas}
+    orfas = {c for c in cat if c.startswith(("erro.", "verif.", "hipotese.")) and c not in usadas}
     assert not orfas, sorted(orfas)
 
 
@@ -112,12 +130,13 @@ def test_catalogo_em_ingles_nao_tem_campos_divergentes() -> None:
         assert campos(modelo) == campos(pt[chave]), chave
 
 
-def test_substituicao_declarada_definicao_ainda_nao_vira_equivalencia(glossario: Glossario) -> None:
-    """Sem a biblioteca (fase 2), a origem declarada não é conferível: no máximo 'restringe'."""
+def test_substituicao_e_sempre_hipotese_exibida(glossario: Glossario) -> None:
+    """Sem a biblioteca (fase 2), nem uma definição declarada é conferível: fica sob hipótese."""
     tab = TabelaDeSimbolos.de([glossario.simbolo(s, "energia") for s in ("H", "U", "Q")]
                               + [glossario.simbolo("P", "pressao_absoluta"),
                                  glossario.simbolo("V", "volume")])
     antes, depois = analisar("Q = H", tab), analisar("Q = U + PV", tab)
     op = Operacao("substituir", analisar("U + PV", tab), simbolo=Sym("H"), origem="definicao")
-    assert certificar(Passo(antes, depois, op), tab, glossario).estado == "reprovado"
-    assert certificar(Passo(antes, depois, op, "restringe"), tab, glossario).estado == "aprovado"
+    cert = certificar(Passo(antes, depois, op), tab, glossario)
+    assert cert.estado == "aprovado" and cert.sob_hipotese
+    assert [h.texto() for h in cert.hipoteses] == ["H = U + P V (definição)"]

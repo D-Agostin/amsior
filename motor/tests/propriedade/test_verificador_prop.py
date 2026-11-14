@@ -96,3 +96,51 @@ def test_passo_verdadeiro_aprova_e_adulterado_reprova(
 
 def test_numero_um_nao_quebra_a_estrategia() -> None:
     assert de_sympy(sp.Integer(1)) == Num("1")
+
+
+# ---------------------------------------------------------------- revisão 0001
+# Geradores das classes de erro que a suíte original não cobria: ramos longe
+# da origem, polos cancelados e escalas extremas.
+
+TAB_REV = TabelaDeSimbolos.de([G.simbolo("u", "numero_adimensional"),
+                               G.simbolo("x", "adimensional"),
+                               G.simbolo("z", "adimensional")])
+constantes = st.builds(lambda m, e: f"{m}" + "0" * e, st.integers(11, 99), st.integers(0, 7))
+
+
+def _passo(antes: str, depois: str, op: str = "reescrever", relacao: str = "equivalente",
+           condicoes: tuple[str, ...] = ()) -> Passo:
+    from amsior.expr import analisar
+    from amsior.verify import Condicao
+    A = lambda s: analisar(s, TAB_REV)  # noqa: E731
+    return Passo(A(antes), A(depois), Operacao(op), relacao,  # type: ignore[arg-type]
+                 condicoes=tuple(Condicao(A(c)) for c in condicoes))
+
+
+@settings(max_examples=25, deadline=None)
+@given(constantes, st.sampled_from(["u", "x"]))
+def test_ramo_de_modulo_longe_da_origem(c: str, v: str) -> None:
+    errado = certificar(_passo(rf"|{v} - {c}| = z", rf"{c} - {v} = z"), TAB_REV, G)
+    assert errado.estado == "reprovado"
+    certo = certificar(_passo(rf"|{v} - {c}| = z", rf"{c} - {v} = z",
+                              condicoes=(rf"{v} \leq {c}",)), TAB_REV, G)
+    assert certo.estado == "aprovado" and certo.sob_hipotese
+
+
+@settings(max_examples=25, deadline=None)
+@given(constantes)
+def test_polo_cancelado_so_implica(c: str) -> None:
+    antes, depois = rf"\frac{{(x - {c}) z}}{{x - {c}}} = u", "z = u"
+    assert certificar(_passo(antes, depois), TAB_REV, G).estado == "reprovado"
+    assert certificar(_passo(antes, depois, relacao="implica"), TAB_REV, G).estado == "aprovado"
+    assert certificar(_passo(depois, antes, relacao="implica"), TAB_REV, G).estado == "reprovado"
+
+
+@settings(max_examples=25, deadline=None)
+@given(st.integers(2, 9), st.integers(20, 80))
+def test_escalas_extremas(m: int, e: int) -> None:
+    antes = rf"{m} \cdot 10^{{-{e}}} u = z"
+    certo = certificar(_passo(antes, rf"u \cdot {m} \cdot 10^{{-{e}}} = z"), TAB_REV, G)
+    assert certo.estado == "aprovado"
+    errado = certificar(_passo(antes, rf"{m + 1} \cdot 10^{{-{e}}} u = z"), TAB_REV, G)
+    assert errado.estado == "reprovado"

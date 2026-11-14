@@ -6,8 +6,10 @@
   decisão 0002 e seções 3.2 e 5 da especificação, no commit `e22c20a`
 - Método: leitura do código e tentativa de construir passos errados que o
   verificador aprove
-- Evidência: `motor/tests/corpus/test_revisao_fable.py` (35 casos, todos
-  reproduzem a falha)
+- Evidência: 35 casos que reproduziam as falhas, hoje em
+  `motor/tests/corpus/passos_ataque.py` (`ERRADOS_REVISAO`) e
+  `motor/tests/corpus/test_revisao_fable.py` (camada V2)
+- Estado: **corrigida** em 14/11/2026 (decisão 0003); ver o fim do relatório
 
 ## Parecer
 
@@ -245,3 +247,33 @@ Critério de aceite da correção: os 35 casos de `test_revisao_fable.py` passam
 ser reprovados (retirar as marcas `xfail`), os 41 passos certos da suíte de
 ataque continuam aprovados, e o teste de propriedade ganha geradores para
 ramos, polos e escalas extremas.
+
+## Estado das correções (14/11/2026)
+
+Todas corrigidas na decisão 0003, com os 35 casos reprovados pelo motivo
+esperado e os 41 passos certos da suíte de ataque ainda aprovados.
+
+| Achado | Correção | Motivo que aparece |
+| --- | --- | --- |
+| A1 | parcial com variável mantida vira objeto opaco | `lado_nao_confere` |
+| A2 | derivada sem dependência declarada vira objeto opaco | `dependencia_nao_declarada` |
+| A3 | derivar/integrar exige identidade; integral indefinida opaca | `equacao_nao_e_identidade`, `integral_indefinida` |
+| A4 | estratos de 10⁻⁹ a 10⁹ e cobertura de ramos | `lado_nao_confere` |
+| A5 | resíduo relativo sem piso; diferença constante refutada | `lado_nao_confere` |
+| A6 | obrigações de domínio na árvore; V2 confere o domínio | `relacao_otimista`, `condicao_ausente`, `dominio_vazio`, `solucao_fora_do_dominio` |
+| A7 | expoente ≠ 0 para equivalência; índice inteiro ≥ 2 | `relacao_otimista`, `indice_invalido` |
+| A8 | desigualdades recusadas | `desigualdade_nao_suportada` |
+| A9 | substituição recursiva e condições insatisfazíveis | `substituicao_recursiva`, `condicoes_insatisfativeis` |
+| A10 | erro interno vira reprovação; argumento e variável ligada conferidos | `argumento_invalido`, `substituicao_variavel_ligada`, `erro_interno` |
+| A11 | relação em dois eixos; `sob_hipotese` calculado | (modelo; especificação v1.3) |
+| A12 | `certificar_cadeia`: continuidade, composição, hipóteses | `cadeia_descontinua`; V2 por candidata na 1B |
+| A13 | avaliador próprio em mpmath; contraprova sempre | `contraprova_divergente` |
+| A14 | `principio` e `aproximacao` só com `contexto="ficha"` | `principio_fora_de_ficha` |
+| A15 | certificado com exigências, amostragem e versões | — |
+
+Achado novo durante a correção: o `sympy.ask` 1.14 prova "`−a > 0` dado
+`a ≠ 0`". O verificador da 1A o usava em `_implicada`; foi retirado
+(decisão 0003, item 3).
+
+O teste de propriedade ganhou geradores de ramos longe da origem, polos
+cancelados e escalas de 10⁻²⁰ a 10⁻⁸⁰.

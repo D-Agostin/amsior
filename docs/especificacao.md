@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-Nov 13, 2026 · @Ruan
+Nov 13, 2026 · @Ruan · v1.3 em 14/11/2026
 
 Esta especificação fecha a arquitetura do Amsior v1: um aplicativo local para Windows, com motor em Python e interface web, organizado como folha de cálculo, em que todo passo exibido é verificado por máquina antes de aparecer. As fases 1 a 4 seguem este documento como roteiro; mudar uma decisão daqui exige registrar a mudança na seção 10.
 
@@ -137,7 +137,7 @@ A expressão é uma árvore JSON que preserva exatamente a forma escrita: `a - b
 
 ### 3.2 Passo
 
-Motor e demonstrações curadas produzem o mesmo registro, julgado pelo mesmo verificador. Além de regra, o passo traz operacao (nome, argumento, lado, símbolo e origem), que o verificador refaz pela sua própria tabela (decisão 0002).
+Motor e demonstrações curadas produzem o mesmo registro, julgado pelo mesmo verificador. Além de regra, o passo traz operacao (nome, argumento, lado, símbolo, origem e, para derivar ou integrar, a declaração de identidade), que o verificador refaz pela sua própria tabela (decisões 0002 e 0003).
 
 ```json
 {
@@ -149,19 +149,23 @@ Motor e demonstrações curadas produzem o mesmo registro, julgado pelo mesmo ve
   "parametros": {"divisor": "..."},
   "justificativa": {"chave": "regra.dividir_ambos_lados", "args": {"divisor": "R T"}},
   "relacao": "equivalente",
-  "condicoes": [{"expr": {"Ne": ["...", "0"]}, "origem": "suposicao", "satisfeita": true}],
-  "certificado": {"metodo": "simbolico", "estado": "aprovado", "detalhe": "..."}, "subpassos": []
+  "condicoes": [{"expr": {"Ne": ["...", "0"]}, "origem": "hipotese", "satisfeita": null}],
+  "certificado": {"metodo": "simbolico", "estado": "aprovado", "sob_hipotese": true,
+                  "hipoteses": ["..."], "exigencias": ["..."], "amostragem": ["..."],
+                  "versoes": {"sympy": "1.14.0", "mpmath": "1.3.0"}},
+  "subpassos": []
 }
 ```
 
 | Campo | Valores |
 | --- | --- |
 | `tipo` | `algebra`, `calculo`, `substituicao`, `principio`, `aproximacao`, `numerico` |
-| `relacao` | `equivalente` (⇔), `implica` (⇒, pode criar raízes estranhas), `restringe` (vale sob condição nova) |
+| `relacao` | `equivalente` (⇔) ou `implica` (⇒, pode criar raízes estranhas), sempre lida sob as hipóteses do passo |
+| `certificado.sob_hipotese` | calculado pelo verificador: a conta só fecha com alguma hipótese (condição declarada, igualdade substituída, variável tratada como constante numa integral, equação declarada identidade), listada em `hipoteses` |
 | `certificado.metodo` | `simbolico`, `numerico`, `revisao_humana` |
 | `certificado.estado` | `aprovado`, `reprovado`, `pendente` |
 
-Os tipos `principio` (invocar a 1ª lei, um balanço) e `aproximacao` (desprezar um termo) só existem em demonstrações curadas e sempre exigem `revisao_humana`.
+Os tipos `principio` (invocar a 1ª lei, um balanço) e `aproximacao` (desprezar um termo) só existem em demonstrações curadas e sempre exigem `revisao_humana`; vindos do motor, reprovam.
 
 ### 3.3 Folha (`.amsior`)
 
@@ -248,7 +252,7 @@ Cada regra do catálogo declara:
 - `id` e `tipo` (álgebra, cálculo);
 - **aplicabilidade**: padrão estrutural que a expressão precisa ter;
 - **transformação**: função pura AmsiorExpr → AmsiorExpr, que mexe só no que a regra descreve;
-- **relação** (equivalente, implica, restringe) e **condições** geradas (divisor não nulo, argumento de logaritmo positivo);
+- **relação** (equivalente, implica) e **condições** geradas (divisor não nulo, argumento de logaritmo positivo);
 - **operação declarada**, em forma que o verificador consegue refazer sozinho (seção 5.1);
 - **justificativa**: chave no catálogo de textos, em versão curta (“Dividindo ambos os lados por R·T”) e longa (com o motivo: “para desfazer a multiplicação que acompanha P”);
 - `fundivel`: se o passo pode ser fundido ao vizinho no modo resumido.
@@ -281,7 +285,7 @@ Uma condição é confrontada com as suposições dos símbolos. Se já está ga
 | ln u = B | Exponencial | Equivalente |
 | log\_b u = B | u = b^B | Equivalente |
 | \|u\| = B | u = ±B | Exige B ≥ 0 |
-| sen u = B (e análogas) | Função inversa, ramo principal | Restringe; aviso de periodicidade |
+| sen u = B (e análogas) | Função inversa, ramo principal | Sob hipótese; aviso de periodicidade |
 
 ### 4.3 Integrais
 
@@ -338,13 +342,17 @@ A conformidade é garantida por sete camadas independentes; um passo só aparece
 
 ### 5.1 Teste de identidade (V1)
 
-Para certificar que duas expressões A e B são idênticas, o verificador tenta, em ordem:
+O verificador trabalha na árvore do Amsior; o SymPy só entra na via simbólica (decisão 0003). Para certificar que duas expressões A e B são idênticas, duas vias independentes rodam sempre:
 
-1. **Simbólico**: `simplify(A − B) == 0` sob as suposições dos símbolos, com variantes (`expand`, `factor`, `logcombine`, `powsimp`, `trigsimp`). Sucesso dá certificado `simbolico`.
-2. **Numérico**: se o simbólico for inconclusivo, avalia A − B com mpmath a 50 dígitos em 20 pontos sorteados dentro do domínio permitido pelas suposições e condições. Resíduo relativo abaixo de 10⁻³⁰ em todos os pontos dá certificado `numerico`, exibido com selo próprio. Um único ponto acima do limite reprova. É evidência forte, não prova, e por isso tem selo distinto.
-3. **Inconclusivo** equivale a reprovado.
+1. **Simbólica**: `simplify(A − B) == 0` sob as suposições dos símbolos, com variantes (`expand`, `cancel`, `logcombine`, `powsimp`). Uma diferença que simplifica a constante não nula reprova.
+2. **Numérica**: avaliador próprio da árvore em mpmath, que não passa pelo SymPy. Sorteia 20 pontos dentro das suposições e condições, com magnitudes de 10⁻⁹ a 10⁹ em seis estratos e pontos perto dos números da expressão; avalia cada lado a 60 e 120 dígitos (240 se instável) e exige `|A − B| ≤ 10⁻³⁰·max(|A|, |B|)` mais o ruído medido. Subexpressões que escolhem ramo (argumento de módulo, `w` em `√(w²)`) precisam ser vistas com os dois sinais. Funções declaradas (`C_A(t)`) viram funções suaves sorteadas; derivadas e integrais definidas são calculadas numericamente.
+3. Simbólica prova e numérica confere: certificado `simbolico`. Simbólica prova e numérica diverge: reprovado (erro de conversão). Simbólica inconclusiva e numérica confere: certificado `numerico`, com selo próprio. Qualquer outro caso equivale a reprovado.
 
 A semente do sorteio é fixa por passo, para que o resultado seja reprodutível.
+
+Derivadas parciais com variáveis mantidas, derivadas de variáveis sem dependência declarada e integrais indefinidas viram objetos opacos, iguais dos dois lados: carregá-los é verificável, “calculá-los” reprova.
+
+**Domínio.** Cada nó que só existe em parte dos reais gera uma obrigação (denominador ≠ 0, argumento de ln > 0, radicando de raiz par ≥ 0, base de potência não inteira > 0, integrando definido no intervalo). Obrigação nova em “depois” exige condição declarada; obrigação de “antes” que some em “depois” limita a relação a `implica`; obrigação falsa com certeza reprova. V2 confere as obrigações da equação original na solução.
 
 Operações dos dois lados (somar, multiplicar, aplicar função) são certificadas lado a lado: o verificador aplica a operação declarada a cada lado de “antes” e exige identidade com o lado correspondente de “depois”. Reescritas de um lado só (fatorar, combinar logaritmos) exigem identidade direta. Substituições exigem identidade após aplicar a definição ou a ficha citada em `usa`.
 
@@ -362,7 +370,7 @@ O verificador mantém sua própria tabela de quais operações preservam a equiv
 | --- | --- |
 | Verificado | Certificado simbólico em V1 e aprovação em V5 |
 | Verificado numericamente | V1 por amostragem de alta precisão; V5 aprovada |
-| Sob hipótese | Passo válido sob condição não garantida pelas suposições, que é mostrada |
+| Sob hipótese | Passo válido só sob hipótese não garantida pelas suposições (condição, igualdade substituída, variável constante numa integral), que é mostrada; calculado pelo verificador |
 | Revisado | Passo de princípio ou aproximação, aprovado em V7 |
 
 ### 5.4 Suíte de testes
@@ -688,3 +696,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | Versão | Data | Mudança |
 | --- | --- | --- |
 | 1.0 | 13/11/2026 | Versão inicial, com as decisões D-01 a D-08 e T-01 a T-06; revisada no mesmo dia (ordem de dependência dos módulos, licenças, campos de símbolo e de passo, critério numérico e independência do verificador, etapa automática de V6). Versão 1.1, na mesma data: D-09 (última edição de cada fonte, seção 8.1) e D-10 (biblioteca de propriedades dos livros, seção 7.5). Versão 1.2, na mesma data, ao fechar a fase 1A: analisador próprio no lugar do Lark; operação declarada no passo; Lt e Le na árvore; substituições limitadas a restringe até a fase 2; zero compatível com qualquer dimensão (decisões 0001 e 0002 do repositório) |
+| 1.3 | 14/11/2026 | Revisão do verificador pelo Fable (revisão 0001) e correções (decisão 0003): verificador sobre a árvore do Amsior, obrigações de domínio, avaliador numérico próprio e contraprova sempre, estratos de magnitude e cobertura de ramos, objetos opacos, relação reduzida a `equivalente` e `implica` com `sob_hipotese` calculado, certificado auditável, verificação de cadeia, `sympy.ask` retirado (seções 3.2, 5.1 e 5.3) |

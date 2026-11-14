@@ -1,137 +1,132 @@
 # Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
 """Tabela própria do verificador: o que cada operação faz e quando preserva a equivalência.
 
-Esta tabela é independente do catálogo de regras do motor de passos. Um passo
-cuja relação ou cujas condições sejam mais otimistas do que esta tabela
-permite é reprovado, mesmo que a conta esteja certa.
+Esta tabela é independente do catálogo de regras do motor de passos. Cada
+operação monta, na árvore AmsiorExpr, o resultado esperado de aplicá-la aos
+dois lados; o domínio desse resultado (divisor ≠ 0, argumento de ln > 0...)
+sai das obrigações de domínio da própria árvore (``dominio.py``).
 
-Dois tipos de exigência:
+A tabela declara só o que o domínio não mostra: as exigências de
+**equivalência**. Sem elas a operação vale, mas num sentido só
+(multiplicar por algo que pode ser zero, elevar ao quadrado, elevar a zero),
+e a relação máxima é ``implica``.
 
-* ``dominio``: sem ela a operação nem está definida (dividir por zero, ln de
-  não positivo). Se não for garantida pelas suposições nem declarada, o passo
-  é reprovado.
-* ``equivalencia``: sem ela a operação vale, mas só num sentido (multiplicar
-  por algo que pode ser zero, elevar ao quadrado). Se não for garantida, a
-  relação máxima é ``implica``.
+Argumentos inválidos (índice de raiz que não é inteiro ≥ 2, variável de
+derivação que não é símbolo) reprovam o passo.
 """
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Literal
 
-import sympy as sp
-
-Predicado = Literal["nao_nulo", "positivo", "nao_negativo"]
+from amsior.expr.nos import (
+    Add, Deriv, Div, Exp, Expr, Integral, Ln, Log, Mul, Num, Pow, Root, Sqrt, Sub, Sym,
+)
+from amsior.verify.arvore import fracao_exata
+from amsior.verify.dominio import Predicado
 
 
 @dataclass(frozen=True)
 class Exigencia:
-    expr: Any
+    expr: Expr
     predicado: Predicado
-    tipo: Literal["dominio", "equivalencia"]
 
 
 @dataclass
 class EfeitoOperacao:
-    esquerdo: Any
-    direito: Any
+    esquerdo: Expr
+    direito: Expr
     relacao_base: Literal["equivalente", "implica"] = "equivalente"
     exigencias: list[Exigencia] = field(default_factory=list)
+    erro: str | None = None  # chave do motivo, se o argumento é inválido
 
 
-def _inteiro_impar(k: Any) -> bool:
-    return bool(k.is_integer and k.is_odd)
+def _somar(L: Expr, R: Expr, a: Expr | None) -> EfeitoOperacao:
+    assert a is not None
+    return EfeitoOperacao(Add((L, a)), Add((R, a)))
 
 
-def _inteiro_par(k: Any) -> bool:
-    return bool(k.is_integer and k.is_even)
+def _subtrair(L: Expr, R: Expr, a: Expr | None) -> EfeitoOperacao:
+    assert a is not None
+    return EfeitoOperacao(Sub(L, a), Sub(R, a))
 
 
-def _somar(L: Any, R: Any, a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(L + a, R + a)
+def _multiplicar(L: Expr, R: Expr, a: Expr | None) -> EfeitoOperacao:
+    assert a is not None
+    return EfeitoOperacao(Mul((L, a)), Mul((R, a)), exigencias=[Exigencia(a, "nao_nulo")])
 
 
-def _subtrair(L: Any, R: Any, a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(L - a, R - a)
+def _dividir(L: Expr, R: Expr, a: Expr | None) -> EfeitoOperacao:
+    assert a is not None
+    return EfeitoOperacao(Div(L, a), Div(R, a))
 
 
-def _multiplicar(L: Any, R: Any, a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(L * a, R * a, exigencias=[Exigencia(a, "nao_nulo", "equivalencia")])
-
-
-def _dividir(L: Any, R: Any, a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(L / a, R / a, exigencias=[Exigencia(a, "nao_nulo", "dominio")])
-
-
-def _elevar(L: Any, R: Any, k: Any) -> EfeitoOperacao:
-    ef = EfeitoOperacao(sp.Pow(L, k), sp.Pow(R, k))
-    if _inteiro_impar(k) and k.is_positive:
-        return ef
-    if _inteiro_par(k) and k.is_positive:
-        ef.exigencias = [Exigencia(L, "nao_negativo", "equivalencia"),
-                         Exigencia(R, "nao_negativo", "equivalencia")]
-        return ef
-    if k.is_integer and k.is_negative:
-        ef.exigencias = [Exigencia(L, "nao_nulo", "dominio"), Exigencia(R, "nao_nulo", "dominio")]
-        if _inteiro_par(k):
-            ef.exigencias += [Exigencia(L, "nao_negativo", "equivalencia"),
-                              Exigencia(R, "nao_negativo", "equivalencia")]
-        return ef
-    pred: Predicado = "positivo" if (k.is_negative or not k.is_number) else "nao_negativo"
-    ef.exigencias = [Exigencia(L, pred, "dominio"), Exigencia(R, pred, "dominio")]
+def _elevar(L: Expr, R: Expr, k: Expr | None) -> EfeitoOperacao:
+    assert k is not None
+    ef = EfeitoOperacao(Pow(L, k), Pow(R, k))
+    q = fracao_exata(k)
+    if q is None:  # expoente simbólico: t ↦ tᵏ só é injetora se k ≠ 0
+        ef.exigencias = [Exigencia(k, "nao_nulo")]
+    elif q == 0:
+        ef.exigencias = [Exigencia(Num("0"), "nao_nulo")]  # falsa: só implica
+    elif q.denominator == 1 and int(q) % 2 == 0:
+        ef.exigencias = [Exigencia(L, "nao_negativo"), Exigencia(R, "nao_negativo")]
     return ef
 
 
-def _raiz(L: Any, R: Any, n: Any) -> EfeitoOperacao:
-    if _inteiro_impar(n):
-        return EfeitoOperacao(sp.real_root(L, n), sp.real_root(R, n))
-    return EfeitoOperacao(
-        sp.root(L, n), sp.root(R, n),
-        exigencias=[Exigencia(L, "nao_negativo", "dominio"), Exigencia(R, "nao_negativo", "dominio")],
-    )
+def _raiz(L: Expr, R: Expr, n: Expr | None) -> EfeitoOperacao:
+    assert n is not None
+    q = fracao_exata(n)
+    if q is None or q.denominator != 1 or q < 2:
+        return EfeitoOperacao(L, R, erro="verif.indice_invalido")
+    if q == 2:
+        return EfeitoOperacao(Sqrt(L), Sqrt(R))
+    return EfeitoOperacao(Root(L, n), Root(R, n))
 
 
-def _ln(L: Any, R: Any, _a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(sp.log(L), sp.log(R), exigencias=[
-        Exigencia(L, "positivo", "dominio"), Exigencia(R, "positivo", "dominio")])
+def _ln(L: Expr, R: Expr, _a: Expr | None) -> EfeitoOperacao:
+    return EfeitoOperacao(Ln(L), Ln(R))
 
 
-def _log(L: Any, R: Any, base: Any) -> EfeitoOperacao:
-    b = base if base is not None else sp.Integer(10)
-    return EfeitoOperacao(sp.log(L, b), sp.log(R, b), exigencias=[
-        Exigencia(L, "positivo", "dominio"), Exigencia(R, "positivo", "dominio"),
-        Exigencia(b, "positivo", "dominio"), Exigencia(b - 1, "nao_nulo", "dominio")])
+def _log(L: Expr, R: Expr, base: Expr | None) -> EfeitoOperacao:
+    b = base if base is not None else Num("10")
+    return EfeitoOperacao(Log(L, b), Log(R, b))
 
 
-def _exp(L: Any, R: Any, _a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(sp.exp(L), sp.exp(R))
+def _exp(L: Expr, R: Expr, _a: Expr | None) -> EfeitoOperacao:
+    return EfeitoOperacao(Exp(L), Exp(R))
 
 
-def _reciproco(L: Any, R: Any, _a: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(1 / L, 1 / R, exigencias=[
-        Exigencia(L, "nao_nulo", "dominio"), Exigencia(R, "nao_nulo", "dominio")])
+def _reciproco(L: Expr, R: Expr, _a: Expr | None) -> EfeitoOperacao:
+    return EfeitoOperacao(Div(Num("1"), L), Div(Num("1"), R))
 
 
-def _trocar(L: Any, R: Any, _a: Any) -> EfeitoOperacao:
+def _trocar(L: Expr, R: Expr, _a: Expr | None) -> EfeitoOperacao:
     return EfeitoOperacao(R, L)
 
 
-def _reescrever(L: Any, R: Any, _a: Any) -> EfeitoOperacao:
+def _reescrever(L: Expr, R: Expr, _a: Expr | None) -> EfeitoOperacao:
     return EfeitoOperacao(L, R)
 
 
-def _derivar(L: Any, R: Any, v: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(sp.Derivative(L, v), sp.Derivative(R, v), "implica")
+def _derivar(L: Expr, R: Expr, v: Expr | None) -> EfeitoOperacao:
+    if not isinstance(v, Sym) or v.id in ("\\pi", "\\infty"):
+        return EfeitoOperacao(L, R, erro="verif.argumento_invalido")
+    return EfeitoOperacao(Deriv(L, v), Deriv(R, v), "implica")
 
 
-def _integrar(L: Any, R: Any, v: Any) -> EfeitoOperacao:
-    return EfeitoOperacao(sp.Integral(L, v), sp.Integral(R, v), "implica")
+def _integrar(L: Expr, R: Expr, v: Expr | None) -> EfeitoOperacao:
+    if not isinstance(v, Sym) or v.id in ("\\pi", "\\infty"):
+        return EfeitoOperacao(L, R, erro="verif.argumento_invalido")
+    return EfeitoOperacao(Integral(L, v), Integral(R, v), "implica")
 
+
+Funcao = Callable[[Expr, Expr, Expr | None], EfeitoOperacao]
 
 # nome → (função, exige argumento)
-OPERACOES: dict[str, tuple[Callable[[Any, Any, Any], EfeitoOperacao], bool]] = {
+OPERACOES: dict[str, tuple[Funcao, bool]] = {
     "somar_ambos": (_somar, True),
     "subtrair_ambos": (_subtrair, True),
     "multiplicar_ambos": (_multiplicar, True),
@@ -144,7 +139,9 @@ OPERACOES: dict[str, tuple[Callable[[Any, Any, Any], EfeitoOperacao], bool]] = {
     "reciproco_ambos": (_reciproco, False),
     "trocar_lados": (_trocar, False),
     "reescrever": (_reescrever, False),
-    "substituir": (_reescrever, False),
+    "substituir": (_reescrever, True),
     "derivar_ambos": (_derivar, True),
     "integrar_ambos": (_integrar, True),
 }
+
+OPERACOES_DE_CALCULO = frozenset({"derivar_ambos", "integrar_ambos"})
