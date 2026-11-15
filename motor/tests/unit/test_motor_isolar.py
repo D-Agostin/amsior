@@ -107,3 +107,19 @@ def test_tipo_da_equacao(latex: str, alvo: str, chave: str, tab: TabelaDeSimbolo
 def test_resultado_traz_o_tipo(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
     r = isolar(analisar("PV = nRT", tab), Sym("T"), tab, glossario)
     assert r.tipo is not None and r.tipo.chave == "tipo.polinomial_1"
+
+
+def test_eliminar_denominador_sem_zero_carregado(glossario: Glossario) -> None:
+    """CSTR de 1ª ordem: multiplicar "... = 0" pelo denominador deixa o lado direito 0
+    (nada de "0(τk + 1)" e de subtrair zero depois), e o fator aparece como na equação."""
+    g = glossario
+    tab = TabelaDeSimbolos.de([g.simbolo("X", "conversao"),
+                               g.simbolo("k", "constante_velocidade_primeira_ordem"),
+                               g.simbolo("\\tau", "tempo_espacial")])
+    r = isolar(analisar(r"X = \frac{k\tau}{1 + k\tau}", tab), Sym("\\tau"), tab, glossario)
+    assert r.estado == "com_passos"
+    passos = r.ramos[0].passos
+    elim = next(p for p in passos if p.regra == "eliminar_denominador")
+    assert para_latex(elim.depois).endswith(r"\left(1 + k \tau\right) = 0")
+    assert not any(r"0 \left(" in para_latex(p.depois) for p in passos)
+    assert [p.regra for p in passos].count("levar_para_a_esquerda") == 1

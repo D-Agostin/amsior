@@ -27,7 +27,7 @@ from typing import Any, Literal
 import sympy as sp
 
 from amsior.expr.latex import para_latex
-from amsior.expr.nos import Add, Eq, Expr, Mul, Num, Sub, Sym
+from amsior.expr.nos import Add, Div, Eq, Expr, Mul, Num, Sub, Sym
 from amsior.expr.ponte_sympy import de_sympy
 from amsior.expr.simbolos import TabelaDeSimbolos
 from amsior.rules.classificar import Classificacao, classificar
@@ -227,8 +227,9 @@ class Isolador:
         f = ctx.conv(eq.esq)
         num, den = sp.fraction(sp.together(f))
         if den.has(u):
-            d = de_sympy(den, self.tabela)
-            return [Proposta("eliminar_denominador", Eq(Mul((eq.esq, d)), Mul((eq.dir, d))),
+            d = self._denominador_como_escrito(eq.esq, den, ctx) or de_sympy(den, self.tabela)
+            # 0·d = 0: o lado direito continua 0, sem um "0(1 + kτ)" para carregar adiante
+            return [Proposta("eliminar_denominador", Eq(Mul((eq.esq, d)), eq.dir),
                              Operacao("multiplicar_ambos", d),
                              justificativa=_j("regra.eliminar_denominador", fator=d))]
         # linear em u: f = a·u + b, com a = ∂f/∂u e b = f(u = 0); nada é expandido,
@@ -249,6 +250,18 @@ class Isolador:
         return [Proposta("agrupar_no_alvo", Eq(agrupado, eq.dir),
                          Operacao("reescrever", lado="esquerdo"),
                          justificativa=_j("regra.agrupar_no_alvo", alvo=Sym(ctx.alvo)))]
+
+    @staticmethod
+    def _denominador_como_escrito(e: Expr, den: Any, ctx: Contexto) -> Expr | None:
+        """O denominador na forma em que aparece na equação (``1 + kτ``), não na do SymPy (``τk + 1``)."""
+        for n in percorrer(e):
+            if isinstance(n, Div) and n.den.__class__ is not Num:
+                try:
+                    if sp.expand(ctx.conv(n.den) - den) == 0:
+                        return n.den
+                except Exception:
+                    continue
+        return None
 
     # ------------------------------------------------------------ oráculo
 

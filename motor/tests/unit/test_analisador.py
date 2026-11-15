@@ -127,6 +127,13 @@ def test_exponencial() -> None:
     assert A("e^{x}") == A("\\exp(x)") == A("\\mathrm{e}^{x}") == Exp(x)
 
 
+def test_exponencial_colada_numa_palavra() -> None:
+    # "Ae^{x}" é A·exp(x) (Arrhenius): o e colado antes de ^ não vira símbolo.
+    assert A("ae^{x}", None) == Mul((a, Exp(x)))
+    assert analisar("ae^{x}", None, modo_palavras="produto") == Mul((a, Exp(x)))
+    assert A("b e^{x}") == Mul((b, Exp(x)))
+
+
 def test_raizes_e_modulo() -> None:
     assert A("\\sqrt{x}") == Sqrt(x)
     assert A("\\sqrt[3]{x}") == Root(x, Num("3"))

@@ -1,0 +1,162 @@
+/* Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+ *
+ * Sistema de design (D-11, especificação 9.4): o ÚNICO lugar com cores, fontes,
+ * tamanhos, espaçamentos e raios. Nenhuma tela usa valor solto.
+ *
+ * Aparências: D · Bancada com papel e tinta (padrão) e H · Leitura longa.
+ * Modos: claro e escuro, projetados juntos. O teste tokens.test.ts confere o
+ * contraste: texto ≥ 4,5:1 na D e ≥ 7:1 na H, nos dois modos.
+ */
+
+:root,
+[data-aparencia="d"] {
+  --fonte-texto: "Inter", "Segoe UI", system-ui, sans-serif;
+  --fonte-numeros: "Inter", "Segoe UI", system-ui, sans-serif;
+  --fonte-mat: "STIX Two Text", "Cambria Math", Cambria, serif;
+  --numeros-recursos: "tnum" 1;
+
+  --tam-mini: 11.5px;
+  --tam-pequeno: 12.5px;
+  --tam-base: 13px;
+  --tam-texto: 13.5px;
+  --tam-titulo: 15px;
+  --tam-mat: 20px;
+  --tam-mat-bloco: 24px;
+  --entrelinha: 1.45;
+  --entrelinha-texto: 1.6;
+  --medida-texto: 70ch;
+
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 20px;
+  --esp-6: 24px;
+  --altura-barra: 44px;
+  --altura-controle: 30px;
+  --altura-botao-icone: 40px;
+  --largura-trilho: 52px;
+  --largura-painel: 240px;
+  --largura-variaveis: 340px;
+  --linha-passo: 14px;
+
+  --raio: 6px;
+  --raio-selo: 3px;
+  --traco-fracao: 1.3px;
+
+  --sombra-dica: 0 6px 20px rgb(0 0 0 / .12);
+  --sombra-dialogo: 0 18px 50px rgb(0 0 0 / .25);
+}
+
+[data-aparencia="h"] {
+  --fonte-texto: "Atkinson Hyperlegible Next", Verdana, "Segoe UI", sans-serif;
+  --fonte-numeros: "Atkinson Hyperlegible Mono", Consolas, monospace;
+  --fonte-mat: "STIX Two Text", "Cambria Math", Cambria, serif;
+  --numeros-recursos: normal;
+
+  --tam-mini: 13px;
+  --tam-pequeno: 14px;
+  --tam-base: 15px;
+  --tam-texto: 15.5px;
+  --tam-titulo: 17px;
+  --tam-mat: 23px;
+  --tam-mat-bloco: 27.5px;
+  --entrelinha: 1.55;
+  --entrelinha-texto: 1.65;
+  --medida-texto: 66ch;
+
+  --altura-barra: 54px;
+  --altura-controle: 38px;
+  --altura-botao-icone: 44px;
+  --largura-trilho: 58px;
+  --largura-painel: 272px;
+  --largura-variaveis: 376px;
+  --linha-passo: 18px;
+
+  --raio-selo: 4px;
+  --traco-fracao: 1.5px;
+}
+
+:root,
+[data-aparencia="d"][data-modo="claro"] {
+  --cor-fundo: #F6F4EF;
+  --cor-superficie: #FFFFFF;
+  --cor-texto: #1D2330;
+  --cor-texto-2: #5A6170;
+  --cor-linha: #E2DED4;
+  --cor-linha-suave: #EEEBE4;
+  --cor-acento: #2F5AA6;
+  --cor-sobre-acento: #FFFFFF;
+  --cor-acento-texto: #2A519A;
+  --cor-acento-suave: #EDF1F9;
+  --cor-ok: #2C7A4B;
+  --cor-ok-linha: #BFDCC9;
+  --cor-aviso: #8A5A00;
+  --cor-aviso-suave: #FBF1DC;
+  --cor-erro: #B42318;
+  --cor-erro-suave: #FDECEA;
+}
+
+[data-aparencia="d"][data-modo="escuro"] {
+  --cor-fundo: #13161C;
+  --cor-superficie: #1C2028;
+  --cor-texto: #E7E9ED;
+  --cor-texto-2: #9BA4B3;
+  --cor-linha: #2B313C;
+  --cor-linha-suave: #252A33;
+  --cor-acento: #8DB2F2;
+  --cor-sobre-acento: #0F1A2E;
+  --cor-acento-texto: #A9C5F5;
+  --cor-acento-suave: #1F2A40;
+  --cor-ok: #6FC491;
+  --cor-ok-linha: #2C5140;
+  --cor-aviso: #F2C46B;
+  --cor-aviso-suave: #3A2F17;
+  --cor-erro: #FF9B8F;
+  --cor-erro-suave: #3D1F1C;
+}
+
+[data-aparencia="h"][data-modo="claro"] {
+  --cor-fundo: #EFEBE1;
+  --cor-superficie: #F8F5EE;
+  --cor-texto: #2A2824;
+  --cor-texto-2: #4A463F;
+  --cor-linha: #D9D3C5;
+  --cor-linha-suave: #E6E1D5;
+  --cor-acento: #1F5E78;
+  --cor-sobre-acento: #FFFFFF;
+  --cor-acento-texto: #174A60;
+  --cor-acento-suave: #DDEAEE;
+  --cor-ok: #1E5829;
+  --cor-ok-linha: #B9D4BC;
+  --cor-aviso: #5F3D00;
+  --cor-aviso-suave: #F6EBD3;
+  --cor-erro: #8A1A12;
+  --cor-erro-suave: #F7E3DE;
+}
+
+[data-aparencia="h"][data-modo="escuro"] {
+  --cor-fundo: #1C1B19;
+  --cor-superficie: #242320;
+  --cor-texto: #DCD7CC;
+  --cor-texto-2: #BDB7AA;
+  --cor-linha: #38362F;
+  --cor-linha-suave: #2E2C27;
+  --cor-acento: #7DBCD6;
+  --cor-sobre-acento: #0D2530;
+  --cor-acento-texto: #9BCDE2;
+  --cor-acento-suave: #192B33;
+  --cor-ok: #86C795;
+  --cor-ok-linha: #33523A;
+  --cor-aviso: #F0C878;
+  --cor-aviso-suave: #3A311F;
+  --cor-erro: #FFA699;
+  --cor-erro-suave: #3E2622;
+}
+
+[data-modo="claro"] { color-scheme: light; }
+[data-modo="escuro"] {
+  color-scheme: dark;
+  --sombra-dica: 0 6px 20px rgb(0 0 0 / .45);
+  --sombra-dialogo: 0 18px 50px rgb(0 0 0 / .6);
+}

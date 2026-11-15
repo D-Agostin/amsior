@@ -18,7 +18,14 @@ dependencies = [
     "PyYAML>=6.0,<7",
 ]
 
+[project.gui-scripts]
+amsior = "amsior.janela:main"
+
 [project.optional-dependencies]
+app = [
+    "fastapi>=0.162,<0.163",
+    "uvicorn>=0.54,<0.55",
+]
 dev = [
     "pytest>=9.1,<10",
     "hypothesis>=6.170,<7",
@@ -43,5 +50,5 @@ warn_return_any = false
 files = ["amsior"]
 
 [[tool.mypy.overrides]]
-module = ["sympy.*", "mpmath.*"]
+module = ["sympy.*", "mpmath.*", "webview.*"]
 ignore_missing_imports = true

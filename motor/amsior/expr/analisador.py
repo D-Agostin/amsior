@@ -495,6 +495,8 @@ class Analisador:
             while self.atual.tipo == "LETRA" and not self.atual.espaco_antes:
                 if self.integrais and self.atual.texto == "d" and self._diferencial_colado():
                     break
+                if self.atual.texto == "e" and self.ver().eh("OP", "^"):
+                    break  # "Ae^{x}" é A·exp(x), não o símbolo e elevado
                 letras.append(self.avancar().texto)
             sufixo = self._sufixos()
             ids = self._resolver_palavra("".join(letras), sufixo, tok.pos)
