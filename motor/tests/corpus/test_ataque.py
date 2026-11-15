@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Critério de aceite da fase 1A: o verificador reprova 100% dos passos errados e aprova 100% dos certos."""
 
 from __future__ import annotations

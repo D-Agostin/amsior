@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Verificação: certificados por passo (V1, V5), por cadeia de passos e de solução (V2)."""
 
 from amsior.verify.certificador import (

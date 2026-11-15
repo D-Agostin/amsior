@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Avaliador numérico próprio da árvore AmsiorExpr (contraprova da via simbólica).
 
 Avalia a árvore direto em mpmath, nos reais, sem passar pelo SymPy: um erro

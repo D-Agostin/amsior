@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Motor de isolar: apresentação, ramos, hipóteses, validade do resultado e recusa."""
 
 from __future__ import annotations

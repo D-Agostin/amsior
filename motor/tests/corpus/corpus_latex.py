@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Corpus de expressões de engenharia química para o critério de ida e volta da fase 1A.
 
 Cada entrada é escrita como um usuário ou o MathLive escreveria: com e sem

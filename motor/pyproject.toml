@@ -7,7 +7,7 @@ name = "amsior"
 version = "0.1.0.dev0"
 description = "Motor de cálculo do Amsior: calculadora e biblioteca didática de equações para engenharia química"
 readme = "README.md"
-license = "LicenseRef-Proprietary"
+license = "AGPL-3.0-only"
 authors = [{ name = "Ruan D'Agostin" }]
 requires-python = ">=3.12"
 # Faixas compatíveis; as versões exatas testadas estão em requirements-lock.txt

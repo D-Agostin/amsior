@@ -1,5 +1,5 @@
 # Amsior — Glossário de grandezas
-# Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 #
 # O glossário identifica a GRANDEZA, não a letra. Cada ficha diz qual letra
 # usa para cada grandeza (seção 8.2 da especificação).

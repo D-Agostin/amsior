@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Tipo da equação em relação a uma variável (D-12).
 
 Segue a classificação usual do ensino: expressões algébricas **racionais

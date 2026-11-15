@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Protótipo de empacotamento da fase 1A ("olá, mundo").
 
 Chama cada biblioteca que o instalador final vai carregar e imprime um

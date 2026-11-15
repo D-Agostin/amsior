@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Desenho de matemática com KaTeX (só leitura; a edição é do MathLive).
 
 import katex from "katex";

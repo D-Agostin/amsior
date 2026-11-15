@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Ícones de traço, desenhados em 24×24 e herdando a cor do texto.
 
 const base = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",

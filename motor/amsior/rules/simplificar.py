@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Simplificações de apresentação, sempre visíveis como passo próprio.
 
 Depois de uma operação nos dois lados (dividir por ``P``), o lado mostra a

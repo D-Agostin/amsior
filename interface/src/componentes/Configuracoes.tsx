@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Configurações de aparência (especificação 9.4): sistema visual D ou H e o modo.
 // É um popover, não um diálogo modal: fecha com Esc ou clicando fora, e não
 // deixa o resto da tela inerte (o editor MathLive para de receber teclas se a

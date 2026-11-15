@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Analisador do LaTeX restrito do Amsior: texto → AmsiorExpr.
 
 Analisador descendente recursivo escrito à mão (ver docs/decisoes/0001). A

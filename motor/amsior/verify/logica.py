@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Prova de obrigações de domínio a partir de fatos (suposições, condições, domínio).
 
 Uma obrigação é provada quando decorre:

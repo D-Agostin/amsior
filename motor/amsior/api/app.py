@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Servidor local (seção 2): FastAPI só em loopback, com token de sessão.
 
 * Toda rota ``/api/v1`` exige o cabeçalho ``X-Amsior-Token`` com o token

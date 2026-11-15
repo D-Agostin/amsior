@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Resolução (especificação 4.3 e 9.4): grade # | Equação | Justificativa |
 // Certificado. Só chegam aqui passos com certificado (T-02); o resultado traz
 // as condições de validade e as hipóteses sob as quais vale.

@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 import { aplicar, gravarPreferencias, lerPreferencias, modoEfetivo, PADRAO } from "../preferencias";
 
 describe("preferências de aparência", () => {
@@ -21,7 +21,7 @@ describe("preferências de aparência", () => {
     expect(lerPreferencias()).toEqual(PADRAO);
   });
 
-  it("seguir o Windows resolve para claro ou escuro", () => {
+  it("seguir o sistema resolve para claro ou escuro", () => {
     expect(modoEfetivo("sistema", true)).toBe("escuro");
     expect(modoEfetivo("sistema", false)).toBe("claro");
     expect(modoEfetivo("claro", true)).toBe("claro");

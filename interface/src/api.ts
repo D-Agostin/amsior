@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Cliente da API local (especificação 9.2). O token da sessão chega no fragmento
 // da URL (#token=...), aberto pela janela do aplicativo, e vai em todo pedido.
 

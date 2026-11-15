@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Regras de isolamento (seção 4.2): desfazer a operação mais externa em volta do alvo.
 
 Cada regra recebe a equação atual, com o alvo só no lado esquerdo, e propõe

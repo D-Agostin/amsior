@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Estado da primeira tela: uma folha com uma equação, a tabela de símbolos e a
 // resolução do alvo escolhido. Cada pedido leva um número de ordem; a resposta
 // de um pedido velho (o usuário já mudou a equação) é descartada.

@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Suíte "verificador sob ataque" (seção 5.4).
 
 Passos certos e passos propositalmente errados, tirados de contas reais de

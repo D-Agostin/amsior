@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Tabela de variáveis: para cada símbolo, a grandeza do glossário (que traz a
 // unidade SI e as suposições usadas na verificação).
 

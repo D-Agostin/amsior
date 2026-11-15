@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Critério de aceite da fase 1B: toda variável do corpus isola com passos ou é recusada
 corretamente, e nenhum passo sai sem certificado aprovado."""
 

@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Nível resumido (especificação 4.4): os passos de apresentação ("fundíveis")
 // somem da tela, mas o certificado de cada um continua valendo. O último passo
 // do ramo sempre aparece, porque é ele que mostra o resultado.

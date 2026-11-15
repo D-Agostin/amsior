@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Conversões entre AmsiorExpr e SymPy.
 
 AmsiorExpr → SymPy alimenta o oráculo e o verificador. SymPy → AmsiorExpr só

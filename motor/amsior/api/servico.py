@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Serviços da API local (seção 9.2), sem servidor: dicionários de entrada e de saída.
 
 Cada função recebe o JSON do pedido já decodificado e devolve o JSON da

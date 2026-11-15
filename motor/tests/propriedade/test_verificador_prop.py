@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Propriedades do verificador com equações aleatórias de lados estritamente positivos.
 
 * Um passo construído aplicando de fato a operação é aprovado.

@@ -1,8 +1,10 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-Nov 13, 2026 · @Ruan · v1.3 em 14/11/2026
+13/11/2026 · v1.6 em 15/11/2026
 
-Esta especificação fecha a arquitetura do Amsior v1: um aplicativo local para Windows, com motor em Python e interface web, organizado como folha de cálculo, em que todo passo exibido é verificado por máquina antes de aparecer. As fases 1 a 4 seguem este documento como roteiro; mudar uma decisão daqui exige registrar a mudança na seção 10.
+O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
+
+Esta especificação fecha a arquitetura do Amsior v1: uma aplicação web que roda inteira no navegador, sem instalação e sem servidor de cálculo, com motor em Python (via WebAssembly) e interface em React, organizada como folha de cálculo, em que todo passo exibido é verificado por máquina antes de aparecer. As fases 1 a 4 seguem este documento como roteiro; mudar uma decisão daqui exige registrar a mudança na seção 10.
 
 ## 1. Decisões fechadas e escopo da v1
 
@@ -11,7 +13,7 @@ As decisões abaixo foram tomadas por Ruan em 13/11/2026 e orientam todo o resto
 | ID | Tema | Decisão |
 | --- | --- | --- |
 | D-01 | Público | Alunos e professores de engenharia química; uso didático |
-| D-02 | Plataforma | Aplicativo local no Windows, offline: motor Python + interface no navegador embutido |
+| D-02 | Plataforma | Aplicação web que roda inteira no navegador do usuário: sem instalação, sem conta e sem servidor de cálculo; funciona sem internet depois da primeira visita. Revista em 15/11/2026 (D-14); até então era um aplicativo local para Windows |
 | D-03 | Formato de trabalho | Folha de cálculo (várias equações, textos e tabelas encadeados, variáveis compartilhadas) |
 | D-04 | Motor de passos v1 | Isolar variável; integrais e derivadas; EDOs de 1ª ordem (separáveis e lineares) |
 | D-05 | Citações | Ficha nasce com livro, capítulo e seção; número de equação e página só entram após conferência de Ruan na última edição da fonte (D-09) |
@@ -34,6 +36,13 @@ Uma decisão foi acrescentada por Ruan em 14/11/2026, na abertura da fase 1B:
 | D-12 | Tipo da expressão | Toda equação mostra, para a variável escolhida, o tipo de equação que ela é (1º grau, racional, irracional, exponencial, logarítmica, mista...), com ligação para a ficha de Matemática que explica o tipo (seção 4.7) |
 | D-13 | Fichas de conceito | A biblioteca ganha fichas de conceito, além das de equação: texto didático, ilustrações e animações sobre um assunto. Duas seções nascem com elas: Matemática (tipos de expressão e de equação, domínio, equivalência) e Reatores (cada tipo de reator, como funciona, usos e animações de demonstração). Seções 3.5, 8.1 e 8.7 |
 
+Duas decisões foram acrescentadas por Ruan em 15/11/2026, depois do primeiro executável (decisão 0006 do repositório):
+
+| ID | Tema | Decisão |
+| --- | --- | --- |
+| D-14 | Navegador | O Amsior passa a rodar no navegador (D-02 revista). Motivo: o Controle Inteligente de Aplicativos do Windows bloqueia executáveis sem assinatura digital e não oferece exceção ao usuário; assinar custa dinheiro ou depende de terceiros, e um site não precisa de assinatura, funciona em qualquer sistema e não exige instalação. O executável da fase 1B deixa de ser entregue |
+| D-15 | Software livre | Código público sob a licença AGPL-3.0, de uso gratuito. O projeto não aceita contribuições externas por enquanto (pull requests fechados); relatos de erro são bem-vindos |
+
 ### Decisões técnicas derivadas
 
 Estas decorrem das decisões acima e ficam fechadas por esta especificação.
@@ -45,7 +54,8 @@ Estas decorrem das decisões acima e ficam fechadas por esta especificação.
 | T-03 | Demonstrações da biblioteca são redigidas e curadas; passos de equações do usuário são gerados | O motor não inventa física; hipóteses e aproximações exigem revisão humana |
 | T-04 | Água pela formulação IAPWS-95 (padrão do CoolProp); IAPWS-IF97 disponível como opção | Corrige o resumo, que citava só a IF97: a IAPWS-95 é a formulação científica de referência, a IF97 é a industrial |
 | T-05 | Arquivos nunca passam por `eval` nem por `sympify` de texto | Segurança: uma folha recebida de terceiros não pode executar código |
-| T-06 | Todo cálculo roda em processo separado com tempo limite | O SymPy pode travar em expressões difíceis; a interface nunca congela |
+| T-06 | Todo cálculo roda fora da linha de execução da interface (num Web Worker), com tempo limite; ao estourar, o trabalhador é encerrado e reposto | O SymPy pode travar em expressões difíceis; a interface nunca congela |
+| T-07 | Nada do que o usuário digita sai do navegador: sem contas, sem telemetria e sem pedidos de rede depois de carregados os arquivos da aplicação | Decorre de D-02 (não há servidor de cálculo) e protege o aluno; folhas ficam no dispositivo dele |
 
 ### Fora do escopo da v1
 
@@ -53,30 +63,34 @@ Estas decorrem das decisões acima e ficam fechadas por esta especificação.
 - EDOs de 2ª ordem geradas pelo motor (a equação da aleta aparece na biblioteca como demonstração curada).
 - Misturas com equações de estado, simulação de fluxogramas e otimização.
 - Colaboração em rede e contas de usuário.
+- Aplicativo de desktop com instalador (D-14). Se um dia voltar, precisa de assinatura digital de código.
 
 ## 2. Arquitetura geral
 
-O Amsior é um único executável que sobe um servidor local em `127.0.0.1`, abre a interface numa janela própria e delega todo cálculo a processos de trabalho isolados. A interface nunca faz matemática: ela edita, exibe e pede.
+O Amsior é um site estático: o navegador baixa a interface e o motor, e tudo roda no dispositivo do usuário. O motor é o mesmo pacote Python `amsior`, executado pelo Pyodide (CPython compilado para WebAssembly) dentro de um Web Worker. A interface nunca faz matemática: ela edita, exibe e pede.
 
 ```
-Interface (janela própria, WebView2): folha, tabela de variáveis, biblioteca, MathLive e KaTeX
-        ^ pedidos e respostas JSON em /api/v1
+Interface (página): folha, tabela de variáveis, biblioteca, MathLive e KaTeX
+        ^ mensagens JSON {id, rota, dados}  (mesmo contrato da seção 9.2)
         v
-Servidor local (FastAPI, só em 127.0.0.1): módulos api, sheet, library  <-->  Arquivos (.amsior, fichas e tabelas YAML)
-        ^ tarefas de cálculo e resultados
-        v
-Trabalhadores (processos isolados, com tempo limite):
-    steps + rules  -->  verify  |  units + numerics  |  props + interp
-    por baixo: SymPy, mpmath, pint, CoolProp, chemicals
+Trabalhador de cálculo (Web Worker com Pyodide, encerrado e reposto ao estourar o tempo):
+    api (despacho)  -->  steps + rules  -->  verify  |  units + numerics  |  props + interp
+    por baixo: SymPy, mpmath, pint (e, na fase 3B, as bibliotecas de propriedades)
+
+Armazenamento do navegador: folhas e preferências     Arquivos .amsior: abrir e baixar pelo usuário
+Service worker: guarda os arquivos da aplicação para uso sem internet
+Hospedagem: arquivos estáticos (GitHub Pages), publicados pela integração contínua
 ```
 
 O módulo em destaque é o verificador: nada gerado pelo motor de passos volta à interface sem passar por ele.
 
-### Processos
+### Partes em execução
 
-1. **Janela** (pywebview sobre o WebView2 do Windows): mostra a interface; sem barra de endereço, sem depender do navegador do aluno.
-2. **Servidor** (FastAPI + Uvicorn, só em loopback, porta livre escolhida na partida, token de sessão aleatório): valida pedidos, lê e grava arquivos, orquestra.
-3. **Trabalhadores** (pool de processos Python): executam motor de passos, verificação, unidades e propriedades. Cada tarefa tem limite de tempo (padrão 10 s, 30 s para EDOs); ao estourar, o processo é encerrado e reposto, e a interface recebe um erro explicado.
+1. **Página** (React): mostra a interface e guarda o estado da folha. Pode ser instalada como aplicativo pelo próprio navegador (PWA), com janela própria.
+2. **Trabalhador de cálculo** (Web Worker): carrega o Pyodide e o pacote `amsior` uma vez e responde aos pedidos. Cada pedido tem limite de tempo (padrão 10 s, 30 s para EDOs); ao estourar, a página encerra o trabalhador, cria outro e mostra um erro explicado (T-06).
+3. **Service worker**: guarda em cache a interface, o Pyodide e as bibliotecas Python, com a versão no nome. Depois da primeira visita o Amsior abre sem internet; versão nova é baixada em segundo plano e entra na abertura seguinte.
+
+Não há servidor de aplicação: a hospedagem só entrega arquivos. O servidor local da fase 1B (`amsior.api.app`, `amsior.janela`) continua existindo como modo de desenvolvimento e como referência dos testes: o mesmo pedido tem de dar a mesma resposta no Python nativo e no navegador.
 
 ### Módulos do pacote `amsior`
 
@@ -93,7 +107,7 @@ O módulo em destaque é o verificador: nada gerado pelo motor de passos volta �
 | `library` | Carga e validação das fichas, glossário de grandezas, vocabulário de hipóteses | `expr`, `units`, `verify` |
 | `sheet` | Modelo da folha, grafo de dependências, recálculo, leitura e gravação de `.amsior` | todos os anteriores |
 | `i18n` | Catálogo de textos e modelos de justificativa por idioma | nenhum |
-| `api` | Rotas HTTP, esquemas de entrada e saída, pool de trabalhadores | todos |
+| `api` | Despacho dos pedidos (`executar(rota, dados)`), esquemas de entrada e saída. No navegador é chamado pelo trabalhador; o servidor HTTP local fica só para desenvolvimento | todos |
 
 Regra de dependência: cada módulo só depende dos que estão acima dele na tabela. `steps` não conhece `sheet` nem `api`; `verify` não conhece `rules` nem `steps` (ele recebe passos prontos e os julga de forma independente). O motor chama o verificador para entregar só passos certificados (decisão 0004).
 
@@ -101,19 +115,20 @@ Regra de dependência: cada módulo só depende dos que estão acima dele na tab
 
 | Camada | Escolha | Observação |
 | --- | --- | --- |
-| Linguagem do motor | Python 3.12 ou superior | Tipagem estrita (mypy), modelos com pydantic |
+| Linguagem do motor | Python 3.12 ou superior | Tipagem estrita (mypy); só bibliotecas que rodam no Pyodide |
+| Python no navegador | Pyodide (CPython em WebAssembly), dentro de um Web Worker | Versão travada; SymPy, mpmath e pint nas mesmas versões do arquivo de trava do motor |
 | Álgebra simbólica | SymPy | Oráculo; precisão arbitrária via mpmath |
 | Unidades | pint | Um único registro, definido em `units` |
-| Propriedades | CoolProp; chemicals/thermo para correlações | Seção 7 |
-| Servidor | FastAPI + Uvicorn | Somente loopback |
+| Propriedades | CoolProp; chemicals/thermo para correlações | Seção 7. Funcionamento no Pyodide a confirmar antes da fase 3B (seção 10.3) |
+| Ponte interface-motor | Mensagens entre a página e o Web Worker | Mesmo contrato JSON da seção 9.2. FastAPI + Uvicorn só no modo de desenvolvimento |
 | Interface | TypeScript + React + Vite | Estado com Zustand |
 | Entrada de equações | MathLive (saída em LaTeX) | Separador decimal configurado para vírgula |
 | Exibição de equações | KaTeX | Passos, fichas e exportação |
-| Janela e empacotamento | pywebview + PyInstaller; instalador Inno Setup | Um instalador, sem exigir Python na máquina |
+| Distribuição | Site estático com service worker (PWA), publicado no GitHub Pages pela integração contínua | Sem instalador e sem assinatura digital; domínio próprio opcional |
 | Testes | pytest + Hypothesis (motor); Vitest + Playwright (interface) | Seção 5 |
 | Animações | Manim Community (geração prévia) e Canvas (interativas) | Seção 9 |
 
-As versões exatas são fixadas num arquivo de trava no início da fase 1, depois de confirmar na documentação atual de cada biblioteca as interfaces usadas (em especial o LaTeX emitido pelo MathLive e o backend IF97 do CoolProp). O analisador de LaTeX é próprio, sem biblioteca externa (decisão 0001 do repositório). As bibliotecas incorporadas ao aplicativo têm licença permissiva (MIT ou BSD); o PyInstaller é GPL com uma exceção que permite distribuir o executável gerado sob qualquer licença. Tudo isso é confirmado na mesma ocasião, antes de distribuir.
+As versões exatas são fixadas num arquivo de trava no início da fase 1, depois de confirmar na documentação atual de cada biblioteca as interfaces usadas (em especial o LaTeX emitido pelo MathLive e o backend IF97 do CoolProp). O analisador de LaTeX é próprio, sem biblioteca externa (decisão 0001 do repositório). O Amsior é distribuído sob a AGPL-3.0 (D-15). As bibliotecas incorporadas têm licença permissiva (MIT, BSD ou OFL nas fontes) e o Pyodide é MPL-2.0, todas compatíveis com a AGPL-3.0; a licença de cada biblioteca nova é conferida antes de entrar. Como a AGPL pede que o usuário de uma aplicação em rede tenha acesso ao código, a interface traz uma ligação para o repositório.
 
 ### Estrutura do repositório
 
@@ -121,7 +136,7 @@ As versões exatas são fixadas num arquivo de trava no início da fase 1, depoi
 amsior/
   motor/amsior/{expr,rules,steps,verify,units,numerics,props,interp,sheet,library,i18n,api}/
   motor/tests/{unit,corpus,propriedade}/
-  interface/src/{blocos,editor,biblioteca,passos,estado}/
+  interface/src/{blocos,editor,biblioteca,passos,estado}/   (inclui o trabalhador de cálculo e o service worker)
   biblioteca/{termodinamica,balancos,reatores,mecflu,calor,massa,opunit}/*.yaml
   biblioteca/_glossario.yaml  biblioteca/_hipoteses.yaml  biblioteca/_fontes.yaml
   propriedades/<fonte>/*.yaml
@@ -177,7 +192,7 @@ Os tipos `principio` (invocar a 1ª lei, um balanço) e `aproximacao` (desprezar
 
 ### 3.3 Folha (`.amsior`)
 
-A folha é um arquivo JSON UTF-8 com `formato` (inteiro, começa em 1), `metadados`, `simbolos` e `blocos` em ordem de exibição.
+A folha é um documento JSON UTF-8 com `formato` (inteiro, começa em 1), `metadados`, `simbolos` e `blocos` em ordem de exibição. No navegador ela fica guardada no armazenamento local do dispositivo e pode ser baixada ou aberta como arquivo `.amsior` (seção 9.1).
 
 | Bloco | Conteúdo |
 | --- | --- |
@@ -679,45 +694,50 @@ A interface tem três regiões fixas: a folha no centro, a tabela de variáveis 
 - **Bloco de resolução**: passos numerados, cada um com a equação (KaTeX), a justificativa, o selo e as condições; subpassos recolhíveis; chave completo/resumido; o termo alterado em cada passo vem destacado.
 - **Tabela de variáveis**: sempre visível; símbolo, nome, valor, unidade (trocável), origem; avisos de faixa e de unidade na própria linha.
 - **Biblioteca**: busca por nome, área, grandeza e hipótese; a ficha abre em painel com equação, hipóteses, demonstração, referência, exemplo e o botão “usar na folha”. Uma aba separada lista os pacotes de propriedades dos livros, com liga e desliga e a ordem de preferência (seção 7.5).
-- **Arquivo**: novo, abrir, salvar, salvamento automático, desfazer e refazer; exportar para PDF (folha de estilo de impressão) e HTML autossuficiente.
+- **Arquivo**: novo, abrir, salvar, salvamento automático, desfazer e refazer; exportar para PDF (folha de estilo de impressão) e HTML autossuficiente. As folhas ficam no armazenamento do navegador (IndexedDB), no dispositivo do usuário; "baixar" e "abrir" trocam arquivos `.amsior` com o disco. Como limpar os dados do navegador apaga as folhas, a interface avisa e oferece baixar uma cópia.
+- **Sem internet**: depois da primeira visita, tudo funciona desligado da rede; a barra de estado mostra quando há versão nova pronta.
+- **Sobre**: autoria e propósito do projeto, licença (AGPL-3.0) e ligação para o código-fonte.
 - **Acessibilidade**: operação completa por teclado; cada equação tem texto alternativo falado gerado da árvore; selos não dependem só de cor.
 - **Textos**: nenhum texto de interface ou de justificativa no código; tudo em catálogos por idioma (`pt-BR` agora, `en` depois).
 
-### 9.2 API local
+### 9.2 Ponte com o motor
 
-Rotas JSON sob `/api/v1`, sem estado entre chamadas de cálculo. Erros seguem um formato único: `codigo`, `mensagem` (chave de tradução) e `detalhe`.
+A página fala com o trabalhador de cálculo por mensagens `{id, rota, dados}` e recebe `{id, ok}` ou `{id, erro}`. Não há estado entre chamadas de cálculo. Erros seguem um formato único: `codigo`, `mensagem`, `chave` (de tradução) e `detalhe`. No modo de desenvolvimento as mesmas rotas existem como HTTP sob `/api/v1`, e os testes comparam as duas vias.
 
 | Rota | Entrada | Saída |
 | --- | --- | --- |
-| `POST /analisar` | LaTeX, tabela de símbolos | AmsiorExpr, símbolos novos, ambiguidades |
-| `POST /isolar` | Equação, alvo, símbolos | Passos, resultado, ramos, certificados |
-| `POST /integrar` | Integral, símbolos, dependências | Passos, resultado, certificados |
-| `POST /derivar` | Expressão, variável, mantidas constantes | Passos, resultado, certificados |
-| `POST /edo` | Equação, função, variável, condição inicial | Classificação, passos, solução, certificados |
-| `POST /avaliar` | Folha ou subconjunto de blocos, valores | Valores com unidade, origem, avisos |
-| `POST /dimensional` | Equação, símbolos | Homogênea ou não, com o termo divergente |
-| `POST /propriedade` | Substância, origem, par de entrada, saídas | Valores, fase, fonte, referência |
-| `POST /interpolar` | Tabela, método, ponto | Valor, passos, avisos |
-| `GET /biblioteca`, `GET /biblioteca/{id}` | Filtros | Índice; ficha completa |
-| `GET/PUT /folhas/{caminho}` | Arquivo `.amsior` | Leitura e gravação validadas, só em pastas escolhidas pelo usuário |
+| `textos` | Idioma | Textos da interface (chaves `ui.*`) |
+| `glossario` | Nenhuma | Grandezas com unidade SI e suposições |
+| `analisar` | LaTeX, tabela de símbolos | AmsiorExpr, símbolos novos, ambiguidades, tipo por variável |
+| `isolar` | Equação, alvo, símbolos | Passos, resultado, ramos, certificados |
+| `integrar` | Integral, símbolos, dependências | Passos, resultado, certificados |
+| `derivar` | Expressão, variável, mantidas constantes | Passos, resultado, certificados |
+| `edo` | Equação, função, variável, condição inicial | Classificação, passos, solução, certificados |
+| `avaliar` | Folha ou subconjunto de blocos, valores | Valores com unidade, origem, avisos |
+| `dimensional` | Equação, símbolos | Homogênea ou não, com o termo divergente |
+| `propriedade` | Substância, origem, par de entrada, saídas | Valores, fase, fonte, referência |
+| `interpolar` | Tabela, método, ponto | Valor, passos, avisos |
+| `biblioteca`, `biblioteca/{id}` | Filtros | Índice; ficha completa |
 
-Metas de desempenho numa máquina de aluno comum: isolar em equação típica de ficha em menos de 1 s com verificação; recálculo numérico de folha com 50 blocos em menos de 200 ms; partida do aplicativo em menos de 5 s.
+Folhas e preferências não passam pelo motor: a página as lê e grava no armazenamento do navegador, e valida todo arquivo `.amsior` aberto antes de usá-lo (T-05).
+
+Desempenho. O Python em WebAssembly é mais lento que o nativo e a primeira visita baixa o motor inteiro (dezenas de MB), que depois fica em cache. As metas do navegador são fixadas ao fim da fase 1C, com medições em máquina de aluno comum: tempo da primeira visita, tempo de abertura nas visitas seguintes, tempo de isolar nos exemplos e recálculo numérico de uma folha de 50 blocos. As metas da versão de desktop (isolar em menos de 1 s, recálculo em menos de 200 ms) ficam como referência do que se quer aproximar.
 
 ### 9.3 Animações (fase 4)
 
-- **Demonstrações em vídeo**: uma cena Manim é gerada automaticamente a partir dos passos da ficha, transformando a equação de cada passo na do seguinte e exibindo a justificativa. Os vídeos são produzidos na máquina de desenvolvimento e distribuídos como arquivos; o aplicativo do aluno não precisa do Manim. Só fichas `verificada` ganham vídeo, e o vídeo guarda a versão da ficha que o gerou.
+- **Demonstrações em vídeo**: uma cena Manim é gerada automaticamente a partir dos passos da ficha, transformando a equação de cada passo na do seguinte e exibindo a justificativa. Os vídeos são produzidos na máquina de desenvolvimento e publicados como arquivos; o navegador do aluno só os reproduz, e eles são baixados sob demanda, fora do cache de uso sem internet. Só fichas `verificada` ganham vídeo, e o vídeo guarda a versão da ficha que o gerou.
 - **Gráficos interativos**: o bloco `grafico` e o campo `animacao` da ficha descrevem, de forma declarativa, a expressão, a variável do eixo e os parâmetros com controle deslizante. Os pontos são calculados pelo motor em lote e desenhados em Canvas.
 - **Animações de conceito** (D-13): cenas para as fichas de conceito, como a mistura num CSTR, o perfil de conversão ao longo de um PFR e o gráfico de Levenspiel comparando CSTR e PFR, com controle deslizante de conversão. Todo número que a cena mostra vem do motor; a cena só desenha.
 
 ### 9.4 Design visual (D-11)
 
-- **Sistemas escolhidos** (14/11/2026, prancha "Amsior — direções visuais da folha"): **D · Bancada com papel e tinta** como padrão e **H · Leitura longa** como alternativa. Mesma estrutura (trilho de ferramentas, passos em grade, tabela de variáveis com origem, barra de estado); D com Inter e STIX Two sobre papel creme e tinta azul; H com Atkinson Hyperlegible Next e Mono, letra maior, contraste de pelo menos 7:1 e papel quente de baixo brilho. Nas configurações: "Aparência" (D ou H) e "Modo" (claro, escuro, seguir o Windows). Impressão e PDF usam sempre D claro.
+- **Sistemas escolhidos** (14/11/2026, prancha "Amsior — direções visuais da folha"): **D · Bancada com papel e tinta** como padrão e **H · Leitura longa** como alternativa. Mesma estrutura (trilho de ferramentas, passos em grade, tabela de variáveis com origem, barra de estado); D com Inter e STIX Two sobre papel creme e tinta azul; H com Atkinson Hyperlegible Next e Mono, letra maior, contraste de pelo menos 7:1 e papel quente de baixo brilho. Nas configurações: "Aparência" (D ou H) e "Modo" (claro, escuro, seguir o sistema). Impressão e PDF usam sempre D claro.
 
 - **Princípio**: a tela serve à leitura da matemática. Pouco ruído, hierarquia clara, espaço generoso, nada que compita com a equação.
 - **Sistema de design próprio**: cores, tipografia, espaçamento, raios e componentes definidos como *tokens* num só lugar e usados por toda a interface; nenhuma cor ou medida solta no código das telas.
-- **Claro e escuro**: os dois temas são projetados juntos, com a mesma hierarquia, e não um derivado do outro. O padrão segue o tema do Windows, com troca manual; impressão e PDF usam sempre o claro.
+- **Claro e escuro**: os dois temas são projetados juntos, com a mesma hierarquia, e não um derivado do outro. O padrão segue o tema do sistema, com troca manual; impressão e PDF usam sempre o claro.
 - **Tipografia**: fonte de interface legível em tamanhos pequenos; matemática em KaTeX com a fonte que combina com o texto; algarismos tabulares nas tabelas de valores.
-- **Contraste e acessibilidade**: texto com contraste mínimo de 4,5:1 (WCAG AA) nos dois temas, 3:1 para elementos gráficos; selos e estados nunca só por cor; foco de teclado sempre visível; animações reduzidas quando o Windows pede.
+- **Contraste e acessibilidade**: texto com contraste mínimo de 4,5:1 (WCAG AA) nos dois temas, 3:1 para elementos gráficos; selos e estados nunca só por cor; foco de teclado sempre visível; animações reduzidas quando o sistema pede.
 - **Revisão**: cada tela nova passa por revisão visual de Ruan nos dois modos antes de entrar numa versão.
 
 ## 10. Roteiro, riscos e pontos em aberto
@@ -730,10 +750,11 @@ Cada fase termina quando seus critérios de aceite passam na integração contí
 | --- | --- | --- |
 | 1A · Fundação | `expr`, `units`, `verify`, `i18n`; analisador de LaTeX restrito; versões travadas | Ida e volta LaTeX → árvore → LaTeX estável em 200 expressões; suíte “verificador sob ataque” reprova 100% dos passos errados e aprova 100% dos certos |
 | 1B · Isolar | `rules`, `steps` (isolar), API, sistema de design (D-11), folha mínima com equação, resolução e tabela de variáveis, primeiro executável | Corpus de 60 equações: toda variável isolada com passos ou recusada corretamente; zero passo exibido sem certificado; testes de propriedade com 10 000 casos sem falha de V2; folha aprovada por Ruan nos modos claro e escuro |
+| 1C · Navegador (D-14) | Motor no Pyodide dentro de um Web Worker; ponte de mensagens no lugar do servidor; service worker e instalação como PWA; publicação automática do site; tela "Sobre" com licença e código-fonte | Os 12 exemplos e o corpus de isolar dão no navegador exatamente os mesmos passos e certificados do Python de referência, comparados na integração contínua; estouro de tempo encerra e repõe o trabalhador; abre e calcula sem internet depois da primeira visita; nenhum pedido de rede leva dados do usuário (T-07); tempos de primeira visita, abertura e isolar medidos e registrados; folha aprovada por Ruan nos dois modos em Chrome ou Edge e em Firefox |
 | 2 · Biblioteca | Esquema de ficha de equação e de conceito, glossário, hipóteses, fontes; as 5 fichas-modelo; as seções de Matemática e de Reatores (D-13); depois as demais | 5 fichas-modelo em `verificada` e 2 fichas-modelo de conceito (equação racional; CSTR) revisadas; toda etiqueta de tipo (D-12) leva a uma ficha de Matemática; corpus da biblioteca verde; cada ficha nova só entra com V1 a V6 aprovadas |
 | 3A · Cálculo | Integrais, derivadas e EDOs com passos | Os 6 padrões da seção 4.3 e os 3 casos de EDO da 4.5 com passos e V3/V4 aprovadas; checagem de dependências cobre os casos de C\_p e de ∫V dP |
 | 3B · Propriedades | `props`, `interp`, blocos de propriedade e interpolação; biblioteca de propriedades dos livros (esquema, importador, seletor de origem e primeiro pacote) | Pontos de verificação da IAPWS reproduzidos; avisos de fase, faixa e extrapolação testados; comparação interpolado × calculado funcionando; um pacote de livro completo transcrito, conferido e comparado com a origem calculada |
-| 4 · Animações e distribuição | Gerador de cenas Manim, gráficos interativos, instalador | Vídeo gerado sem ajuste manual para as 5 fichas-modelo; instalação limpa em Windows 10 e 11 sem Python; exportação em PDF fiel à tela |
+| 4 · Animações e distribuição | Gerador de cenas Manim, gráficos interativos, versão pública do site | Vídeo gerado sem ajuste manual para as 5 fichas-modelo; o site abre e funciona nas versões atuais de Chrome, Edge, Firefox e Safari sem instalar nada; exportação em PDF fiel à tela |
 
 Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 1A e as demonstrações delicadas da fase 2 (cúbicas de estado, aletas, efetividade-NTU, balanço de energia com reação).
 
@@ -747,19 +768,27 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | Passos corretos, mas pouco naturais | Valor didático baixo | Revisão de Ruan sobre o corpus; ajuste de prioridade das regras; modo resumido |
 | Citação errada | Perda de credibilidade | D-05: nada de memória; conferência na última edição da fonte |
 | Diferença entre valor do Amsior e tabela do livro | Aluno acha que o programa errou | Fonte e estado de referência visíveis; nota explicativa no bloco |
-| Empacotamento (PyInstaller com CoolProp e WebView2) | Instalador falha em algumas máquinas | Protótipo de empacotamento já na fase 1A, com um “olá, mundo” que chama cada biblioteca |
+| Primeira visita pesada (Python e SymPy no navegador) | Aluno com internet lenta desiste antes de abrir | Tela de carregamento com progresso; cache pelo service worker; medir na fase 1C e cortar o que não for usado |
+| Python em WebAssembly mais lento que o nativo | Passos demoram; tempo limite estoura em casos que passavam | Medir os exemplos e o corpus na fase 1C; rever o tempo limite com dados; aquecer o motor ao abrir |
+| Resultado diferente entre navegador e Python de referência | Passo certificado num ambiente e não no outro | Mesmas versões de SymPy e mpmath nos dois; comparação automática do corpus na integração contínua |
+| Bibliotecas de propriedades (CoolProp, chemicals) no navegador | Fase 3B sem a fonte prevista | Confirmar antes da fase 3B; se faltar, restringir o conjunto de fluidos ou trocar a fonte, com registro aqui |
+| Dados só no navegador | Aluno limpa o navegador e perde as folhas | Aviso claro; baixar e abrir arquivo `.amsior`; salvamento automático com cópia para baixar |
 | Crescimento de escopo | Fases que não fecham | Lista “fora do escopo” da seção 1; mudanças só pelo registro abaixo |
 
 ### 10.3 Pontos em aberto (não bloqueiam a fase 1)
 
 - [ ] Acesso de Ruan à última edição de cada fonte (seção 8.1), com edição, ano e ISBN registrados em `_fontes.yaml` antes da fase 2.
-- [ ] Licença do código do Amsior e do conteúdo das fichas, a decidir antes de distribuir a alunos.
-- [ ] Assinatura digital do instalador, para evitar o alerta do Windows em máquinas de alunos.
+- [x] Licença do código do Amsior: AGPL-3.0 (D-15, 15/11/2026). O conteúdo das fichas segue a mesma licença por ora.
+- [ ] Avaliar uma licença de conteúdo (Creative Commons) para o texto didático das fichas, antes da fase 2.
+- [x] Assinatura digital: deixa de ser necessária com a versão de navegador (D-14). Se o executável voltar, a SignPath Foundation assina projetos de código aberto sem custo.
+- [ ] Endereço de publicação (GitHub Pages ou domínio próprio), a definir na fase 1C.
+- [ ] Confirmar CoolProp e chemicals/thermo no Pyodide, antes da fase 3B.
+- [ ] Quando reabrir o projeto a contribuições externas, e sob quais regras (D-15).
 - [ ] Lista final das cerca de 50 fichas, a fechar no início da fase 2.
 - [ ] Livro-base da seção de Matemática e lista final das fichas de conceito de Matemática e de Reatores (proposta na seção 8.7).
 - [ ] Escopo exato da v1.1: solução numérica com método exibido, EDO linear de 2ª ordem, derivação implícita.
 
-* [ ] Direitos de reprodução das tabelas de propriedades dos livros (seção 7.5), a resolver antes de distribuir pacotes a alunos.
+* [ ] Direitos de reprodução das tabelas de propriedades dos livros (seção 7.5), a resolver antes de distribuir pacotes a alunos. Com o repositório público (D-15), vale também antes de enviar qualquer tabela transcrita ao repositório.
 * [ ] Original ou tradução: definir se a citação aponta para a última edição em inglês ou para a última em português, quando forem edições diferentes.
 * [ ] Últimas edições de Levenspiel e de Treybal, a confirmar.
 
@@ -771,3 +800,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.3 | 14/11/2026 | Revisão do verificador pelo Fable (revisão 0001) e correções (decisão 0003): verificador sobre a árvore do Amsior, obrigações de domínio, avaliador numérico próprio e contraprova sempre, estratos de magnitude e cobertura de ramos, objetos opacos, relação reduzida a `equivalente` e `implica` com `sob_hipotese` calculado, certificado auditável, verificação de cadeia, `sympy.ask` retirado (seções 3.2, 5.1 e 5.3) |
 | 1.4 | 14/11/2026 | D-11 (design visual como requisito, modos claro e escuro, seção 9.4); critério visual na fase 1B; `verify` antes de `rules` e `steps` na ordem de dependência (decisão 0004) |
 | 1.5 | 14/11/2026 | Sistemas visuais D (padrão) e H; D-12 (tipo da equação, seção 4.7); D-13 (fichas de conceito, seções de Matemática e Reatores, seções 3.5, 8.7 e 9.3) |
+| 1.6 | 15/11/2026 | D-14: o Amsior passa a rodar no navegador (D-02 revista; seções 2, 3.3, 9.1, 9.2 e 10; T-06 revista; T-07 nova; fase 1C nova; riscos de empacotamento trocados pelos da versão web). D-15: software livre sob AGPL-3.0, sem contribuições externas por enquanto. Decisão 0006 do repositório |

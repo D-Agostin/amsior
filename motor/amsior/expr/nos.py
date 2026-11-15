@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Árvore de expressões do Amsior (AmsiorExpr).
 
 A árvore preserva a forma escrita pelo autor: ``a - b`` é ``Sub(a, b)``, e não

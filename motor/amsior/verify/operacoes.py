@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Tabela própria do verificador: o que cada operação faz e quando preserva a equivalência.
 
 Esta tabela é independente do catálogo de regras do motor de passos. Cada

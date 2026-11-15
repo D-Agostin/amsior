@@ -1,6 +1,6 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Preferências de aparência (especificação 9.4): D ou H, claro, escuro ou seguir
-// o Windows, e o nível de detalhe. Ficam também no armazenamento local; se ele faltar
+// o sistema, e o nível de detalhe. Ficam também no armazenamento local; se ele faltar
 // ou falhar, valem os padrões (D, seguir o sistema, completo). O servidor guarda
 // a cópia que vale entre partidas (amsior.api.app.Preferencias).
 
@@ -36,7 +36,7 @@ export function gravarPreferencias(p: Preferencias): void {
   try { localStorage.setItem(CHAVE, JSON.stringify(p)); } catch { /* sem armazenamento: só nesta sessão */ }
 }
 
-/** Modo efetivo: "sistema" segue a preferência de cor do Windows. */
+/** Modo efetivo: "sistema" segue a preferência de cor do sistema. */
 export function modoEfetivo(modo: Modo, sistemaEscuro: boolean): "claro" | "escuro" {
   if (modo === "sistema") return sistemaEscuro ? "escuro" : "claro";
   return modo;

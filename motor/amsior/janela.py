@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Partida do aplicativo (seção 2): servidor local, janela própria e processo de cálculo.
 
 * O servidor sobe só em ``127.0.0.1``, numa porta livre, com um token de sessão

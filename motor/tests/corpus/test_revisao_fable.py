@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Achados da revisão 0001 na camada V2 (docs/revisoes/0001-verificador-fase-1a.md).
 
 Os achados de passo (A1 a A14) estão no corpus de ataque, em

@@ -1,4 +1,4 @@
-# Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+# Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 """Símbolos e tabela de símbolos.
 
 O ``id`` de um símbolo é a sua forma LaTeX canônica, a mesma que o impressor

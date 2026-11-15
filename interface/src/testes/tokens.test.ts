@@ -1,4 +1,4 @@
-// Amsior — Copyright (c) 2026 Ruan D'Agostin. Todos os direitos reservados.
+// Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // D-11: contraste do texto ≥ 4,5:1 na aparência D e ≥ 7:1 na H, nos dois modos,
 // lido do próprio tokens.css (o único lugar com cores).
 import { readFileSync } from "node:fs";
