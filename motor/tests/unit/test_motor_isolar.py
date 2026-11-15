@@ -84,3 +84,26 @@ def test_recusas(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
 def test_sem_passos_passa_em_v2(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
     r = isolar(analisar(r"x + \ln x = a", tab), Sym("x"), tab, glossario)
     assert r.estado in ("sem_passos", "recusado") and not r.ramos
+
+
+@pytest.mark.parametrize(("latex", "alvo", "chave"), [
+    ("PV = nRT", "V", "tipo.polinomial_1"),
+    ("x^2 = a", "x", "tipo.polinomial_2"),
+    (r"z = \frac{a}{x}", "x", "tipo.racional"),
+    (r"\sqrt{x} = a", "x", "tipo.irracional"),
+    ("x^{0.8} = a", "x", "tipo.irracional"),
+    ("e^{x} = a", "x", "tipo.exponencial"),
+    ("a^{x} = z", "x", "tipo.exponencial"),
+    (r"\ln\frac{a}{x} = z", "x", "tipo.logaritmica"),
+    (r"x + \ln x = a", "x", "tipo.mista"),
+    ("|x - a| = z", "x", "tipo.modulo"),
+])
+def test_tipo_da_equacao(latex: str, alvo: str, chave: str, tab: TabelaDeSimbolos) -> None:
+    from amsior.rules.classificar import classificar
+    c = classificar(analisar(latex, tab), alvo, tab)
+    assert c is not None and c.chave == chave
+
+
+def test_resultado_traz_o_tipo(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
+    r = isolar(analisar("PV = nRT", tab), Sym("T"), tab, glossario)
+    assert r.tipo is not None and r.tipo.chave == "tipo.polinomial_1"

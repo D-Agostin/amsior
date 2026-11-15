@@ -30,6 +30,7 @@ from amsior.expr.latex import para_latex
 from amsior.expr.nos import Add, Eq, Expr, Mul, Num, Sub, Sym
 from amsior.expr.ponte_sympy import de_sympy
 from amsior.expr.simbolos import TabelaDeSimbolos
+from amsior.rules.classificar import Classificacao, classificar
 from amsior.rules.isolar import (
     Contexto, Proposta, Ramo, Recusa, _j, descascar, passo_de_cancelamento, trocar_lados,
 )
@@ -62,6 +63,7 @@ class ResultadoIsolar:
     sem_passos: list[Eq] = field(default_factory=list)
     motivo: Motivo | None = None
     rejeitados: list[dict[str, Any]] = field(default_factory=list)  # para o registro de regressão
+    tipo: Classificacao | None = None  # tipo da equação no alvo (D-12)
 
 
 class _Falha(Exception):
@@ -106,6 +108,7 @@ class Isolador:
         if dim.estado == "reprovado" and dim.erro is not None:
             res.motivo = Motivo("isolar.nao_homogenea", {"erro": dim.erro.mensagem()})
             return res
+        res.tipo = classificar(equacao, alvo.id, self.tabela)
         ctx = Contexto(self.tabela, alvo.id)
         self._ctx = ctx
         try:

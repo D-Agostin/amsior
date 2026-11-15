@@ -117,5 +117,17 @@
   "isolar.trigonometrica": "Funções trigonométricas inversas ainda não estão no motor.",
   "isolar.varias_ocorrencias": "A variável aparece mais de uma vez.",
   "isolar.v2_reprovado": "O resultado não satisfez a equação original ({detalhe}).",
-  "regra.reciproco_dos_dois_lados": "Invertendo os dois lados."
+  "regra.reciproco_dos_dois_lados": "Invertendo os dois lados.",
+  "tipo.polinomial_1": "Equação do 1º grau (linear) em \\({alvo}\\)",
+  "tipo.polinomial_2": "Equação do 2º grau (quadrática) em \\({alvo}\\)",
+  "tipo.polinomial_3": "Equação do 3º grau (cúbica) em \\({alvo}\\)",
+  "tipo.polinomial": "Equação polinomial de grau {grau} em \\({alvo}\\)",
+  "tipo.racional": "Equação racional fracionária em \\({alvo}\\): a variável aparece no denominador (grau {grau} depois de tirar os denominadores)",
+  "tipo.irracional": "Equação irracional em \\({alvo}\\): a variável aparece sob raiz ou com expoente fracionário",
+  "tipo.exponencial": "Equação exponencial em \\({alvo}\\): a variável aparece no expoente",
+  "tipo.logaritmica": "Equação logarítmica em \\({alvo}\\): a variável aparece dentro de um logaritmo",
+  "tipo.trigonometrica": "Equação trigonométrica em \\({alvo}\\)",
+  "tipo.modulo": "Equação modular em \\({alvo}\\): a variável aparece dentro de um módulo",
+  "tipo.transcendente": "Equação transcendente em \\({alvo}\\)",
+  "tipo.mista": "Equação mista em \\({alvo}\\): a variável aparece fora e dentro de uma função transcendente; em geral não há forma fechada elementar"
 }

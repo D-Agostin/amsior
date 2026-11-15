@@ -31,6 +31,8 @@ Uma decisão foi acrescentada por Ruan em 14/11/2026, na abertura da fase 1B:
 | ID | Tema | Decisão |
 | --- | --- | --- |
 | D-11 | Design visual | O design é requisito, não acabamento: um visual excelente cansa menos e favorece a aprendizagem, e é onde os softwares da área costumam falhar. Modos claro e escuro com o mesmo cuidado (seção 9.4); nenhuma tela entra numa versão sem a revisão visual de Ruan nos dois modos |
+| D-12 | Tipo da expressão | Toda equação mostra, para a variável escolhida, o tipo de equação que ela é (1º grau, racional, irracional, exponencial, logarítmica, mista...), com ligação para a ficha de Matemática que explica o tipo (seção 4.7) |
+| D-13 | Fichas de conceito | A biblioteca ganha fichas de conceito, além das de equação: texto didático, ilustrações e animações sobre um assunto. Duas seções nascem com elas: Matemática (tipos de expressão e de equação, domínio, equivalência) e Reatores (cada tipo de reator, como funciona, usos e animações de demonstração). Seções 3.5, 8.1 e 8.7 |
 
 ### Decisões técnicas derivadas
 
@@ -247,6 +249,33 @@ revisao: {automatica: null, humana: null, externo: null}
 
 Campos obrigatórios para o estado `verificada`: todos os de `referencias` preenchidos e conferidos, `exemplo.esperado`, pelo menos uma hipótese do vocabulário controlado e todos os passos com certificado aprovado.
 
+### 3.5 Ficha de conceito (D-13)
+
+Explica um assunto em vez de uma equação: o que é, como funciona, quando se usa, com ilustrações e animações. Segue o mesmo fluxo de revisão das fichas de equação (seção 8.5), com redação própria (seção 8.6).
+
+```yaml
+id: reatores.cstr
+tipo: conceito
+versao: 1
+estado: rascunho
+area: reatores
+titulo: {pt: "Reator contínuo de tanque agitado (CSTR)"}
+resumo: {pt: "..."}
+secoes:                       # texto em Markdown com LaTeX; cada seção pode ter figura
+  - {titulo: {pt: "Como funciona"}, texto: {pt: "..."}, figura: reatores/cstr_esquema.svg}
+  - {titulo: {pt: "Quando se usa"}, texto: {pt: "..."}}
+  - {titulo: {pt: "Vantagens e limitações"}, texto: {pt: "..."}}
+equacoes: [reatores.cstr_projeto, reatores.tempo_espacial]   # fichas de equação ligadas
+exemplos:                     # contas verificadas pelo motor, como nas fichas de equação
+  - {enunciado: {pt: "..."}, usa: reatores.cstr_projeto, pede: V}
+animacao: {cena: reatores/cstr_mistura, interativa: reatores/levenspiel}
+referencias: [{fonte: fogler, capitulo: null, secao: null, conferido: {por: null, em: null}}]
+relacionadas: [reatores.pfr, reatores.cstr_em_serie]
+revisao: {humana: null, externo: null}
+```
+
+Afirmações quantitativas do texto entram como `exemplos`, para que o motor as confira; o restante passa pela revisão humana (V7).
+
 ## 4. Motor de passos
 
 O motor aplica regras nomeadas sobre a AmsiorExpr, uma por vez, e só entrega a sequência se todos os passos receberem certificado. Ele não é um CAS geral: cobre bem os padrões da engenharia química e recusa com clareza o que não cobre.
@@ -331,6 +360,20 @@ Integrar e isolar são chamadas aos motores 4.2 e 4.3; seus passos aparecem como
 ### 4.6 Níveis de detalhe
 
 A mesma lista de passos é exibida em dois níveis: **completo** (todos) e **resumido** (passos `fundivel` unidos ao vizinho, com a justificativa composta). O certificado do passo fundido é a conjunção dos certificados originais.
+
+### 4.7 Tipo da equação (D-12)
+
+Antes de resolver, o motor classifica a equação na variável escolhida, pela classificação usual do ensino:
+
+| Tipo | Quando | Exemplo |
+| --- | --- | --- |
+| 1º, 2º, 3º grau ou polinomial de grau n | expressão racional inteira na variável | `PV = nRT` em V; Bernoulli em v₁ (2º grau) |
+| Racional fracionária | a variável aparece no denominador; o grau é o de depois de tirar os denominadores | Charles em T₁ |
+| Irracional | a variável aparece sob raiz ou com expoente fracionário | Dittus-Boelter em Re |
+| Exponencial, logarítmica, trigonométrica, modular | a variável aparece só dentro dessa função | Arrhenius em Eₐ; Clausius-Clapeyron em P₂ |
+| Mista | a variável aparece fora e dentro de uma função transcendente | LMTD em ΔT₂ (sem forma fechada) |
+
+A etiqueta aparece no bloco de equação e no cabeçalho da resolução e leva à ficha de Matemática do tipo. Ela é só informativa: não muda passos nem verificação.
 
 ## 5. Verificação e conformidade científica
 
@@ -534,6 +577,7 @@ Cada área segue a notação de um livro-base (D-06), sempre na última edição
 | Transferência de calor | [Incropera (Bergman, Lavine, Incropera e DeWitt)](https://www.wileyplus.com/incropera-fundamentals-heat-mass-transfer-8e/) | 8ª, 2017 |
 | Transferência de massa | [Bird, Stewart e Lightfoot](https://gov.wiley.com/WileyCDA/WileyTitle/productCd-0470115394.html) | 2ª revisada, 2007 |
 | Operações unitárias | [McCabe, Smith e Harriott](https://Www.Wikipedia.org/wiki/Unit_Operations_of_Chemical_Engineering) | 7ª, 2004 |
+| Matemática (D-13) | A definir (seção 10.3) | — |
 
 Fontes de apoio, também na última edição:
 
@@ -615,6 +659,15 @@ São 56 candidatas; a lista final (cerca de 50) fecha no início da fase 2. As c
 | Transferência de massa (1) | 1ª lei de Fick |
 | Operações unitárias (5) | Volatilidade relativa; linha de operação de McCabe-Thiele; Fenske; Kremser; Rachford-Rice (implícita, sem isolamento na v1) |
 
+Fichas de conceito candidatas (D-13), a confirmar com a lista final. Em negrito, as duas fichas-modelo.
+
+| Seção | Fichas de conceito |
+| --- | --- |
+| Matemática (12) | Expressões algébricas e sua classificação (racionais inteiras, fracionárias, irracionais; monômios, polinômios e grau); equação do 1º grau; equação do 2º grau (discriminante, dois ramos); polinomiais de grau maior; **equação racional** (domínio, eliminar denominadores, raízes estranhas); equação irracional (elevar ao quadrado cria raízes estranhas); exponenciais e logaritmos (propriedades, mudança de base, por que o argumento precisa ser adimensional); equação exponencial e logarítmica; módulo e trigonométricas com ramo principal; equações mistas e por que não têm forma fechada; domínio, equivalência e implicação (o que significa "sob hipótese"); grandezas, dimensões e homogeneidade |
+| Reatores (9) | Batelada; semibatelada; **CSTR**; PFR; leito fixo (PBR); CSTRs em série e a aproximação do PFR; reator com reciclo; isotérmico, adiabático e com troca térmica; o gráfico de Levenspiel e a escolha entre CSTR e PFR |
+
+Cada ficha de Reatores traz o esquema do equipamento, como funciona, onde se usa na indústria, vantagens e limitações, a equação de projeto ligada e uma animação (seção 9.3).
+
 ## 9. Interface, API e animações
 
 A interface tem três regiões fixas: a folha no centro, a tabela de variáveis à direita e a biblioteca à esquerda. Tudo o que ela mostra de matemática vem do motor pela API.
@@ -654,8 +707,11 @@ Metas de desempenho numa máquina de aluno comum: isolar em equação típica de
 
 - **Demonstrações em vídeo**: uma cena Manim é gerada automaticamente a partir dos passos da ficha, transformando a equação de cada passo na do seguinte e exibindo a justificativa. Os vídeos são produzidos na máquina de desenvolvimento e distribuídos como arquivos; o aplicativo do aluno não precisa do Manim. Só fichas `verificada` ganham vídeo, e o vídeo guarda a versão da ficha que o gerou.
 - **Gráficos interativos**: o bloco `grafico` e o campo `animacao` da ficha descrevem, de forma declarativa, a expressão, a variável do eixo e os parâmetros com controle deslizante. Os pontos são calculados pelo motor em lote e desenhados em Canvas.
+- **Animações de conceito** (D-13): cenas para as fichas de conceito, como a mistura num CSTR, o perfil de conversão ao longo de um PFR e o gráfico de Levenspiel comparando CSTR e PFR, com controle deslizante de conversão. Todo número que a cena mostra vem do motor; a cena só desenha.
 
 ### 9.4 Design visual (D-11)
+
+- **Sistemas escolhidos** (14/11/2026, prancha "Amsior — direções visuais da folha"): **D · Bancada com papel e tinta** como padrão e **H · Leitura longa** como alternativa. Mesma estrutura (trilho de ferramentas, passos em grade, tabela de variáveis com origem, barra de estado); D com Inter e STIX Two sobre papel creme e tinta azul; H com Atkinson Hyperlegible Next e Mono, letra maior, contraste de pelo menos 7:1 e papel quente de baixo brilho. Nas configurações: "Aparência" (D ou H) e "Modo" (claro, escuro, seguir o Windows). Impressão e PDF usam sempre D claro.
 
 - **Princípio**: a tela serve à leitura da matemática. Pouco ruído, hierarquia clara, espaço generoso, nada que compita com a equação.
 - **Sistema de design próprio**: cores, tipografia, espaçamento, raios e componentes definidos como *tokens* num só lugar e usados por toda a interface; nenhuma cor ou medida solta no código das telas.
@@ -674,7 +730,7 @@ Cada fase termina quando seus critérios de aceite passam na integração contí
 | --- | --- | --- |
 | 1A · Fundação | `expr`, `units`, `verify`, `i18n`; analisador de LaTeX restrito; versões travadas | Ida e volta LaTeX → árvore → LaTeX estável em 200 expressões; suíte “verificador sob ataque” reprova 100% dos passos errados e aprova 100% dos certos |
 | 1B · Isolar | `rules`, `steps` (isolar), API, sistema de design (D-11), folha mínima com equação, resolução e tabela de variáveis, primeiro executável | Corpus de 60 equações: toda variável isolada com passos ou recusada corretamente; zero passo exibido sem certificado; testes de propriedade com 10 000 casos sem falha de V2; folha aprovada por Ruan nos modos claro e escuro |
-| 2 · Biblioteca | Esquema de ficha, glossário, hipóteses, fontes; as 5 fichas-modelo; depois as demais | 5 fichas-modelo em `verificada`; corpus da biblioteca verde; cada ficha nova só entra com V1 a V6 aprovadas |
+| 2 · Biblioteca | Esquema de ficha de equação e de conceito, glossário, hipóteses, fontes; as 5 fichas-modelo; as seções de Matemática e de Reatores (D-13); depois as demais | 5 fichas-modelo em `verificada` e 2 fichas-modelo de conceito (equação racional; CSTR) revisadas; toda etiqueta de tipo (D-12) leva a uma ficha de Matemática; corpus da biblioteca verde; cada ficha nova só entra com V1 a V6 aprovadas |
 | 3A · Cálculo | Integrais, derivadas e EDOs com passos | Os 6 padrões da seção 4.3 e os 3 casos de EDO da 4.5 com passos e V3/V4 aprovadas; checagem de dependências cobre os casos de C\_p e de ∫V dP |
 | 3B · Propriedades | `props`, `interp`, blocos de propriedade e interpolação; biblioteca de propriedades dos livros (esquema, importador, seletor de origem e primeiro pacote) | Pontos de verificação da IAPWS reproduzidos; avisos de fase, faixa e extrapolação testados; comparação interpolado × calculado funcionando; um pacote de livro completo transcrito, conferido e comparado com a origem calculada |
 | 4 · Animações e distribuição | Gerador de cenas Manim, gráficos interativos, instalador | Vídeo gerado sem ajuste manual para as 5 fichas-modelo; instalação limpa em Windows 10 e 11 sem Python; exportação em PDF fiel à tela |
@@ -700,6 +756,7 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 - [ ] Licença do código do Amsior e do conteúdo das fichas, a decidir antes de distribuir a alunos.
 - [ ] Assinatura digital do instalador, para evitar o alerta do Windows em máquinas de alunos.
 - [ ] Lista final das cerca de 50 fichas, a fechar no início da fase 2.
+- [ ] Livro-base da seção de Matemática e lista final das fichas de conceito de Matemática e de Reatores (proposta na seção 8.7).
 - [ ] Escopo exato da v1.1: solução numérica com método exibido, EDO linear de 2ª ordem, derivação implícita.
 
 * [ ] Direitos de reprodução das tabelas de propriedades dos livros (seção 7.5), a resolver antes de distribuir pacotes a alunos.
@@ -713,3 +770,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.0 | 13/11/2026 | Versão inicial, com as decisões D-01 a D-08 e T-01 a T-06; revisada no mesmo dia (ordem de dependência dos módulos, licenças, campos de símbolo e de passo, critério numérico e independência do verificador, etapa automática de V6). Versão 1.1, na mesma data: D-09 (última edição de cada fonte, seção 8.1) e D-10 (biblioteca de propriedades dos livros, seção 7.5). Versão 1.2, na mesma data, ao fechar a fase 1A: analisador próprio no lugar do Lark; operação declarada no passo; Lt e Le na árvore; substituições limitadas a restringe até a fase 2; zero compatível com qualquer dimensão (decisões 0001 e 0002 do repositório) |
 | 1.3 | 14/11/2026 | Revisão do verificador pelo Fable (revisão 0001) e correções (decisão 0003): verificador sobre a árvore do Amsior, obrigações de domínio, avaliador numérico próprio e contraprova sempre, estratos de magnitude e cobertura de ramos, objetos opacos, relação reduzida a `equivalente` e `implica` com `sob_hipotese` calculado, certificado auditável, verificação de cadeia, `sympy.ask` retirado (seções 3.2, 5.1 e 5.3) |
 | 1.4 | 14/11/2026 | D-11 (design visual como requisito, modos claro e escuro, seção 9.4); critério visual na fase 1B; `verify` antes de `rules` e `steps` na ordem de dependência (decisão 0004) |
+| 1.5 | 14/11/2026 | Sistemas visuais D (padrão) e H; D-12 (tipo da equação, seção 4.7); D-13 (fichas de conceito, seções de Matemática e Reatores, seções 3.5, 8.7 e 9.3) |

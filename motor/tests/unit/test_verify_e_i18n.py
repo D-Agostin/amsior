@@ -99,7 +99,7 @@ def test_passo_serializa_e_volta(glossario: Glossario) -> None:
 
 # ------------------------------------------------------------ catálogo de textos
 
-_CHAVE = re.compile(r"""["']((?:erro|verif|predicado|hipotese|origem|regra|isolar|ramo)\.[a-z0-9_.]+)["']""")
+_CHAVE = re.compile(r"""["']((?:erro|verif|predicado|hipotese|origem|regra|isolar|ramo|tipo)\.[a-z0-9_.]+)["']""")
 
 
 def _chaves_usadas() -> set[str]:
@@ -119,7 +119,7 @@ def test_toda_chave_usada_no_codigo_existe_em_pt_br() -> None:
 def test_catalogo_sem_chaves_orfas_de_erro() -> None:
     usadas = _chaves_usadas()
     cat = catalogo(IDIOMA_PADRAO)
-    orfas = {c for c in cat if c.startswith(("erro.", "verif.", "hipotese.", "regra.", "isolar.", "ramo.")) and c not in usadas}
+    orfas = {c for c in cat if c.startswith(("erro.", "verif.", "hipotese.", "regra.", "isolar.", "ramo.", "tipo.")) and c not in usadas}
     assert not orfas, sorted(orfas)
 
 
