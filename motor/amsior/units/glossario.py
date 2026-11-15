@@ -1,16 +1,19 @@
 # Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
-"""Glossário de grandezas (biblioteca/_glossario.yaml)."""
+"""Glossário de grandezas (biblioteca/_glossario.yaml).
+
+No navegador (Pyodide, sem PyYAML) o motor lê a cópia em JSON, ``_glossario.json``,
+gerada a partir do YAML na montagem da versão web (ferramentas/web/montar_motor.py).
+"""
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 from typing import Any
-
-import yaml
 
 from amsior.expr.simbolos import Papel, Simbolo
 from amsior.units.dimensao import Dim, dimensao_de_unidade
@@ -87,8 +90,23 @@ class Glossario:
         return cls(grandezas)
 
 
+def ler_dados(arquivo: Path) -> Any:
+    """YAML ou JSON, pela extensão. O PyYAML só é importado quando é preciso."""
+    texto = arquivo.read_text(encoding="utf-8")
+    if arquivo.suffix == ".json":
+        return json.loads(texto)
+    import yaml
+
+    return yaml.safe_load(texto)
+
+
 @cache
 def carregar_glossario(caminho: str | None = None) -> Glossario:
-    arquivo = Path(caminho) if caminho else pasta_biblioteca() / "_glossario.yaml"
-    dados = yaml.safe_load(arquivo.read_text(encoding="utf-8"))
-    return Glossario.de_dados(dados)
+    if caminho:
+        arquivo = Path(caminho)
+    else:
+        pasta = pasta_biblioteca()
+        arquivo = pasta / "_glossario.yaml"
+        if not arquivo.exists() and (pasta / "_glossario.json").exists():
+            arquivo = pasta / "_glossario.json"
+    return Glossario.de_dados(ler_dados(arquivo))

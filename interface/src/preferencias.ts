@@ -1,8 +1,7 @@
 // Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
 // Preferências de aparência (especificação 9.4): D ou H, claro, escuro ou seguir
-// o sistema, e o nível de detalhe. Ficam também no armazenamento local; se ele faltar
-// ou falhar, valem os padrões (D, seguir o sistema, completo). O servidor guarda
-// a cópia que vale entre partidas (amsior.api.app.Preferencias).
+// o sistema, e o nível de detalhe. Ficam no armazenamento do navegador; se ele
+// faltar ou falhar, valem os padrões (D, seguir o sistema, completo).
 
 export type Aparencia = "d" | "h";
 export type Modo = "claro" | "escuro" | "sistema";
@@ -22,7 +21,6 @@ export function validarPreferencias(p: Partial<Record<keyof Preferencias, unknow
   };
 }
 
-/** Cópia local, só para a primeira pintura; a fonte é o servidor (a porta muda a cada partida). */
 export function lerPreferencias(): Preferencias {
   try {
     const bruto = localStorage.getItem(CHAVE);

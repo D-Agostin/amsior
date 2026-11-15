@@ -17,10 +17,10 @@ import "@fontsource/atkinson-hyperlegible-mono/500.css";
 import "katex/dist/katex.min.css";
 import "./estilo/tokens.css";
 import "./estilo/base.css";
-import { api } from "./api";
+import { api, motor } from "./api";
 import { App } from "./App";
 import { useEstado } from "./estado";
-import { aplicar, validarPreferencias } from "./preferencias";
+import { aplicar } from "./preferencias";
 import { carregarTextos, t } from "./textos";
 
 const raiz = createRoot(document.getElementById("raiz")!);
@@ -46,16 +46,17 @@ function precarregarFontes(): void {
 
 async function partir(): Promise<void> {
   precarregarFontes();
+  // O motor começa a carregar já; a tela abre com os textos e o glossário do site
+  // e os pedidos esperam na fila até o motor ficar pronto.
+  motor.ouvir((e) => useEstado.setState({ motor: e }));
+  motor.iniciar();
   try {
-    const [textos, glossario, prefs] = await Promise.all([
-      api.textos(), api.glossario(), api.preferencias().catch(() => null)]);
-    carregarTextos(textos);
-    if (prefs) useEstado.getState().definirPrefs(validarPreferencias(prefs), true);
-    useEstado.getState().definirGlossario(glossario.grandezas);
+    const dados = await api.dados();
+    carregarTextos(dados.textos);
+    useEstado.getState().definirGlossario(dados.glossario.grandezas);
     raiz.render(<StrictMode><App /></StrictMode>);
   } catch {
-    useEstado.setState({ motor: "sem_motor" });
-    raiz.render(<p className="falha-partida" role="alert">{t("ui.estado.sem_motor")}</p>);
+    raiz.render(<p className="falha-partida" role="alert">{t("ui.estado.falhou")}</p>);
   }
 }
 

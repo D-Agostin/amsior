@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "preparar": "node ferramentas/copiar-mathlive.mjs",
+    "preparar": "node ferramentas/preparar-public.mjs",
     "build": "npm run preparar && tsc -b && vite build",
     "test": "vitest run",
     "tipos": "tsc -b"
@@ -18,6 +18,7 @@
     "@fontsource/stix-two-text": "5.3.0",
     "katex": "0.19.1",
     "mathlive": "0.111.4",
+    "pyodide": "314.0.8",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "zustand": "5.1.0"

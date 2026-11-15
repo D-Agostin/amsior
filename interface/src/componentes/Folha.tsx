@@ -37,6 +37,7 @@ function BlocoEquacao() {
   const erro = useEstado((s) => s.erroAnalise);
   const lendo = useEstado((s) => s.lendo);
   const latex = useEstado((s) => s.latex);
+  const motorCarregando = useEstado((s) => s.motor.estado === "carregando" || s.motor.estado === "reiniciando");
 
   return (
     <section className="cartao bloco-equacao" aria-label={t("ui.folha.equacao")}>
@@ -53,6 +54,8 @@ function BlocoEquacao() {
             <Mat tex={analise.latex} className={lendo ? "esmaecido" : undefined} />
             {!analise.equacao ? <span className="mensagem-aviso">{t("ui.folha.nao_e_equacao")}</span> : null}
           </>
+        ) : lendo && latex && motorCarregando ? (
+          <span className="nota">{t("ui.res.esperando_motor")}</span>
         ) : (
           <span className="nota"><Texto texto={t("ui.folha.dica_entrada")} /></span>
         )}

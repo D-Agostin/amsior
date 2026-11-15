@@ -295,10 +295,23 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   font-variant-numeric: tabular-nums; font-size: var(--tam-mini); color: var(--cor-texto-2);
 }
 .estado-pronto { color: var(--cor-ok); }
-.estado-ocupado { color: var(--cor-acento-texto); }
-.estado-sem_motor { color: var(--cor-erro); }
+.estado-ocupado, .estado-carregando, .estado-reiniciando { color: var(--cor-acento-texto); }
+.estado-falhou { color: var(--cor-erro); }
+.rodape-link { color: var(--cor-texto-2); }
+.rodape-link:hover { color: var(--cor-acento-texto); }
 
 .falha-partida { padding: var(--esp-6); color: var(--cor-erro); }
+
+/* ------------------------------------------------------------ medição (#medir) */
+
+.medicao { padding: var(--esp-6); display: flex; flex-direction: column; gap: var(--esp-3); max-width: 60rem; }
+.medicao-resumo { display: grid; grid-template-columns: max-content 1fr; gap: var(--esp-1) var(--esp-4); margin: 0; }
+.medicao-resumo dt { color: var(--cor-texto-2); }
+.medicao-resumo dd { margin: 0; font-variant-numeric: tabular-nums; }
+.medicao-tabela { max-width: 40rem; font-variant-numeric: tabular-nums; }
+.medicao-tabela tbody th { font-weight: 400; }
+.medicao-copiar { align-self: flex-start; }
+.medicao-json { display: none; }
 
 /* ------------------------------------------------------------ configurações */
 

@@ -98,6 +98,7 @@ export function Resolucao() {
   const r = useEstado((s) => s.isolamento);
   const erro = useEstado((s) => s.erroIsolar);
   const isolando = useEstado((s) => s.isolando);
+  const motor = useEstado((s) => s.motor);
   if (!alvo || !analise?.equacao) return null;
 
   const faltam = faltamGrandezas(analise, simbolos);
@@ -126,7 +127,9 @@ export function Resolucao() {
       {faltam.length > 0 ? (
         <p className="aviso-faixa">{t("ui.var.falta")}</p>
       ) : isolando && !r ? (
-        <p className="nota resolucao-estado">{t("ui.res.calculando")}</p>
+        <p className="nota resolucao-estado">
+          {motor.estado === "carregando" || motor.estado === "reiniciando" ? t("ui.res.esperando_motor") : t("ui.res.calculando")}
+        </p>
       ) : erro ? (
         <p className="erro-faixa">{erro.mensagem ? <Texto texto={erro.mensagem} /> : t(erro.chave)}</p>
       ) : r ? (

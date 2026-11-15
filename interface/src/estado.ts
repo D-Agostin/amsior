@@ -5,6 +5,7 @@
 
 import { create } from "zustand";
 import { api, FalhaDaApi } from "./api";
+import type { EstadoDoMotor } from "./motor/cliente";
 import type { Analise, ErroApi, Grandeza, Isolamento, SimboloPedido } from "./api";
 import { aplicar, gravarPreferencias, lerPreferencias } from "./preferencias";
 import type { Preferencias } from "./preferencias";
@@ -19,13 +20,12 @@ export interface Exemplo {
 
 export interface Simb { grandeza: string | null; papel: string }
 
-export type EstadoMotor = "pronto" | "ocupado" | "sem_motor";
 
 interface Estado {
   prefs: Preferencias;
   sistemaEscuro: boolean;
   glossario: Grandeza[];
-  motor: EstadoMotor;
+  motor: EstadoDoMotor;
 
   exemplo: string | null;
   latex: string;
@@ -39,7 +39,7 @@ interface Estado {
   erroIsolar: ErroApi | null;
   isolando: boolean;
 
-  definirPrefs: (p: Partial<Preferencias>, doServidor?: boolean) => void;
+  definirPrefs: (p: Partial<Preferencias>) => void;
   definirSistemaEscuro: (escuro: boolean) => void;
   definirGlossario: (g: Grandeza[]) => void;
   definirLatex: (latex: string) => void;
@@ -78,7 +78,7 @@ export const useEstado = create<Estado>((set, get) => {
       set({ analise: null, erroAnalise: null, lendo: false, isolamento: null, erroIsolar: null, alvo: null });
       return;
     }
-    set({ lendo: true, motor: "ocupado" });
+    set({ lendo: true });
     try {
       const a = await api.analisar(latex, pedidoDeSimbolos(simbolos));
       if (ordem !== ordemAnalise) return;
@@ -86,14 +86,14 @@ export const useEstado = create<Estado>((set, get) => {
       const novos: Record<string, Simb> = {};
       for (const s of a.simbolos) novos[s] = get().simbolos[s] ?? { grandeza: null, papel: "variavel" };
       const alvo = get().alvo;
-      set({ analise: a, erroAnalise: null, lendo: false, simbolos: novos, motor: "pronto",
+      set({ analise: a, erroAnalise: null, lendo: false, simbolos: novos,
             alvo: alvo && a.simbolos.includes(alvo) && a.equacao ? alvo : null });
       if (!(alvo && a.simbolos.includes(alvo))) set({ isolamento: null, erroIsolar: null });
       depois?.();
     } catch (e) {
       if (ordem !== ordemAnalise) return;
       const erro = comoErro(e);
-      set({ erroAnalise: erro, lendo: false, motor: erro.codigo === "sem_conexao" ? "sem_motor" : "pronto" });
+      set({ erroAnalise: erro, lendo: false });
     }
   };
 
@@ -101,16 +101,15 @@ export const useEstado = create<Estado>((set, get) => {
     const { latex, simbolos, analise } = get();
     if (!analise?.equacao) return;
     const ordem = ++ordemIsolar;
-    set({ alvo, isolando: true, erroIsolar: null, motor: "ocupado" });
+    set({ alvo, isolando: true, erroIsolar: null });
     try {
       const r = await api.isolar(latex, alvo, pedidoDeSimbolos(simbolos, analise.simbolos));
       if (ordem !== ordemIsolar) return;
-      set({ isolamento: r, isolando: false, motor: "pronto" });
+      set({ isolamento: r, isolando: false });
     } catch (e) {
       if (ordem !== ordemIsolar) return;
       const erro = comoErro(e);
-      set({ isolamento: null, erroIsolar: erro, isolando: false,
-            motor: erro.codigo === "sem_conexao" ? "sem_motor" : "pronto" });
+      set({ isolamento: null, erroIsolar: erro, isolando: false });
     }
   };
 
@@ -119,7 +118,7 @@ export const useEstado = create<Estado>((set, get) => {
     prefs,
     sistemaEscuro: false,
     glossario: [],
-    motor: "pronto",
+    motor: { estado: "carregando", etapa: "python", fracao: null },
     exemplo: null,
     latex: "",
     simbolos: {},
@@ -131,10 +130,9 @@ export const useEstado = create<Estado>((set, get) => {
     erroIsolar: null,
     isolando: false,
 
-    definirPrefs: (p, doServidor = false) => {
+    definirPrefs: (p) => {
       const nova = { ...get().prefs, ...p };
       gravarPreferencias(nova);
-      if (!doServidor) api.gravarPreferencias(nova).catch(() => { /* fica só nesta sessão */ });
       aplicar(nova, get().sistemaEscuro);
       set({ prefs: nova });
     },

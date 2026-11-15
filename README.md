@@ -17,8 +17,9 @@ Em desenvolvimento; ainda não há versão pública para uso.
 - **Fase 1B (isolar variável), concluída:** motor que isola uma variável com
   passos certificados, primeira tela (equação, resolução e tabela de
   variáveis) e dois sistemas visuais com modo claro e escuro.
-- **Fase 1C (navegador), a fazer:** o Amsior passa a rodar inteiro no
-  navegador, sem instalação. Veja a
+- **Fase 1C (navegador), em andamento:** o Amsior passa a rodar inteiro no
+  navegador, sem instalação. O motor já roda no navegador e dá as mesmas
+  respostas do Python nativo. Veja a
   [decisão 0006](docs/decisoes/0006-navegador-e-software-livre.md).
 
 ## O que existe
@@ -48,14 +49,19 @@ python -m mypy
 python -m pytest
 ```
 
-Interface (Node 22):
+Site (Node 22 e, para a partida mais rápida, um Python 3.14 para o bytecode):
 
 ```
+python ferramentas/web/montar_motor.py
 cd interface
 npm ci
 npm test
 npm run build
+npx vite preview
 ```
+
+Com o site aberto, o endereço terminado em `#medir` mostra quanto o navegador
+baixou e quanto o motor leva para isolar cada exemplo.
 
 ## Documentos
 

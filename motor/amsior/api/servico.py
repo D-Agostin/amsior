@@ -195,7 +195,8 @@ def rota_textos(_dados: dict[str, Any] | None = None) -> dict[str, str]:
 
 
 ROTAS: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
-    "glossario": rota_glossario, "analisar": rota_analisar, "isolar": rota_isolar}
+    "textos": rota_textos, "glossario": rota_glossario, "analisar": rota_analisar,
+    "isolar": rota_isolar}
 
 
 def executar(rota: str, dados: dict[str, Any]) -> dict[str, Any]:

@@ -12,7 +12,7 @@ import pytest
 pytest.importorskip("fastapi")
 
 from amsior.api.app import Calculista, criar_app  # noqa: E402
-from amsior.api.servico import executar, unidade_legivel  # noqa: E402
+from amsior.api.servico import executar, rota_textos, unidade_legivel  # noqa: E402
 
 TOKEN = "teste-123"
 GAS = [{"id": "P", "grandeza": "pressao_absoluta"}, {"id": "V", "grandeza": "volume"},
@@ -210,3 +210,18 @@ def test_autoteste_da_janela_sobe_o_servidor_de_verdade(tmp_path: Any, monkeypat
         s.parar()
     assert rel["interface"] == "ok" and rel["grandezas"] >= 60
     assert rel["isolar"] == "V = \\frac{n R T}{p}"
+
+
+def test_glossario_em_json_e_o_mesmo_do_yaml(tmp_path: Any) -> None:
+    """No navegador (sem PyYAML) o motor lê _glossario.json; tem de dar o mesmo glossário."""
+    import yaml
+    from amsior.units.glossario import carregar_glossario, pasta_biblioteca
+    dados = yaml.safe_load((pasta_biblioteca() / "_glossario.yaml").read_text(encoding="utf-8"))
+    (tmp_path / "_glossario.json").write_text(json.dumps(dados), encoding="utf-8")
+    de_json, de_yaml = carregar_glossario(str(tmp_path / "_glossario.json")), carregar_glossario()
+    assert de_json._g == de_yaml._g and len(de_json._g) >= 60
+
+
+def test_textos_tambem_saem_pelo_executar() -> None:
+    """O trabalhador do navegador só fala por executar(rota, dados)."""
+    assert executar("textos", {})["ok"] == rota_textos()

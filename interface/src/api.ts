@@ -1,6 +1,10 @@
 // Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
-// Cliente da API local (especificação 9.2). O token da sessão chega no fragmento
-// da URL (#token=...), aberto pela janela do aplicativo, e vai em todo pedido.
+// Pedidos ao motor (especificação 9.2). O motor roda no próprio navegador, num
+// trabalhador de cálculo (motor/trabalhador.ts); nada sai do dispositivo (T-07).
+
+import { Motor } from "./motor/cliente";
+import type { ErroMotor } from "./motor/cliente";
+import { t } from "./textos";
 
 export interface Grandeza { id: string; nome: string; unidade: string; suposicoes: string[] }
 
@@ -54,37 +58,34 @@ export class FalhaDaApi extends Error {
 
 export interface SimboloPedido { id: string; grandeza?: string | null; papel?: string }
 
-function token(): string {
-  const m = /token=([^&]+)/.exec(window.location.hash);
-  if (m) {
-    try { sessionStorage.setItem("amsior.token", m[1]); } catch { /* armazenamento indisponível */ }
-    return m[1];
-  }
-  try { return sessionStorage.getItem("amsior.token") ?? ""; } catch { return ""; }
-}
+export interface DadosIniciais { textos: Record<string, string>; glossario: { grandezas: Grandeza[] } }
 
-async function pedir<T>(metodo: "GET" | "POST" | "PUT", rota: string, corpo?: unknown): Promise<T> {
-  let resposta: Response;
-  try {
-    resposta = await fetch(`./api/v1/${rota}`, {
-      method: metodo,
-      headers: { "content-type": "application/json", "x-amsior-token": token() },
-      body: corpo === undefined ? undefined : JSON.stringify(corpo),
-    });
-  } catch {
-    throw new FalhaDaApi({ codigo: "sem_conexao", mensagem: "", chave: "ui.estado.sem_motor", detalhe: null });
+const BASE = new URL("./", document.baseURI).href;
+
+/** O motor; só começa a carregar quando main.tsx chama motor.iniciar(). */
+export const motor = new Motor(BASE, () =>
+  new Worker(new URL("./motor/trabalhador.ts", import.meta.url), { type: "module", name: "amsior-motor" }));
+
+async function pedir<T>(rota: string, dados: unknown, chave?: string): Promise<T> {
+  const r = await motor.pedir(rota, dados, { chave });
+  if (r.erro) {
+    const erro: ErroMotor = { ...r.erro };
+    if (!erro.mensagem && erro.chave.startsWith("ui.")) {
+      erro.mensagem = t(erro.chave, (erro.detalhe ?? {}) as Record<string, string | number>);
+    }
+    throw new FalhaDaApi(erro);
   }
-  const dados = await resposta.json().catch(() => null);
-  if (!resposta.ok) throw new FalhaDaApi(dados as ErroApi);
-  return dados as T;
+  return r.ok as T;
 }
 
 export const api = {
-  textos: () => pedir<Record<string, string>>("GET", "textos"),
-  preferencias: () => pedir<Record<string, string>>("GET", "preferencias"),
-  gravarPreferencias: (p: object) => pedir<Record<string, string>>("PUT", "preferencias", p),
-  glossario: () => pedir<{ grandezas: Grandeza[] }>("GET", "glossario"),
-  analisar: (latex: string, simbolos: SimboloPedido[]) => pedir<Analise>("POST", "analisar", { latex, simbolos }),
+  /** Textos e glossário prontos no site: a tela abre antes de o motor terminar de carregar. */
+  dados: async (): Promise<DadosIniciais> => {
+    const r = await fetch(`${BASE}motor/dados.json`);
+    if (!r.ok) throw new FalhaDaApi({ codigo: "sem_motor", mensagem: "", chave: "ui.estado.falhou", detalhe: r.status });
+    return (await r.json()) as DadosIniciais;
+  },
+  analisar: (latex: string, simbolos: SimboloPedido[]) => pedir<Analise>("analisar", { latex, simbolos }, "analisar"),
   isolar: (latex: string, alvo: string, simbolos: SimboloPedido[]) =>
-    pedir<Isolamento>("POST", "isolar", { latex, alvo, simbolos }),
+    pedir<Isolamento>("isolar", { latex, alvo, simbolos }, "isolar"),
 };

@@ -2,3 +2,5 @@ node_modules/
 dist/
 public/mathlive/
 *.tsbuildinfo
+public/pyodide/
+public/motor/
