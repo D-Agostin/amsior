@@ -28,7 +28,7 @@ from typing import Any, Literal
 import sympy as sp
 
 from amsior.expr.latex import para_latex
-from amsior.expr.nos import Add, Div, Eq, Expr, Mul, Neg, Num, Pow, Sub, Sym
+from amsior.expr.nos import Add, Div, Eq, Expr, Mul, Neg, Num, Pow, Sqrt, Sub, Sym
 from amsior.expr.ponte_sympy import de_sympy
 from amsior.expr.simbolos import TabelaDeSimbolos
 from amsior.rules.classificar import Classificacao, classificar
@@ -151,8 +151,40 @@ class Isolador:
                 if vivos[0].rotulo:
                     cam.rotulo = vivos[0].rotulo
                 self._aplicar(cam, vivos[0].propostas)
-            prontos.append(self._fechar(eq0, cam))
+            try:
+                prontos.append(self._fechar(eq0, cam))
+            except _Falha as f:
+                estranha = self._raiz_estranha(eq0, cam, ctx) if f.motivo.chave == "isolar.v2_reprovado" else None
+                if estranha is None:
+                    raise
+                res.descartados.append(estranha)
+        if not prontos:
+            raise _Falha(Motivo("isolar.so_raizes_estranhas"))
         return prontos
+
+    def _raiz_estranha(self, eq0: Eq, cam: _Caminho, ctx: Contexto) -> Motivo | None:
+        """Candidata numérica que não satisfaz a equação original (seção 4.2, item 6).
+
+        Só vale depois de um passo que não é equivalência pura (elevar ao quadrado,
+        eliminar denominador, raiz par com condição): ali podem nascer raízes que a
+        equação original não tem. A candidata é substituída na equação original; se
+        ela não a satisfaz (ou cai fora do domínio), o ramo é descartado com o motivo.
+        Resultado literal não é descartado assim: a falha continua sendo falha.
+        """
+        if not any(p.relacao == "implica" or p.condicoes for p in cam.passos):
+            return None
+        if livres(cam.eq.dir):
+            return None
+        conv = self.verificador.conv
+        u = conv(Sym(ctx.alvo))
+        valor = conv(cam.eq.dir)
+        try:
+            dif = sp.simplify((conv(eq0.esq) - conv(eq0.dir)).subs(u, valor))
+        except Exception:
+            dif = sp.nan
+        if dif == 0:
+            return None  # satisfaz: a falha de V2 era outra coisa
+        return Motivo("ramo.raiz_estranha", {"valor": para_latex(cam.eq.dir), "alvo": ctx.alvo})
 
     def _proximo(self, eq: Eq, ctx: Contexto) -> list[Ramo]:
         na_esq, na_dir = ctx.tem(eq.esq), ctx.tem(eq.dir)
@@ -163,7 +195,26 @@ class Isolador:
             if isinstance(r, Recusa):
                 raise _Falha(Motivo(r.chave, r.args))
             return r
+        radical = self._isolar_radical(eq, ctx)
+        if radical is not None:
+            return [Ramo([radical])]
         return [Ramo(self._reunir(eq, ctx))]
+
+    def _isolar_radical(self, eq: Eq, ctx: Contexto) -> Proposta | None:
+        """√A = B com o alvo em A e em B: eleva os dois lados ao quadrado.
+
+        O passo vale sob a condição B ≥ 0 (a raiz quadrada não é negativa); sem ela,
+        só implica. As candidatas que violam a condição são as raízes estranhas, que
+        a conferência na equação original descarta no fim de cada ramo.
+        """
+        for lado_r, lado_o, inverter in ((eq.esq, eq.dir, False), (eq.dir, eq.esq, True)):
+            if isinstance(lado_r, Sqrt) and ctx.tem(lado_r) and ctx.tem(lado_o):
+                dois = Num("2")
+                depois = Eq(lado_r.a, Pow(lado_o, dois)) if not inverter else Eq(Pow(lado_o, dois), lado_r.a)
+                return Proposta("elevar_os_dois_lados", depois, Operacao("elevar_ambos", dois),
+                                condicoes=ctx.condicao(lado_o, "nao_negativo"),
+                                justificativa=_j("regra.elevar_ao_quadrado_radical", termo=lado_o))
+        return None
 
     def _aplicar(self, cam: _Caminho, propostas: list[Proposta]) -> None:
         for p in propostas:
@@ -244,6 +295,9 @@ class Isolador:
         # linear em u: f = a·u + b, com a = ∂f/∂u e b = f(u = 0); nada é expandido,
         # e logaritmos como ln(T₂/T₁) ficam inteiros
         alvo_f = num if den == 1 else f
+        if not alvo_f.has(u):
+            # o alvo sumiu ao simplificar: x/(x − 1) = 1/(x − 1) vira 1 = 0 no domínio
+            raise _Falha(Motivo("isolar.identidade" if sp.simplify(alvo_f) == 0 else "isolar.sem_solucao"))
         try:
             a = sp.diff(alvo_f, u)
             b = alvo_f.subs(u, 0)
@@ -308,7 +362,7 @@ class Isolador:
                                 condicoes=ctx.condicao(a_expr, "nao_nulo"),
                                 justificativa=_j("regra.dividir_pelo_coeficiente", alvo=x, coeficiente=a_expr)))
         # u² + pu + q = 0  →  (u + p/2)² = p²/4 − q = Δ/4a²
-        h = sp.simplify(b / 2)
+        h = sp.factor(b / 2) if (b / 2).is_rational_function() else sp.simplify(b / 2)
         quadrado = Pow(_soma([(sp.Integer(1), x), (h, None)], tab), Num("2"))
         resto = sp.together(b**2 / 4 - c)
         j = _j("regra.completar_quadrado", alvo=x, delta=de_sympy(delta, tab))
@@ -383,6 +437,8 @@ def _soma(termos: list[tuple[Any, Expr | None]], tabela: TabelaDeSimbolos) -> Ex
     for coef, mono in termos:
         if coef == 0:
             continue
+        if coef.is_rational_function():  # −(2D + 1)/(2D), não (−2D − 1)/(2D); ln fica intacto
+            coef = sp.factor(coef)
         neg = bool(coef.could_extract_minus_sign())
         mag = -coef if neg else coef
         if mono is None:

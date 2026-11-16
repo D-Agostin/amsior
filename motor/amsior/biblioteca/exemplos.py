@@ -20,6 +20,19 @@ from amsior.biblioteca.esquema import Biblioteca, Ficha, Problema
 GRANDEZA_PADRAO = "adimensional"
 
 
+def simbolo_canonico(latex: str) -> str:
+    """``v_0`` e ``v_{0}`` são o mesmo símbolo: vale a forma que o analisador produz."""
+    from amsior.expr.analisador import analisar
+    from amsior.expr.nos import Sym
+
+    e = analisar(latex)
+    return e.id if isinstance(e, Sym) else latex
+
+
+def simbolos_declarados(ex: dict[str, Any]) -> dict[str, str]:
+    return {simbolo_canonico(str(s["simbolo"])): str(s["grandeza"]) for s in ex.get("simbolos") or ()}
+
+
 def conferir_exemplos(b: Biblioteca, fichas: list[Ficha] | None = None) -> list[Problema]:
     from amsior.api.servico import executar
 
@@ -44,13 +57,13 @@ def _conferir(f: Ficha, i: int, ex: dict[str, Any], executar: Executar) -> list[
         return [Problema(f.arquivo, campo, msg)]
 
     latex = ex["equacao"]
-    declarados = {str(s["simbolo"]): str(s["grandeza"]) for s in ex.get("simbolos") or ()}
+    declarados = simbolos_declarados(ex)
     lido = executar("analisar", {"latex": latex, "simbolos": [
         {"id": k, "grandeza": g} for k, g in declarados.items()]})
     if "erro" in lido:
         return erro(f"a equação não se lê: {lido['erro']['mensagem']}")
     simbolos = [{"id": s, "grandeza": declarados.get(s, GRANDEZA_PADRAO)} for s in lido["ok"]["simbolos"]]
-    r = executar("isolar", {"latex": latex, "alvo": ex["pede"], "simbolos": simbolos})
+    r = executar("isolar", {"latex": latex, "alvo": simbolo_canonico(ex["pede"]), "simbolos": simbolos})
     if "erro" in r:
         return erro(f"o motor recusou o pedido: {r['erro']['mensagem']}")
     ok = r["ok"]

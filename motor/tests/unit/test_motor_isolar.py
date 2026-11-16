@@ -174,3 +174,25 @@ def test_recusa_honesta_sem_regra(tab: TabelaDeSimbolos, glossario: Glossario) -
     assert r.estado == "sem_passos" and r.motivo is not None
     assert r.motivo.chave == "isolar.sem_regra_reunir"
     assert [para_latex(e) for e in r.sem_passos] == ["x = 3"]  # x = 2 é raiz estranha
+
+
+# ------------------------------------------------------------------ raízes estranhas (seção 4.2, item 6)
+
+
+@pytest.mark.parametrize(("latex", "esperado", "estranha"), [
+    (r"\sqrt{x + 2} = x", ["x = 2"], "-1"),
+    (r"x = \sqrt{x + 2}", ["x = 2"], "-1"),
+    (r"\sqrt{x + 6} = x", ["x = 3"], "-2"),
+])
+def test_radical_com_alvo_dos_dois_lados(latex: str, esperado: list[str], estranha: str,
+                                         tab: TabelaDeSimbolos, glossario: Glossario) -> None:
+    r = isolar(analisar(latex, tab), Sym("x"), tab, glossario)
+    assert r.estado == "com_passos" and _resultados(r) == esperado
+    assert r.ramos[0].passos[0].regra == "elevar_os_dois_lados"
+    assert [d.chave for d in r.descartados] == ["ramo.raiz_estranha"]
+    assert r.descartados[0].args["valor"] == estranha
+
+
+def test_alvo_que_some_ao_simplificar(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
+    r = isolar(analisar(r"\frac{x}{x - 1} = \frac{1}{x - 1}", tab), Sym("x"), tab, glossario)
+    assert r.estado == "recusado" and r.motivo is not None and r.motivo.chave == "isolar.sem_solucao"

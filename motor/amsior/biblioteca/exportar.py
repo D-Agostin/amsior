@@ -16,7 +16,7 @@ import json
 from typing import Any
 
 from amsior.biblioteca.esquema import AREAS, Biblioteca, Ficha
-from amsior.biblioteca.exemplos import GRANDEZA_PADRAO
+from amsior.biblioteca.exemplos import GRANDEZA_PADRAO, simbolo_canonico, simbolos_declarados
 
 
 def para_interface(b: Biblioteca) -> dict[str, Any]:
@@ -81,13 +81,13 @@ def _sem_comentarios(svg: str) -> str:
 def _exemplo(e: dict[str, Any]) -> dict[str, Any]:
     from amsior.api.servico import executar
 
-    declarados = {str(s["simbolo"]): str(s["grandeza"]) for s in e.get("simbolos") or ()}
+    declarados = simbolos_declarados(e)
     lido = executar("analisar", {"latex": e["equacao"], "simbolos": [
         {"id": k, "grandeza": g} for k, g in declarados.items()]})["ok"]
     return {
         "enunciado": e["enunciado"],
         "equacao": e["equacao"],
-        "pede": e["pede"],
+        "pede": simbolo_canonico(e["pede"]),
         "simbolos": [{"id": s, "grandeza": declarados.get(s, GRANDEZA_PADRAO)} for s in lido["simbolos"]],
         "passos": e.get("passos", True),
     }
