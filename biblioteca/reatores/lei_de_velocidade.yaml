@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de conceito (Reatores). Copyright (c) 2026 Ruan D'Agostin.
+
+id: reatores.lei_de_velocidade
+tipo: conceito
+versao: 1
+estado: rascunho
+area: reatores
+grupo: {pt: "Fundamentos"}
+ordem: 3
+titulo: {pt: "Lei de velocidade, ordem e Arrhenius"}
+resumo: null
+secoes: []
+equacoes: []
+exemplos: []
+animacao: null
+referencias:
+  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
+relacionadas: []
+revisao: {humana: null, externo: null}

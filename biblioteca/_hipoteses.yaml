@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Vocabulário de hipóteses. Copyright (c) 2026 Ruan D'Agostin.
+#
+# Seção 8.3 da especificação: uma ficha só cita hipótese daqui; criar uma nova
+# é uma alteração revisada. Cada hipótese tem um enunciado e, quando existe, a
+# consequência matemática que ela permite usar (em LaTeX). A consequência
+# ainda não é aplicada pelo verificador; é a forma que ele vai usar.
+#
+# Campos:
+#   enunciado     frase curta, no presente, sobre o sistema
+#   consequencia  LaTeX da consequência matemática (opcional)
+#   areas         onde a hipótese costuma aparecer (só para busca)
+formato: 1
+hipoteses:
+
+  # Sistema e processo
+  sistema_fechado:
+    enunciado: {pt: "Não entra nem sai massa pela fronteira do sistema."}
+    consequencia: 'dm = 0'
+    areas: [termodinamica, balancos]
+  regime_permanente:
+    enunciado: {pt: "Nenhuma propriedade do sistema varia com o tempo."}
+    consequencia: '\frac{d}{dt} = 0'
+    areas: [balancos, reatores, mecanica_dos_fluidos, transferencia_de_calor]
+  energias_cinetica_potencial_desprezaveis:
+    enunciado: {pt: "As variações de energia cinética e de energia potencial são desprezíveis diante das demais parcelas de energia."}
+    consequencia: '\Delta E_c = \Delta E_p = 0'
+    areas: [termodinamica, balancos]
+  pressao_constante:
+    enunciado: {pt: "A pressão é a mesma durante todo o processo."}
+    consequencia: 'dP = 0'
+    areas: [termodinamica, balancos]
+  volume_constante:
+    enunciado: {pt: "O volume do sistema não varia durante o processo."}
+    consequencia: 'dV = 0'
+    areas: [termodinamica, reatores]
+  isotermico:
+    enunciado: {pt: "A temperatura é a mesma durante todo o processo."}
+    consequencia: 'dT = 0'
+    areas: [termodinamica, reatores]
+  adiabatico:
+    enunciado: {pt: "Não há troca de calor com a vizinhança."}
+    consequencia: 'Q = 0'
+    areas: [termodinamica, reatores]
+  sem_mudanca_de_fase:
+    enunciado: {pt: "Não há mudança de fase no intervalo considerado."}
+    areas: [termodinamica, balancos]
+  sem_reacao:
+    enunciado: {pt: "Não ocorre reação química."}
+    areas: [termodinamica, balancos]
+
+  # Substâncias e fases
+  substancia_pura:
+    enunciado: {pt: "O sistema contém uma única espécie química."}
+    areas: [termodinamica]
+  gas_ideal:
+    enunciado: {pt: "O gás se comporta como gás ideal: as moléculas não interagem e o volume próprio delas é desprezível."}
+    consequencia: 'PV = nRT'
+    areas: [termodinamica, balancos, reatores]
+  equilibrio_liquido_vapor:
+    enunciado: {pt: "Líquido e vapor estão em equilíbrio de fases."}
+    areas: [termodinamica, operacoes_unitarias]
+  vapor_gas_ideal:
+    enunciado: {pt: "A fase vapor se comporta como gás ideal."}
+    consequencia: 'PV^{V} = RT'
+    areas: [termodinamica, operacoes_unitarias]
+  volume_liquido_desprezivel:
+    enunciado: {pt: "O volume molar do líquido é desprezível diante do volume molar do vapor."}
+    consequencia: '\Delta V_{vap} \approx V^{V}'
+    areas: [termodinamica]
+  dhvap_constante:
+    enunciado: {pt: "A entalpia de vaporização não varia no intervalo de temperatura considerado."}
+    areas: [termodinamica]
+
+  # Reatores
+  mistura_perfeita:
+    enunciado: {pt: "Composição e temperatura são uniformes em todo o volume do reator e iguais às da corrente de saída."}
+    areas: [reatores]
+  escoamento_empistonado:
+    enunciado: {pt: "Não há mistura na direção do escoamento, e as propriedades são uniformes em cada seção transversal."}
+    areas: [reatores]
+  densidade_constante:
+    enunciado: {pt: "A massa específica da mistura reacional não muda com a reação; num reator contínuo, a vazão volumétrica de saída é igual à de entrada."}
+    consequencia: 'v = v_0'
+    areas: [reatores]

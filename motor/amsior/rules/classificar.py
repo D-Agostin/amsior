@@ -32,7 +32,7 @@ Familia = Literal["exponencial", "logaritmica", "trigonometrica", "modulo"]
 _TRANSCENDENTES = frozenset({"exponencial", "logaritmica", "trigonometrica", "modulo"})
 
 
-# todas as chaves possíveis (são também os ids das fichas de Matemática que explicam cada tipo)
+# todas as chaves possíveis; cada uma leva à ficha de Matemática que a lista em `tipos`
 CHAVES: tuple[str, ...] = (
     "tipo.polinomial_1", "tipo.polinomial_2", "tipo.polinomial_3", "tipo.polinomial",
     "tipo.racional", "tipo.irracional", "tipo.exponencial", "tipo.logaritmica",
@@ -49,7 +49,7 @@ class Classificacao:
 
     @property
     def chave(self) -> str:
-        """Chave do catálogo de textos e id da ficha de Matemática que explica o tipo."""
+        """Chave do catálogo de textos; a ficha que explica o tipo a cita em ``tipos``."""
         if self.classe == "polinomial" and self.grau in (1, 2, 3):
             return f"tipo.polinomial_{self.grau}"
         if self.classe == "transcendente" and len(self.familias) == 1:

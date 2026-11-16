@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de conceito (Reatores). Copyright (c) 2026 Ruan D'Agostin.
+
+id: reatores.cstr
+tipo: conceito
+versao: 1
+estado: rascunho
+area: reatores
+grupo: {pt: "Reatores ideais"}
+ordem: 6
+titulo: {pt: "Reator contínuo de tanque agitado (CSTR)"}
+resumo: null
+secoes: []
+equacoes: []
+exemplos: []
+animacao: null
+referencias:
+  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
+relacionadas: []
+revisao: {humana: null, externo: null}

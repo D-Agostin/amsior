@@ -276,7 +276,10 @@ tipo: conceito
 versao: 1
 estado: rascunho
 area: reatores
+grupo: {pt: "Reatores ideais"}  # grupo e posição na lista da seção 8.7
+ordem: 6
 titulo: {pt: "Reator contínuo de tanque agitado (CSTR)"}
+# tipos: [tipo.racional]      # só em Matemática: tipos de equação (D-12) que a ficha explica
 resumo: {pt: "..."}
 secoes:                       # texto em Markdown com LaTeX; cada seção pode ter figura
   - {titulo: {pt: "Como funciona"}, texto: {pt: "..."}, figura: reatores/cstr_esquema.svg}
@@ -286,12 +289,14 @@ equacoes: [reatores.cstr_projeto, reatores.tempo_espacial]   # fichas de equaç�
 exemplos:                     # contas verificadas pelo motor, como nas fichas de equação
   - {enunciado: {pt: "..."}, usa: reatores.cstr_projeto, pede: V}
 animacao: {cena: reatores/cstr_mistura, interativa: reatores/levenspiel}
-referencias: [{fonte: fogler, capitulo: null, secao: null, conferido: {por: null, em: null}}]
+referencias: [{fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}]
 relacionadas: [reatores.pfr, reatores.cstr_em_serie]
 revisao: {humana: null, externo: null}
 ```
 
 Afirmações quantitativas do texto entram como `exemplos`, para que o motor as confira; o restante passa pela revisão humana (V7).
+
+O esquema das duas espécies de ficha é conferido pelo módulo `amsior.biblioteca` em toda execução dos testes: campos desconhecidos, ids que não batem com o arquivo, fontes e hipóteses fora dos vocabulários, ligações para fichas inexistentes, uma ficha visível apontando para um rascunho, números de página sem conferência (D-05) e um tipo de equação explicado por duas fichas são erros. Na ficha de equação, a equação tem de se ler sem ambiguidade e usar exatamente os símbolos declarados em `variaveis`, com as grandezas do glossário.
 
 Quando a ficha adapta trecho, exemplo ou figura de obra aberta (seção 8.6), a referência traz `uso: adaptacao` e o campo `adaptacao: {pt: "..."}` diz o que veio da obra e o que foi mudado; a licença e os autores vêm do registro de fontes. Sem esse campo, a referência é só citação.
 

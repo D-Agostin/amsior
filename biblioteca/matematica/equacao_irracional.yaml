@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de conceito (Matemática). Copyright (c) 2026 Ruan D'Agostin.
+
+id: matematica.equacao_irracional
+tipo: conceito
+versao: 1
+estado: rascunho
+area: matematica
+grupo: {pt: "Tipos de equação"}
+ordem: 8
+titulo: {pt: "Equação irracional"}
+tipos: [tipo.irracional]
+resumo: null
+secoes: []
+equacoes: []
+exemplos: []
+animacao: null
+referencias:
+  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
+relacionadas: []
+revisao: {humana: null, externo: null}

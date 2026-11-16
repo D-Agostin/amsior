@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de conceito (Matemática). Copyright (c) 2026 Ruan D'Agostin.
+
+id: matematica.dominio
+tipo: conceito
+versao: 1
+estado: rascunho
+area: matematica
+grupo: {pt: "Linguagem"}
+ordem: 2
+titulo: {pt: "Domínio de uma expressão"}
+resumo: null
+secoes: []
+equacoes: []
+exemplos: []
+animacao: null
+referencias:
+  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
+relacionadas: []
+revisao: {humana: null, externo: null}

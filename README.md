@@ -24,6 +24,10 @@ Em desenvolvimento; ainda não há versão pública para uso.
   aplicativo pelo navegador. Versão de teste em
   <https://d-agostin.github.io/amsior/>. Veja a
   [decisão 0006](docs/decisoes/0006-navegador-e-software-livre.md).
+- **Fase 2 (biblioteca), em andamento:** esquema das fichas de equação e de
+  conceito conferido pelos testes, registro de fontes, vocabulário de
+  hipóteses e as 28 fichas de conceito de Matemática e de Reatores criadas
+  como rascunho, na ordem da especificação.
 
 ## O que existe
 
@@ -38,8 +42,11 @@ Em desenvolvimento; ainda não há versão pública para uso.
 - `motor/amsior/i18n`: catálogo de textos (pt-BR).
 - `interface/`: interface em React e TypeScript.
 - `biblioteca/_glossario.yaml`: 60 grandezas com unidade SI e suposições.
+- `motor/amsior/biblioteca`: leitura e validação das fichas.
 - `biblioteca/_fontes.yaml`: livros-base e de apoio, na última edição, com o
   estado da conferência.
+- `biblioteca/_hipoteses.yaml`: vocabulário controlado de hipóteses.
+- `biblioteca/matematica/` e `biblioteca/reatores/`: fichas de conceito.
 
 ## Como rodar (desenvolvimento)
 
