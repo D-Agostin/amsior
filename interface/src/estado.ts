@@ -6,7 +6,7 @@
 import { create } from "zustand";
 import { api, FalhaDaApi } from "./api";
 import type { EstadoDoMotor } from "./motor/cliente";
-import type { Analise, ErroApi, Grandeza, Isolamento, SimboloPedido } from "./api";
+import type { Analise, BibliotecaApi, ErroApi, Grandeza, Isolamento, SimboloPedido } from "./api";
 import { aplicar, gravarPreferencias, lerPreferencias } from "./preferencias";
 import type { Preferencias } from "./preferencias";
 
@@ -25,6 +25,9 @@ interface Estado {
   prefs: Preferencias;
   sistemaEscuro: boolean;
   glossario: Grandeza[];
+  biblioteca: BibliotecaApi;
+  /** Ficha aberta no centro, no lugar da folha (id), ou nenhuma. */
+  fichaAberta: string | null;
   motor: EstadoDoMotor;
   /** Versão nova do site esperando: chamar põe em uso e recarrega. */
   atualizar: (() => void) | null;
@@ -46,6 +49,8 @@ interface Estado {
   definirPrefs: (p: Partial<Preferencias>) => void;
   definirSistemaEscuro: (escuro: boolean) => void;
   definirGlossario: (g: Grandeza[]) => void;
+  definirBiblioteca: (b: BibliotecaApi) => void;
+  abrirFicha: (id: string | null) => void;
   definirLatex: (latex: string) => void;
   carregarExemplo: (ex: Exemplo) => void;
   definirGrandeza: (id: string, grandeza: string | null) => void;
@@ -122,6 +127,8 @@ export const useEstado = create<Estado>((set, get) => {
     prefs,
     sistemaEscuro: false,
     glossario: [],
+    biblioteca: { areas: [], fichas: {}, tipos: {} },
+    fichaAberta: null,
     motor: { estado: "carregando", etapa: "python", fracao: null },
     atualizar: null,
     instalar: null,
@@ -147,6 +154,8 @@ export const useEstado = create<Estado>((set, get) => {
       set({ sistemaEscuro: escuro });
     },
     definirGlossario: (g) => set({ glossario: g }),
+    definirBiblioteca: (b) => set({ biblioteca: b }),
+    abrirFicha: (id) => set({ fichaAberta: id && get().biblioteca.fichas[id] ? id : null }),
 
     definirLatex: (latex) => {
       if (latex === get().latex) return;
@@ -166,7 +175,8 @@ export const useEstado = create<Estado>((set, get) => {
       clearTimeout(temporizador);
       const simbolos: Record<string, Simb> = {};
       for (const s of ex.simbolos) simbolos[s.id] = { grandeza: s.grandeza ?? null, papel: s.papel ?? "variavel" };
-      set({ exemplo: ex.id, latex: ex.latex, simbolos, alvo: null, isolamento: null, erroIsolar: null });
+      set({ exemplo: ex.id, latex: ex.latex, simbolos, alvo: null, isolamento: null, erroIsolar: null,
+            fichaAberta: null });
       void analisarAgora(() => void isolarAgora(ex.alvo));
     },
 

@@ -35,6 +35,10 @@ export function Sobre() {
             <a href={t("ui.codigo.url")} target="_blank" rel="noreferrer">{t("ui.sobre.codigo")}</a>
             <a href={t("ui.sobre.licenca_url")} target="_blank" rel="noreferrer">{t("ui.sobre.licenca_texto")}</a>
           </p>
+          <p className="nota">{t("ui.sobre.conteudo")}</p>
+          <p className="sobre-links">
+            <a href={t("ui.sobre.conteudo_url")} target="_blank" rel="noreferrer">{t("ui.sobre.conteudo_texto")}</a>
+          </p>
         </section>
         <section className="campo">
           <h3>{t("ui.sobre.terceiros_titulo")}</h3>

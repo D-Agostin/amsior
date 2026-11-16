@@ -25,3 +25,6 @@ export const IconeFechar = () => (
 export const IconeSobre = () => (
   <svg {...base} width={16} height={16}><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.01" /></svg>
 );
+export const IconeBiblioteca = () => (
+  <svg {...base}><path d="M12 6.5C10.3 5 7.8 4.5 4 4.5v13c3.8 0 6.3.5 8 2 1.7-1.5 4.2-2 8-2v-13c-3.8 0-6.3.5-8 2zM12 6.5v13" /></svg>
+);

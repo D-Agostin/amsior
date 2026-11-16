@@ -36,6 +36,25 @@ def isolar_exemplo(pg: Page, nome: str) -> dict[str, Any]:
     return {"exemplo": nome, "passos": passos, "certificados": selos, "s": round(time.monotonic() - t0, 2)}
 
 
+def biblioteca(pg: Page) -> dict[str, Any]:
+    """Abre a ficha-modelo de Matemática, leva um exemplo à folha e volta pela etiqueta do tipo."""
+    pg.get_by_role("button", name="Biblioteca", exact=True).click()
+    pg.locator(".arvore-item", has_text="Equação racional").click()
+    pg.wait_for_selector(".ficha-papel", timeout=30_000)
+    r: dict[str, Any] = {
+        "equacoes": pg.locator(".ficha-eq-num").count(),
+        "passos_da_deducao": pg.locator(".ficha-passo").count(),
+        "caixas": pg.locator(".ficha-caixa").count(),
+    }
+    pg.get_by_role("button", name="Abrir na folha").nth(1).click()  # o exemplo que vira do 2º grau
+    pg.wait_for_selector(".resultado", timeout=120_000)
+    r["exemplo_passos"] = pg.locator(".passo:not(.passo-cabeca):not(.passo-dada)").count()
+    r["exemplo_certificados"] = pg.locator(".passo .selo-ok").count()
+    pg.get_by_role("button", name="Ver a ficha").click()
+    r["volta_pela_etiqueta"] = pg.locator("#ficha-titulo").inner_text() == "Equação racional"
+    return r
+
+
 def main(url: str) -> dict[str, Any]:
     rel: dict[str, Any] = {"url": url, "erros": [], "pedidos_para_fora": []}
     origem = url.split("#")[0].rstrip("/")
@@ -79,11 +98,15 @@ def main(url: str) -> dict[str, Any]:
         pg.wait_for_selector(".estado-pronto", timeout=180_000)
         rel["controlada_pelo_sw"] = pg.evaluate("!!navigator.serviceWorker.controller")
         rel["sem_internet"] = isolar_exemplo(pg, "Arrhenius")
+        rel["biblioteca"] = biblioteca(pg)
         nav.close()
 
     ok = (not rel["erros"] and not rel["pedidos_para_fora"] and rel["controlada_pelo_sw"]
           and all(r["passos"] > 0 and r["passos"] == r["certificados"]
-                  for r in (rel["com_internet"], rel["sem_internet"])))
+                  for r in (rel["com_internet"], rel["sem_internet"]))
+          and rel["biblioteca"]["equacoes"] >= 10 and rel["biblioteca"]["caixas"] >= 3
+          and 0 < rel["biblioteca"]["exemplo_passos"] == rel["biblioteca"]["exemplo_certificados"]
+          and rel["biblioteca"]["volta_pela_etiqueta"])
     rel["ok"] = ok
     return rel
 

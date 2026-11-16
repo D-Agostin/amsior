@@ -362,6 +362,73 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .opcao-nome { font-weight: 600; }
 .opcao-dica { color: var(--cor-texto-2); font-size: var(--tam-pequeno); line-height: var(--entrelinha-texto); }
 
+/* ------------------------------------------------------------ ficha de conceito (3.5, 8.6) */
+
+.ficha { align-items: center; }
+.ficha-barra { width: 100%; max-width: calc(var(--medida-texto) + 12em); display: flex; }
+.ficha-papel {
+  width: 100%; max-width: calc(var(--medida-texto) + 12em); background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha); border-radius: var(--raio); padding: 0 var(--esp-6) var(--esp-6);
+  font-size: var(--tam-texto); line-height: var(--entrelinha-texto); overflow: hidden;
+}
+.ficha-cabeca {
+  margin: 0 calc(-1 * var(--esp-6)) var(--esp-5); padding: var(--esp-4) var(--esp-6);
+  background: var(--cor-acento); color: var(--cor-sobre-acento);
+}
+.ficha-cabeca-topo { display: flex; justify-content: space-between; align-items: center; font-size: var(--tam-pequeno); }
+.ficha-cabeca .selo { background: var(--cor-superficie); }
+.ficha-cabeca h1 { margin: var(--esp-1) 0 0; font-size: calc(var(--tam-titulo) * 1.5); font-weight: 600; line-height: 1.25; }
+.ficha-secao-titulo {
+  display: flex; align-items: center; gap: var(--esp-3); margin: var(--esp-6) 0 var(--esp-3); padding-bottom: var(--esp-2);
+  font-size: calc(var(--tam-titulo) * 1.1); font-weight: 600; border-bottom: 2px solid var(--cor-acento);
+}
+.ficha-secao-num {
+  display: inline-grid; place-items: center; min-width: 1.7em; height: 1.7em; border-radius: var(--raio-selo);
+  background: var(--cor-acento); color: var(--cor-sobre-acento); font-size: var(--tam-pequeno);
+}
+.ficha-texto { margin: var(--esp-3) 0; max-width: var(--medida-texto); }
+.ficha-eq { display: flex; align-items: center; gap: var(--esp-3); margin: var(--esp-4) 0; }
+.ficha-eq-corpo { flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; text-align: center; font-size: var(--tam-mat); }
+.ficha-eq-destaque .ficha-eq-corpo { flex: 0 1 auto; margin: 0 auto; padding: var(--esp-2) var(--esp-5);
+  border: 1.5px solid var(--cor-texto); border-radius: var(--raio-selo); }
+.ficha-eq-num { flex: 0 0 auto; min-width: 2.5em; text-align: right; color: var(--cor-texto-2); font-size: var(--tam-pequeno); }
+.ficha-eq-nota { margin: calc(-1 * var(--esp-2)) auto var(--esp-3); text-align: center; color: var(--cor-texto-2); font-size: var(--tam-pequeno); max-width: var(--medida-texto); }
+.ficha-onde { margin: 0 0 var(--esp-4); font-size: var(--tam-base); }
+.ficha-onde .rotulo { font-weight: 600; }
+.ficha-onde ul { margin: var(--esp-1) 0 0; padding-left: var(--esp-5); }
+.ficha-onde li { margin: var(--esp-1) 0; }
+.ficha-lista { margin: var(--esp-3) 0; padding-left: var(--esp-5); max-width: var(--medida-texto); }
+.ficha-lista li { margin: var(--esp-2) 0; }
+.ficha-caixa { margin: var(--esp-5) 0; border: 1px solid var(--cor-linha); border-radius: var(--raio); overflow: hidden; }
+.ficha-caixa-titulo { padding: var(--esp-2) var(--esp-4); font-weight: 600; font-size: var(--tam-base); }
+.ficha-caixa-corpo { padding: var(--esp-1) var(--esp-4); }
+.ficha-caixa-resumo { border-color: var(--cor-acento); }
+.ficha-caixa-resumo .ficha-caixa-titulo { background: var(--cor-acento); color: var(--cor-sobre-acento); }
+.ficha-caixa-resumo .ficha-caixa-corpo { background: var(--cor-acento-suave); }
+.ficha-caixa-destaque { border-color: var(--cor-ok); }
+.ficha-caixa-destaque .ficha-caixa-titulo { background: var(--cor-ok); color: var(--cor-superficie); }
+.ficha-caixa-atencao, .ficha-caixa-hipoteses { border-color: var(--cor-aviso); }
+.ficha-caixa-atencao .ficha-caixa-titulo, .ficha-caixa-hipoteses .ficha-caixa-titulo { background: var(--cor-aviso); color: var(--cor-superficie); }
+.ficha-caixa-atencao .ficha-caixa-corpo, .ficha-caixa-hipoteses .ficha-caixa-corpo { background: var(--cor-aviso-suave); }
+.ficha-passos { list-style: none; margin: var(--esp-4) 0; padding: 0; display: flex; flex-direction: column; gap: var(--esp-3); }
+.ficha-passo { border: 1px solid var(--cor-linha); border-radius: var(--raio); overflow: hidden; }
+.ficha-passo-titulo { padding: var(--esp-2) var(--esp-4); font-weight: 600; color: var(--cor-acento-texto);
+  background: var(--cor-acento-suave); border-bottom: 1px solid var(--cor-linha); }
+.ficha-passo-corpo { padding: 0 var(--esp-4); }
+.ficha-tabela { margin: var(--esp-3) 0; }
+.ficha-simbolo { text-align: center; }
+.ficha-figura { margin: var(--esp-4) auto; max-width: 30em; color: var(--cor-texto); }
+.ficha-figura-svg svg { display: block; width: 100%; height: auto; }
+.ficha-figura figcaption { margin-top: var(--esp-2); text-align: center; color: var(--cor-texto-2); font-size: var(--tam-pequeno); }
+.ficha-exemplos { list-style: decimal; padding-left: var(--esp-5); display: flex; flex-direction: column; gap: var(--esp-3); }
+.ficha-exemplo { padding: var(--esp-2) 0; border-bottom: 1px solid var(--cor-linha-suave); }
+.ficha-exemplo-texto { margin-bottom: var(--esp-1); }
+.ficha-exemplo-eq { display: block; margin: var(--esp-2) 0; font-size: var(--tam-mat); overflow-x: auto; }
+.ficha-relacionadas { padding-left: var(--esp-5); }
+.ficha-link { border: 0; padding: 0; background: transparent; color: var(--cor-acento-texto); text-decoration: underline; cursor: pointer; font: inherit; }
+.adendo-tipo .ficha-link { margin-left: var(--esp-2); font-size: var(--tam-pequeno); }
+.ficha-referencias li { margin: var(--esp-2) 0; }
+
 /* ------------------------------------------------------------ telas estreitas */
 
 @media (max-width: 1100px) {
@@ -381,6 +448,6 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 /* ------------------------------------------------------------ impressão: sempre D, modo claro (9.4) */
 
 @media print {
-  .trilho, .painel, .cabecalho-acoes, .rodape, .isolar, .editor-campo::part(virtual-keyboard-toggle) { display: none !important; }
+  .trilho, .painel, .cabecalho-acoes, .rodape, .isolar, .ficha-barra, .editor-campo::part(virtual-keyboard-toggle) { display: none !important; }
   .corpo, .folha, .variaveis { overflow: visible; }
 }

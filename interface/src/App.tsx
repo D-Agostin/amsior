@@ -7,7 +7,9 @@ import { Medicao } from "./componentes/Medicao";
 import { t } from "./textos";
 import { Cabecalho } from "./componentes/Cabecalho";
 import { Folha } from "./componentes/Folha";
-import { PainelExemplos, Trilho } from "./componentes/Lateral";
+import { Ficha } from "./componentes/Ficha";
+import { PainelBiblioteca, PainelExemplos, Trilho } from "./componentes/Lateral";
+import type { Painel } from "./componentes/Lateral";
 import { TabelaVariaveis } from "./componentes/TabelaVariaveis";
 
 /** Texto da barra de estado para o estado do motor. */
@@ -43,16 +45,16 @@ function Rodape() {
 }
 
 export function App() {
-  const [painel, setPainel] = useState(true);
+  const [painel, setPainel] = useState<Painel | null>("exemplos");
+  const ficha = useEstado((s) => s.fichaAberta);
   if (window.location.hash.includes("medir")) return <Medicao />;
   return (
     <div className="app">
       <Cabecalho />
       <div className="corpo">
-        <Trilho aberto={painel} alternar={() => setPainel((p) => !p)} />
-        {painel ? <PainelExemplos /> : null}
-        <Folha />
-        <TabelaVariaveis />
+        <Trilho painel={painel} alternar={(p) => setPainel((atual) => (atual === p ? null : p))} />
+        {painel === "exemplos" ? <PainelExemplos /> : painel === "biblioteca" ? <PainelBiblioteca /> : null}
+        {ficha ? <Ficha id={ficha} /> : <><Folha /><TabelaVariaveis /></>}
       </div>
       <Rodape />
     </div>

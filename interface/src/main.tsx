@@ -71,6 +71,7 @@ async function partir(): Promise<void> {
     const dados = await api.dados();
     carregarTextos(dados.textos);
     useEstado.getState().definirGlossario(dados.glossario.grandezas);
+    if (dados.biblioteca) useEstado.getState().definirBiblioteca(dados.biblioteca);
     raiz.render(<StrictMode><App /></StrictMode>);
   } catch {
     raiz.render(<p className="falha-partida" role="alert">{t("ui.estado.falhou")}</p>);

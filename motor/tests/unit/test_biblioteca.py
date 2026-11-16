@@ -306,3 +306,27 @@ def test_caixa_dentro_de_passo_e_recusada(pasta: Path) -> None:
 def test_fichas_do_repositorio_sem_equacao_no_texto(biblioteca) -> None:  # type: ignore[no-untyped-def]
     """A regra vale para todo o conteúdo, inclusive enunciados de exemplos."""
     assert not [str(p) for p in biblioteca.problemas if "texto corrido" in p.mensagem]
+
+
+# ------------------------------------------------------------------ exportação para a interface
+
+
+def test_exportacao_so_leva_o_que_o_aluno_ve(biblioteca) -> None:  # type: ignore[no-untyped-def]
+    import json
+
+    from amsior.biblioteca.exportar import para_interface
+
+    d = para_interface(biblioteca)
+    json.dumps(d)
+    assert set(d["fichas"]) == {f.id for f in biblioteca.fichas.values() if f.visivel}
+    assert d["tipos"]["tipo.racional"] == "matematica.equacao_racional"
+    assert all(fid in d["fichas"] for fid in d["tipos"].values())
+    for f in d["fichas"].values():
+        assert all(r in d["fichas"] for r in f["relacionadas"])
+        for ex in f["exemplos"]:
+            assert all(s["grandeza"] for s in ex["simbolos"])
+    cstr = d["fichas"]["reatores.cstr"]
+    fig = cstr["secoes"][0]["blocos"][0]
+    assert fig["svg"].startswith("<svg") and "SPDX" not in fig["svg"]
+    ref = cstr["referencias"][0]
+    assert ref["titulo"].startswith("Elements") and ref["pagina"] is None and not ref["conferido"]

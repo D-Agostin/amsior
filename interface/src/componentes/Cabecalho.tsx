@@ -16,10 +16,18 @@ function Marca() {
   );
 }
 
+/** Exemplo do painel (chave do catálogo) ou de uma ficha ("<ficha>#<n>"). */
+export function tituloDoExemplo(id: string, fichas: Record<string, { titulo: { pt: string } }>): string {
+  const [ficha, n] = id.split("#");
+  if (n && fichas[ficha]) return t("ui.ficha.exemplo_titulo", { ficha: fichas[ficha].titulo.pt, n });
+  return t(`ui.exemplo.${id}`);
+}
+
 export function Cabecalho() {
   const prefs = useEstado((s) => s.prefs);
   const sistemaEscuro = useEstado((s) => s.sistemaEscuro);
   const exemplo = useEstado((s) => s.exemplo);
+  const fichas = useEstado((s) => s.biblioteca.fichas);
   const definirPrefs = useEstado((s) => s.definirPrefs);
   const atual = modoEfetivo(prefs.modo, sistemaEscuro);
   const outro = atual === "claro" ? "escuro" : "claro";
@@ -28,7 +36,7 @@ export function Cabecalho() {
     <header className="cabecalho">
       <div className="cabecalho-marca"><Marca /></div>
       <div className="cabecalho-folha" aria-live="polite">
-        {exemplo ? t(`ui.exemplo.${exemplo}`) : null}
+        {exemplo ? tituloDoExemplo(exemplo, fichas) : null}
       </div>
       <div className="cabecalho-acoes">
         <div role="group" aria-label={t("ui.nivel.rotulo")} className="segmentado" title={t("ui.nivel.dica")}>

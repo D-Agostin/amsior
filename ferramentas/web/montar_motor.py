@@ -172,7 +172,12 @@ def dados_da_interface() -> dict[str, object]:
     sys.path.insert(0, str(RAIZ / "motor"))
     from amsior.api.servico import executar
 
-    return {"textos": executar("textos", {})["ok"], "glossario": executar("glossario", {})["ok"]}
+    from amsior.biblioteca import carregar_biblioteca
+    from amsior.biblioteca.exportar import para_interface
+
+    return {"textos": executar("textos", {})["ok"], "glossario": executar("glossario", {})["ok"],
+            # fichas que o aluno vê (nada de rascunho), com figuras e exemplos prontos
+            "biblioteca": para_interface(carregar_biblioteca(RAIZ / "biblioteca"))}
 
 
 if __name__ == "__main__":

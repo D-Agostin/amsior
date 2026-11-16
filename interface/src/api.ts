@@ -58,7 +58,71 @@ export class FalhaDaApi extends Error {
 
 export interface SimboloPedido { id: string; grandeza?: string | null; papel?: string }
 
-export interface DadosIniciais { textos: Record<string, string>; glossario: { grandezas: Grandeza[] } }
+// ---------------------------------------------------------------- biblioteca (seções 3.5 e 8.6)
+
+export interface TextoML { pt: string; en?: string }
+
+export type Bloco =
+  | { texto: TextoML }
+  | { equacao: string; destaque?: boolean; nota?: TextoML; onde?: { simbolo: string; texto: TextoML }[] }
+  | { lista: TextoML[] }
+  | { caixa: "resumo" | "destaque" | "atencao" | "hipoteses"; titulo?: TextoML; blocos: Bloco[] }
+  | { passos: { titulo: TextoML; blocos: Bloco[] }[] }
+  | { tabela: { colunas: TextoML[]; linhas: TextoML[][] } }
+  | { figura: string; svg?: string; legenda?: TextoML };
+
+export interface ExemploFicha {
+  enunciado: TextoML;
+  equacao: string;
+  pede: string;
+  simbolos: { id: string; grandeza: string }[];
+  passos: boolean;
+}
+
+export interface ReferenciaFicha {
+  titulo: string;
+  autores: string[];
+  edicao: number | null;
+  ano: number | null;
+  licenca: string | null;
+  url: string | null;
+  uso: "citacao" | "adaptacao";
+  adaptacao: TextoML | null;
+  capitulo: string | null;
+  secao: string | null;
+  equacao: string | null;
+  pagina: string | number | null;
+  conferido: boolean;
+}
+
+export interface FichaApi {
+  id: string;
+  area: string;
+  estado: "auto_verificada" | "verificada";
+  versao: number;
+  grupo: TextoML | null;
+  titulo: TextoML;
+  tipos: string[];
+  resumo: Bloco[];
+  variaveis: { simbolo: string; grandeza: string; nome?: TextoML; nota?: TextoML }[];
+  secoes: { titulo: TextoML; blocos: Bloco[] }[];
+  exemplos: ExemploFicha[];
+  referencias: ReferenciaFicha[];
+  relacionadas: string[];
+}
+
+export interface BibliotecaApi {
+  areas: { id: string; fichas: string[] }[];
+  fichas: Record<string, FichaApi>;
+  /** tipo de equação (D-12) → ficha de Matemática que o explica */
+  tipos: Record<string, string>;
+}
+
+export interface DadosIniciais {
+  textos: Record<string, string>;
+  glossario: { grandezas: Grandeza[] };
+  biblioteca: BibliotecaApi;
+}
 
 const BASE = new URL("./", document.baseURI).href;
 

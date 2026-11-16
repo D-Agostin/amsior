@@ -99,11 +99,14 @@ export function Resolucao() {
   const erro = useEstado((s) => s.erroIsolar);
   const isolando = useEstado((s) => s.isolando);
   const motor = useEstado((s) => s.motor);
+  const tiposComFicha = useEstado((s) => s.biblioteca.tipos);
+  const abrirFicha = useEstado((s) => s.abrirFicha);
   if (!alvo || !analise?.equacao) return null;
 
   const faltam = faltamGrandezas(analise, simbolos);
   const tipo = r?.alvo === alvo ? r.tipo : analise.tipos[alvo] ?? null;
   const n = r ? contar(r.ramos) : null;
+  const fichaDoTipo = tipo ? tiposComFicha[tipo.chave] : undefined;
 
   return (
     <section className="cartao resolucao" aria-label={t("ui.res.titulo")} aria-busy={isolando}>
@@ -121,7 +124,12 @@ export function Resolucao() {
         ) : null}
       </div>
       {tipo ? (
-        <div className="adendo-tipo"><span className="rotulo">{t("ui.res.tipo")}</span><span><Texto texto={tipo.texto} /></span></div>
+        <div className="adendo-tipo">
+          <span className="rotulo">{t("ui.res.tipo")}</span><span><Texto texto={tipo.texto} /></span>
+          {fichaDoTipo ? (
+            <button type="button" className="ficha-link" onClick={() => abrirFicha(fichaDoTipo)}>{t("ui.res.ver_ficha")}</button>
+          ) : null}
+        </div>
       ) : null}
 
       {faltam.length > 0 ? (
