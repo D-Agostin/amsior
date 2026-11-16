@@ -4,18 +4,125 @@
 id: matematica.equacao_irracional
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: matematica
 grupo: {pt: "Tipos de equação"}
 ordem: 8
 titulo: {pt: "Equação irracional"}
 tipos: [tipo.irracional]
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "Uma equação é **irracional** numa variável quando ela aparece sob uma raiz ou com expoente fracionário. A resolução tem três tempos:"}
+  - lista:
+      - {pt: "**Isolar a raiz** de um lado."}
+      - {pt: "**Elevar os dois lados** à potência que desfaz a raiz."}
+      - {pt: "**Conferir** cada candidata na equação original: elevar ao quadrado pode criar raízes estranhas."}
+
+secoes:
+  - titulo: {pt: "O que é"}
+    blocos:
+      - texto: {pt: "A variável está dentro de um radical, como em"}
+      - equacao: '\sqrt{2x + 1} = 3'
+      - texto: {pt: "ou tem expoente que não é inteiro. Um expoente fracionário é uma raiz disfarçada:"}
+      - equacao: 'x^{\frac{1}{2}} = \sqrt{x}, \qquad x^{\frac{4}{5}} = \sqrt[5]{x^{4}}'
+      - texto: {pt: "As correlações empíricas de engenharia estão cheias desses expoentes, como o 0,8 do número de Reynolds na correlação de Dittus-Boelter."}
+
+  - titulo: {pt: "Isolar a raiz e elevar"}
+    blocos:
+      - texto: {pt: "Com a raiz sozinha de um lado, elevar ao quadrado a desfaz. Na equação do exemplo:"}
+      - passos:
+          - titulo: {pt: "Elevar os dois lados ao quadrado"}
+            blocos:
+              - equacao: '\left(\sqrt{2x + 1}\right)^{2} = 3^{2} \quad\Longrightarrow\quad 2x + 1 = 9'
+          - titulo: {pt: "Resolver a equação que sobrou"}
+            blocos:
+              - equacao: '2x = 8 \quad\Longrightarrow\quad x = 4'
+          - titulo: {pt: "Conferir na equação original"}
+            blocos:
+              - equacao: '\sqrt{2 \cdot 4 + 1} = \sqrt{9} = 3'
+              - texto: {pt: "A candidata satisfaz a equação original, então é a solução."}
+
+  - titulo: {pt: "Por que aparecem raízes estranhas"}
+    blocos:
+      - texto: {pt: "Elevar ao quadrado não é uma operação reversível. Se dois números são iguais, os quadrados também são; mas quadrados iguais não garantem números iguais, porque um número e o seu oposto têm o mesmo quadrado:"}
+      - equacao: 'A = B \quad\Longrightarrow\quad A^{2} = B^{2}, \qquad\text{mas}\qquad A^{2} = B^{2} \quad\Longrightarrow\quad A = B \;\text{ou}\; A = -B'
+      - texto: {pt: "A equação elevada ao quadrado guarda as soluções da original e ganha as de outra equação, com o sinal trocado. Veja:"}
+      - equacao: '\sqrt{x + 2} = x'
+      - passos:
+          - titulo: {pt: "Elevar ao quadrado"}
+            blocos:
+              - texto: {pt: "A raiz quadrada nunca é negativa, então o passo só vale onde o lado direito não é negativo:"}
+              - equacao: 'x + 2 = x^{2}, \qquad x \geq 0'
+          - titulo: {pt: "Resolver a equação do 2º grau"}
+            blocos:
+              - equacao: 'x^{2} - x - 2 = 0 \quad\Longrightarrow\quad x = 2 \;\;\text{ou}\;\; x = -1'
+          - titulo: {pt: "Conferir na equação original"}
+            blocos:
+              - equacao: 'x = 2: \quad \sqrt{4} = 2 \qquad\qquad x = -1: \quad \sqrt{1} = 1 \neq -1'
+              - texto: {pt: "A candidata \\(-1\\) não satisfaz a equação original: é **raiz estranha** e é descartada. Ela é a solução de outra equação, a de sinal trocado."}
+              - equacao: 'S = \{2\}'
+                destaque: true
+      - caixa: atencao
+        titulo: {pt: "Conferir não é opcional"}
+        blocos:
+          - texto: {pt: "Depois de elevar ao quadrado, toda candidata tem de voltar à equação original. O Amsior faz isso sozinho: o passo de elevar mostra a condição de sinal, e a candidata que falha aparece como descartada, com o motivo."}
+
+  - titulo: {pt: "Na engenharia"}
+    blocos:
+      - texto: {pt: "Na descarga de um tanque aberto, a velocidade do jato se liga à altura do líquido pela equação de Torricelli:"}
+      - equacao: 'v = \sqrt{2\,g\,h}'
+        onde:
+          - {simbolo: 'v', texto: {pt: "velocidade de saída do líquido"}}
+          - {simbolo: 'g', texto: {pt: "aceleração da gravidade"}}
+          - {simbolo: 'h', texto: {pt: "altura do líquido acima do orifício"}}
+      - texto: {pt: "Em \\(h\\), a equação é irracional. Como a velocidade é positiva, elevar ao quadrado não cria raiz estranha:"}
+      - equacao: 'h = \frac{v^{2}}{2\,g}'
+        destaque: true
+      - texto: {pt: "Na correlação de Dittus-Boelter, o número de Reynolds tem expoente 0,8. Isolá-lo pede elevar os dois lados ao inverso do expoente, o que exige grandezas positivas, como são os números adimensionais dessa correlação:"}
+      - equacao: '\mathrm{Nu} = 0{,}023\,\mathrm{Re}^{0{,}8}\,\mathrm{Pr}^{0{,}4} \quad\Longrightarrow\quad \mathrm{Re} = \left(\frac{\mathrm{Nu}}{0{,}023\,\mathrm{Pr}^{0{,}4}}\right)^{\frac{5}{4}}'
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Resolva em \\(x\\)."}
+    equacao: '\sqrt{2x + 1} = 3'
+    pede: x
+    esperado: ['x = 4']
+  - enunciado: {pt: "Resolva em \\(x\\). A candidata \\(-1\\) é raiz estranha."}
+    equacao: '\sqrt{x + 2} = x'
+    pede: x
+    esperado: ['x = 2']
+  - enunciado: {pt: "Torricelli: isole a altura \\(h\\)."}
+    equacao: 'v = \sqrt{2 g h}'
+    simbolos:
+      - {simbolo: v, grandeza: velocidade}
+      - {simbolo: g, grandeza: aceleracao_gravidade}
+      - {simbolo: h, grandeza: comprimento}
+    pede: h
+    esperado: ['h = \frac{v^{2}}{2 g}']
+  - enunciado: {pt: "Dittus-Boelter: isole o número de Reynolds."}
+    equacao: '\mathrm{Nu} = 0.023\,\mathrm{Re}^{0.8}\,\mathrm{Pr}^{0.4}'
+    simbolos:
+      - {simbolo: '\mathrm{Nu}', grandeza: numero_adimensional}
+      - {simbolo: '\mathrm{Re}', grandeza: numero_adimensional}
+      - {simbolo: '\mathrm{Pr}', grandeza: numero_adimensional}
+    pede: '\mathrm{Re}'
+    esperado: ['\mathrm{Re} = \left(\frac{\mathrm{Nu}}{0{,}023 \mathrm{Pr}^{0{,}4}}\right)^{\frac{5}{4}}']
+
 animacao: null
+
 referencias:
-  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: reamat_precalculo
+    uso: citacao
+    capitulo: "Equações e inequações"
+    secao: "Equações radicais ou irracionais"
+    conferido: {por: null, em: null}
+  - fonte: incropera
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [matematica.equacao_2_grau, matematica.equacao_racional, matematica.equivalencia_e_implicacao,
+               matematica.potencias_e_logaritmos]
 revisao: {humana: null, externo: null}

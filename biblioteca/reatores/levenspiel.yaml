@@ -4,17 +4,117 @@
 id: reatores.levenspiel
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: reatores
 grupo: {pt: "Arranjos e escolha"}
 ordem: 9
 titulo: {pt: "Gráfico de Levenspiel e a escolha entre CSTR e PFR"}
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "O gráfico de Levenspiel põe \\(F_{A0}/(-r_{A})\\) contra a conversão. Nele, o volume de cada reator ideal é uma área:"}
+  - lista:
+      - {pt: "**CSTR:** o retângulo com a altura da curva na conversão de saída."}
+      - {pt: "**PFR:** a área sob a curva, da entrada até a saída."}
+  - texto: {pt: "Quando a curva sobe com a conversão, como nas reações de ordem positiva, o retângulo é maior que a área sob a curva, e o PFR precisa de menos volume."}
+
+secoes:
+  - titulo: {pt: "As duas áreas"}
+    blocos:
+      - texto: {pt: "As equações de projeto dos dois reatores, com a mesma reação e a mesma alimentação, são:"}
+      - equacao: 'V_{\mathrm{CSTR}} = \frac{F_{A0}}{-r_{A}}\bigg|_{\text{saída}} \cdot X'
+        nota: {pt: "Base vezes altura: a altura é o valor da curva na conversão de saída."}
+      - equacao: 'V_{\mathrm{PFR}} = \int_{0}^{X} \frac{F_{A0}}{-r_{A}}\, dX'
+        nota: {pt: "Área sob a curva entre a entrada e a saída."}
+      - texto: {pt: "No CSTR, a reação toda acontece na composição de saída, onde a velocidade é a mais baixa e \\(F_{A0}/(-r_{A})\\) é o maior. No PFR, cada trecho do tubo reage na sua própria composição, e o volume soma as contribuições de todas elas."}
+
+  - titulo: {pt: "Lendo o gráfico"}
+    blocos:
+      - figura: reatores/levenspiel_primeira_ordem.svg
+        legenda: {pt: "Reação de 1ª ordem com densidade constante, até 80 % de conversão; o eixo vertical está em unidades de \\(v_{0}/k\\). O retângulo tracejado (CSTR) tem área 4; a área escura sob a curva (PFR), cerca de 1,6."}
+      - texto: {pt: "Para a 1ª ordem com densidade constante, a velocidade é proporcional a \\(1 - X\\), e a curva é"}
+      - equacao: '\frac{F_{A0}}{-r_{A}} = \frac{v_{0}}{k}\,\frac{1}{1 - X}'
+      - texto: {pt: "Ela cresce sem limite perto da conversão completa. Por isso as áreas dos dois reatores se afastam cada vez mais quando se pede conversão alta."}
+
+  - titulo: {pt: "1ª ordem em números"}
+    blocos:
+      - texto: {pt: "Dividindo os volumes por \\(v_{0}/k\\), sobram os números de Damköhler de cada reator:"}
+      - equacao: '\text{CSTR: } \tau k = \frac{X}{1 - X} \qquad\qquad \text{PFR: } \tau k = \ln \frac{1}{1 - X}'
+      - tabela:
+          colunas: [{pt: "Conversão"}, {pt: "CSTR: \\(\\tau k\\)"}, {pt: "PFR: \\(\\tau k\\)"}, {pt: "Volume do CSTR / volume do PFR"}]
+          linhas:
+            - [{pt: "50 %"}, {pt: "1"}, {pt: "\\(\\ln 2\\), cerca de 0,69"}, {pt: "cerca de 1,4"}]
+            - [{pt: "90 %"}, {pt: "9"}, {pt: "\\(\\ln 10\\), cerca de 2,30"}, {pt: "cerca de 3,9"}]
+            - [{pt: "99 %"}, {pt: "99"}, {pt: "\\(\\ln 100\\), cerca de 4,61"}, {pt: "cerca de 21,5"}]
+      - caixa: destaque
+        titulo: {pt: "A regra que sai do gráfico"}
+        blocos:
+          - texto: {pt: "Para reações de ordem positiva, o PFR atinge a mesma conversão com menos volume, e a diferença cresce muito com a conversão pedida. Em conversões baixas, os dois ficam próximos."}
+
+  - titulo: {pt: "Quando o CSTR ganha"}
+    blocos:
+      - texto: {pt: "Se a velocidade **cresce** com a conversão, a curva desce, e o retângulo fica menor que a área sob ela. Isso acontece em:"}
+      - lista:
+          - {pt: "reações de ordem negativa no reagente;"}
+          - {pt: "reações autocatalíticas, no trecho em que o produto acelera a reação;"}
+          - {pt: "reações exotérmicas adiabáticas, no trecho em que o aumento de temperatura pesa mais que o consumo do reagente."}
+      - texto: {pt: "Quando a curva tem mínimo, a melhor combinação pode ser um CSTR até o mínimo e um PFR depois dele."}
+      - caixa: atencao
+        titulo: {pt: "Condições da comparação"}
+        blocos:
+          - texto: {pt: "O gráfico compara reatores com a mesma reação, a mesma alimentação e a mesma temperatura em cada conversão. Volume é só um critério: controle de temperatura, seletividade e custo também pesam na escolha."}
+
+  - titulo: {pt: "Reatores em série"}
+    blocos:
+      - texto: {pt: "O gráfico também mostra por que vários CSTRs em série se aproximam do PFR. Cada tanque é um retângulo com a altura da curva na sua saída; com muitos tanques, os retângulos formam uma escada que se encaixa sob a curva. A ficha de reatores em série desenvolve esse caso."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "CSTR, 1ª ordem: \\(\\tau k\\) para 50 % de conversão."}
+    equacao: '\frac{1}{2} = \frac{D}{1 + D}'
+    simbolos: &d
+      - {simbolo: D, grandeza: numero_adimensional}
+    pede: D
+    esperado: ['D = 1']
+  - enunciado: {pt: "PFR, 1ª ordem: \\(\\tau k\\) para 50 % de conversão."}
+    equacao: '\frac{1}{2} = 1 - e^{-D}'
+    simbolos: *d
+    pede: D
+    esperado: ['D = \ln 2']
+  - enunciado: {pt: "CSTR, 1ª ordem: \\(\\tau k\\) para 99 % de conversão."}
+    equacao: '\frac{99}{100} = \frac{D}{1 + D}'
+    simbolos: *d
+    pede: D
+    esperado: ['D = 99']
+  - enunciado: {pt: "PFR, 1ª ordem: \\(\\tau k\\) para 99 % de conversão."}
+    equacao: '\frac{99}{100} = 1 - e^{-D}'
+    simbolos: *d
+    pede: D
+    esperado: ['D = \ln 100']
+  - enunciado: {pt: "CSTR, 1ª ordem: \\(\\tau k\\) para 80 % de conversão (o retângulo da figura)."}
+    equacao: '\frac{4}{5} = \frac{D}{1 + D}'
+    simbolos: *d
+    pede: D
+    esperado: ['D = 4']
+  - enunciado: {pt: "PFR, 1ª ordem: \\(\\tau k\\) para 80 % de conversão (a área sob a curva na figura)."}
+    equacao: '\frac{4}{5} = 1 - e^{-D}'
+    simbolos: *d
+    pede: D
+    esperado: ['D = \ln 5']
+
 animacao: null
+
 referencias:
-  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: levenspiel
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [reatores.cstr, reatores.pfr, reatores.associacao_de_reatores, reatores.conversao_e_tempo_espacial]
 revisao: {humana: null, externo: null}

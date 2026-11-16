@@ -442,7 +442,11 @@ def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> N
             v.erro(campo, "esperado um mapa")
             continue
         v.chaves(ex, {"enunciado", "usa", "equacao", "simbolos", "dados", "pede", "esperado",
-                      "passos", "tolerancia_rel"}, campo)
+                      "passos", "tipo", "tolerancia_rel"}, campo)
+        if "tipo" in ex:
+            from amsior.rules.classificar import CHAVES
+            if ex["tipo"] not in CHAVES:
+                v.erro(f"{campo}.tipo", f"tipo desconhecido: {ex['tipo']}")
         _Validador(f.arquivo, campo, v.saida).multilingue(ex, "enunciado", obrigatorio=True)
         if isinstance(ex.get("enunciado"), dict) and isinstance(ex["enunciado"].get("pt"), str):
             verificar_texto_corrido(ex["enunciado"]["pt"], f"{campo}.enunciado", v.erro)
@@ -463,7 +467,7 @@ def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> N
         esp = ex.get("esperado")
         if esp is not None and (not isinstance(esp, list) or not all(isinstance(e, str) for e in esp)):
             v.erro(f"{campo}.esperado", "lista de resultados em LaTeX, como o motor os escreve")
-        if pronta and "equacao" in ex and esp is None:
+        if pronta and "equacao" in ex and esp is None and "tipo" not in ex:
             v.erro(f"{campo}.esperado", "obrigatório fora de rascunho: é o que o motor confere")
         if "passos" in ex and not isinstance(ex["passos"], bool):
             v.erro(f"{campo}.passos", "verdadeiro (com passos) ou falso (resultado sem passos)")

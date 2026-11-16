@@ -77,6 +77,9 @@ export interface ExemploFicha {
   pede: string;
   simbolos: { id: string; grandeza: string }[];
   passos: boolean;
+  /** exemplo de classificação (D-12): o tipo que o motor dá na variável pedida */
+  tipo?: string | null;
+  tem_resultado?: boolean;
 }
 
 export interface ReferenciaFicha {

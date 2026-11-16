@@ -4,17 +4,150 @@
 id: reatores.pfr
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: reatores
 grupo: {pt: "Reatores ideais"}
 ordem: 7
 titulo: {pt: "Reator tubular de escoamento empistonado (PFR)"}
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "No PFR, o fluido atravessa um tubo como uma sucessão de fatias que não se misturam entre si. A composição muda **ao longo do comprimento**, e cada fatia reage como um pequeno reator batelada. O volume necessário é"}
+  - equacao: 'V = F_{A0} \int_{0}^{X} \frac{dX}{-r_{A}}'
+  - texto: {pt: "e, para reação de 1ª ordem com densidade constante,"}
+  - equacao: 'X = 1 - e^{-\tau k}'
+    destaque: true
+
+variaveis:
+  - {simbolo: 'F_{A0}', grandeza: vazao_molar, nome: {pt: "vazão molar de A na entrada"}}
+  - {simbolo: 'F_{A}', grandeza: vazao_molar, nome: {pt: "vazão molar de A numa posição do tubo"}}
+  - {simbolo: 'r_{A}', grandeza: taxa_reacao, nome: {pt: "velocidade de formação de A por volume, na posição"}, nota: {pt: "negativa para um reagente"}}
+  - {simbolo: 'X', grandeza: conversao, nome: {pt: "conversão de A"}}
+  - {simbolo: 'V', grandeza: volume, nome: {pt: "volume de tubo, da entrada até a posição"}}
+  - {simbolo: 'C_{A0}', grandeza: concentracao_molar, nome: {pt: "concentração de A na entrada"}}
+  - {simbolo: 'v_{0}', grandeza: vazao_volumetrica, nome: {pt: "vazão volumétrica de entrada"}}
+  - {simbolo: '\tau', grandeza: tempo_espacial, nome: {pt: "tempo espacial"}}
+  - {simbolo: 'k', grandeza: constante_velocidade_primeira_ordem, nome: {pt: "constante de velocidade de 1ª ordem"}}
+
+secoes:
+  - titulo: {pt: "Como funciona"}
+    blocos:
+      - texto: {pt: "A alimentação entra numa ponta do tubo e o produto sai na outra. Na idealização do escoamento empistonado, o perfil de velocidade é plano: todo o fluido de uma seção anda junto, sem se misturar com o que vem antes ou depois. A concentração do reagente cai continuamente da entrada para a saída."}
+      - caixa: hipoteses
+        titulo: {pt: "Hipóteses do PFR ideal"}
+        blocos:
+          - lista:
+              - {pt: "**Regime permanente:** nada varia com o tempo num ponto fixo do tubo."}
+              - {pt: "**Escoamento empistonado:** sem mistura na direção do escoamento; propriedades uniformes em cada seção."}
+              - {pt: "**Densidade constante** (só para a forma de 1ª ordem abaixo)."}
+
+  - titulo: {pt: "Equação de projeto"}
+    blocos:
+      - passos:
+          - titulo: {pt: "Balanço molar numa fatia do tubo"}
+            blocos:
+              - texto: {pt: "Numa fatia de volume \\(\\Delta V\\), em regime permanente, o que entra menos o que sai mais o que se forma é zero:"}
+              - equacao: 'F_{A}\big|_{V} - F_{A}\big|_{V + \Delta V} + r_{A}\,\Delta V = 0'
+          - titulo: {pt: "Fazer a fatia tender a zero"}
+            blocos:
+              - texto: {pt: "Dividindo por \\(\\Delta V\\) e levando ao limite, sai a forma diferencial:"}
+              - equacao: '\frac{dF_{A}}{dV} = r_{A}'
+          - titulo: {pt: "Escrever com a conversão e integrar"}
+            blocos:
+              - equacao: 'F_{A} = F_{A0}\,(1 - X) \quad\Longrightarrow\quad F_{A0}\,\frac{dX}{dV} = -r_{A}'
+              - texto: {pt: "Separando e integrando da entrada (conversão zero) até a saída:"}
+              - equacao: 'V = F_{A0} \int_{0}^{X} \frac{dX}{-r_{A}}'
+                destaque: true
+                nota: {pt: "Vale para qualquer lei de velocidade, com \\(-r_{A}\\) avaliada em cada posição do tubo."}
+          - titulo: {pt: "1ª ordem, densidade constante"}
+            blocos:
+              - texto: {pt: "Com \\(-r_{A}\\) igual a \\(k C_{A0}(1 - X)\\) e \\(F_{A0}\\) igual a \\(C_{A0} v_{0}\\), a concentração de entrada se cancela:"}
+              - equacao: '\tau = \frac{V}{v_{0}} = \int_{0}^{X} \frac{dX}{k\,(1 - X)} = \frac{1}{k} \ln \frac{1}{1 - X}'
+          - titulo: {pt: "Isolar a conversão"}
+            blocos:
+              - equacao: 'X = 1 - e^{-\tau k}'
+                destaque: true
+      - caixa: destaque
+        titulo: {pt: "PFR e batelada: a mesma conta"}
+        blocos:
+          - texto: {pt: "Com densidade constante, o resultado do PFR é o do batelada com o tempo de reação trocado pelo tempo espacial. Faz sentido: cada fatia de fluido atravessa o tubo como um pequeno batelada, e o tempo que ela passa lá dentro é o tempo espacial."}
+
+  - titulo: {pt: "Comparação com o CSTR"}
+    blocos:
+      - texto: {pt: "Para a mesma reação de 1ª ordem, o CSTR e o PFR pedem números de Damköhler diferentes para a mesma conversão:"}
+      - equacao: '\text{CSTR: } \tau k = \frac{X}{1 - X} \qquad\qquad \text{PFR: } \tau k = \ln \frac{1}{1 - X}'
+      - texto: {pt: "Para 90 % de conversão, o CSTR pede \\(\\tau k\\) igual a 9, e o PFR, \\(\\ln 10\\), cerca de 2,3: quase quatro vezes menos volume. A explicação está no gráfico de Levenspiel."}
+
+  - titulo: {pt: "Onde se usa"}
+    blocos:
+      - lista:
+          - {pt: "**Reações em fase gasosa** em grande escala, como o craqueamento térmico."}
+          - {pt: "**Reações rápidas** e processos contínuos de alta produção."}
+          - {pt: "**Reatores com troca térmica** em tubos longos ou em feixes de tubos dentro de uma carcaça."}
+          - {pt: "Com catalisador no tubo, vira o reator de leito fixo, que tem ficha própria."}
+
+  - titulo: {pt: "Vantagens e limitações"}
+    blocos:
+      - texto: {pt: "**Vantagens**"}
+      - lista:
+          - {pt: "Para reações de ordem positiva, dá mais conversão por volume que o CSTR."}
+          - {pt: "Operação contínua, sem partes móveis no escoamento."}
+          - {pt: "Boa área de troca térmica por volume, em tubos de diâmetro pequeno."}
+      - texto: {pt: "**Limitações**"}
+      - lista:
+          - {pt: "A temperatura varia ao longo do tubo; em reações muito exotérmicas, podem surgir pontos quentes."}
+          - {pt: "Há perda de carga, que cresce com o comprimento."}
+          - {pt: "O escoamento real nunca é perfeitamente empistonado: há dispersão e perfis de velocidade."}
+      - caixa: atencao
+        titulo: {pt: "Erro comum"}
+        blocos:
+          - texto: {pt: "Usar a forma de densidade constante para um gás cuja reação muda o número de mols. Nesse caso a vazão volumétrica muda ao longo do tubo, e a concentração tem de levar a correção estequiométrica."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "1ª ordem, densidade constante: isole a conversão \\(X\\)."}
+    equacao: '\tau = \frac{1}{k}\ln\frac{1}{1 - X}'
+    simbolos:
+      - {simbolo: '\tau', grandeza: tempo_espacial}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+      - {simbolo: X, grandeza: conversao}
+    pede: X
+    esperado: ['X = 1 - \frac{1}{e^{\tau k}}']
+  - enunciado: {pt: "Isole o tempo espacial \\(\\tau\\) necessário para uma conversão \\(X\\)."}
+    equacao: 'X = 1 - e^{-\tau k}'
+    simbolos:
+      - {simbolo: X, grandeza: conversao}
+      - {simbolo: '\tau', grandeza: tempo_espacial}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+    pede: '\tau'
+    esperado: ['\tau = -\frac{\ln\left(1 - X\right)}{k}']
+  - enunciado: {pt: "Número de Damköhler do PFR para 90 % de conversão."}
+    equacao: '\frac{9}{10} = 1 - e^{-D}'
+    simbolos:
+      - {simbolo: D, grandeza: numero_adimensional}
+    pede: D
+    esperado: ['D = \ln 10']
+  - enunciado: {pt: "Número de Damköhler do CSTR para 90 % de conversão, para comparar."}
+    equacao: '\frac{9}{10} = \frac{D}{1 + D}'
+    simbolos:
+      - {simbolo: D, grandeza: numero_adimensional}
+    pede: D
+    esperado: ['D = 9']
+
 animacao: null
+
 referencias:
-  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: levenspiel
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [reatores.batelada, reatores.cstr, reatores.levenspiel, reatores.pbr,
+               reatores.conversao_e_tempo_espacial, reatores.associacao_de_reatores]
 revisao: {humana: null, externo: null}

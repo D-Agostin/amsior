@@ -4,18 +4,129 @@
 id: matematica.equacao_2_grau
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: matematica
 grupo: {pt: "Tipos de equação"}
 ordem: 5
 titulo: {pt: "Equação do 2º grau"}
 tipos: [tipo.polinomial_2]
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "Uma equação é do **2º grau** numa variável quando, depois de arrumada, o maior expoente da variável é 2:"}
+  - equacao: 'a x^{2} + b x + c = 0'
+  - texto: {pt: "Com \\(a\\) diferente de zero, as soluções saem da fórmula resolutiva (fórmula de Bhaskara):"}
+  - equacao: 'x = \frac{-b \pm \sqrt{\Delta}}{2a}, \qquad \Delta = b^{2} - 4ac'
+    destaque: true
+  - texto: {pt: "O sinal do discriminante \\(\\Delta\\) diz quantas soluções reais existem: duas, uma (dupla) ou nenhuma."}
+
+secoes:
+  - titulo: {pt: "Forma geral"}
+    blocos:
+      - equacao: 'a x^{2} + b x + c = 0'
+        onde:
+          - {simbolo: 'a', texto: {pt: "coeficiente de \\(x^{2}\\); não pode ser zero, senão a equação é do 1º grau"}}
+          - {simbolo: 'b', texto: {pt: "coeficiente de \\(x\\)"}}
+          - {simbolo: 'c', texto: {pt: "termo independente"}}
+
+  - titulo: {pt: "De onde sai a fórmula: completar o quadrado"}
+    blocos:
+      - texto: {pt: "A fórmula resolutiva não é uma regra para decorar. Ela sai de transformar o lado esquerdo num quadrado perfeito, em cinco passos."}
+      - passos:
+          - titulo: {pt: "Dividir por \\(a\\)"}
+            blocos:
+              - texto: {pt: "Com \\(a\\) diferente de zero, o termo em \\(x^{2}\\) fica com coeficiente 1:"}
+              - equacao: 'x^{2} + \frac{b}{a}\,x + \frac{c}{a} = 0'
+          - titulo: {pt: "Passar o termo independente para o outro lado"}
+            blocos:
+              - equacao: 'x^{2} + \frac{b}{a}\,x = -\frac{c}{a}'
+          - titulo: {pt: "Somar o que falta para o quadrado perfeito"}
+            blocos:
+              - texto: {pt: "O quadrado de uma soma é"}
+              - equacao: '\left(x + \frac{b}{2a}\right)^{2} = x^{2} + \frac{b}{a}\,x + \frac{b^{2}}{4a^{2}}'
+              - texto: {pt: "Então basta somar \\(\\frac{b^{2}}{4a^{2}}\\) aos dois lados:"}
+              - equacao: '\left(x + \frac{b}{2a}\right)^{2} = \frac{b^{2} - 4ac}{4a^{2}} = \frac{\Delta}{4a^{2}}'
+          - titulo: {pt: "Tirar a raiz quadrada, com os dois sinais"}
+            blocos:
+              - texto: {pt: "Um número e o seu oposto têm o mesmo quadrado. Por isso a raiz abre dois ramos, e só existe se o lado direito não for negativo:"}
+              - equacao: 'x + \frac{b}{2a} = \pm \frac{\sqrt{\Delta}}{2a}'
+          - titulo: {pt: "Isolar \\(x\\)"}
+            blocos:
+              - equacao: 'x = \frac{-b \pm \sqrt{\Delta}}{2a}'
+                destaque: true
+
+  - titulo: {pt: "O discriminante"}
+    blocos:
+      - equacao: '\Delta = b^{2} - 4ac'
+      - tabela:
+          colunas: [{pt: "Sinal de \\(\\Delta\\)"}, {pt: "Soluções reais"}]
+          linhas:
+            - [{pt: "positivo"}, {pt: "duas, diferentes"}]
+            - [{pt: "zero"}, {pt: "uma só, chamada raiz dupla"}]
+            - [{pt: "negativo"}, {pt: "nenhuma: o quadrado do passo 3 não pode ser negativo"}]
+      - texto: {pt: "Por exemplo, a equação abaixo tem discriminante 1 e duas soluções, 2 e 3:"}
+      - equacao: 'x^{2} - 5x + 6 = 0'
+
+  - titulo: {pt: "Como o Amsior resolve"}
+    blocos:
+      - texto: {pt: "O Amsior segue o mesmo caminho da dedução: forma padrão, divisão pelo coeficiente de \\(x^{2}\\), quadrado completo e raiz com os dois ramos. Cada passo é uma operação que o verificador refaz. Na equação do exemplo acima, o quadrado completo é"}
+      - equacao: '\left(x - \frac{5}{2}\right)^{2} = \frac{1}{4}'
+      - texto: {pt: "e os dois ramos dão as duas soluções. Com discriminante negativo, o Amsior recusa e mostra o valor de \\(\\Delta\\); com discriminante zero, mostra um ramo só."}
+
+  - titulo: {pt: "Na engenharia: CSTR com reação de 2ª ordem"}
+    blocos:
+      - texto: {pt: "Num CSTR com reação de 2ª ordem e densidade constante, a equação de projeto, escrita com o número de Damköhler, é do 2º grau na conversão:"}
+      - equacao: '\mathrm{Da}\,(1 - X)^{2} = X, \qquad \mathrm{Da} = \tau\,k\,C_{A0}'
+        onde:
+          - {simbolo: 'X', texto: {pt: "conversão do reagente"}}
+          - {simbolo: '\tau', texto: {pt: "tempo espacial"}}
+          - {simbolo: 'k', texto: {pt: "constante de velocidade de 2ª ordem"}}
+          - {simbolo: 'C_{A0}', texto: {pt: "concentração do reagente na entrada"}}
+      - texto: {pt: "A fórmula dá duas raízes:"}
+      - equacao: 'X = \frac{2\,\mathrm{Da} + 1}{2\,\mathrm{Da}} \pm \sqrt{\frac{4\,\mathrm{Da} + 1}{4\,\mathrm{Da}^{2}}}'
+      - caixa: atencao
+        titulo: {pt: "Escolher a raiz com sentido físico"}
+        blocos:
+          - texto: {pt: "A matemática aceita as duas raízes; a física, só uma. O primeiro termo já é maior que 1, então o ramo com sinal positivo dá conversão acima de 1, o que é impossível. A conversão do reator é a do ramo negativo:"}
+          - equacao: 'X = \frac{2\,\mathrm{Da} + 1 - \sqrt{4\,\mathrm{Da} + 1}}{2\,\mathrm{Da}}'
+            destaque: true
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Resolva em \\(x\\). O discriminante é 1."}
+    equacao: 'x^2 - 5x + 6 = 0'
+    pede: x
+    esperado: ['x = 2', 'x = 3']
+  - enunciado: {pt: "Resolva em \\(x\\). O discriminante é zero: raiz dupla."}
+    equacao: 'x^2 - 6x + 9 = 0'
+    pede: x
+    esperado: ['x = 3']
+  - enunciado: {pt: "Resolva em \\(x\\). Dividir os dois lados por \\(x\\) perderia uma solução."}
+    equacao: 'x^2 = x'
+    pede: x
+    esperado: ['x = 0', 'x = 1']
+  - enunciado: {pt: "CSTR de 2ª ordem: isole a conversão \\(X\\)."}
+    equacao: 'D(1 - X)^2 = X'
+    simbolos:
+      - {simbolo: D, grandeza: numero_adimensional}
+      - {simbolo: X, grandeza: conversao}
+    pede: X
+    esperado: ['X = \sqrt{\frac{4 D + 1}{4 D^{2}}} + \frac{2 D + 1}{2 D}', 'X = \frac{2 D + 1}{2 D} - \sqrt{\frac{4 D + 1}{4 D^{2}}}']
+
 animacao: null
+
 referencias:
-  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: reamat_precalculo
+    uso: citacao
+    capitulo: "Equações"
+    secao: "Equações do 2º grau"
+    conferido: {por: null, em: null}
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [matematica.equacao_1_grau, matematica.equacao_racional, matematica.equacao_irracional,
+               matematica.equivalencia_e_implicacao, reatores.cstr]
 revisao: {humana: null, externo: null}

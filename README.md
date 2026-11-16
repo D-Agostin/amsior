@@ -27,9 +27,13 @@ Em desenvolvimento; ainda não há versão pública para uso.
 - **Fase 2 (biblioteca), em andamento:** esquema das fichas de equação e de
   conceito conferido pelos testes, registro de fontes, vocabulário de
   hipóteses e as 28 fichas de conceito de Matemática e de Reatores criadas
-  na ordem da especificação. As duas fichas-modelo (equação racional e CSTR)
-  estão escritas, com exemplos que o motor refaz nos testes; as demais são
-  rascunho. O motor passou a isolar equações do 2º grau com passos.
+  na ordem da especificação. Onze já estão escritas, em revisão, e aparecem no
+  painel da biblioteca do site: em Matemática, expressões algébricas, equações
+  do 1º e do 2º grau, racional, irracional e equivalência e implicação; em
+  Reatores, conversão e tempo espacial, batelada, CSTR, PFR e o gráfico de
+  Levenspiel. Os exemplos de cada ficha são refeitos pelo motor nos testes.
+  O motor passou a resolver equações do 2º grau com passos e a descartar
+  raízes estranhas com o motivo.
 
 ## O que existe
 

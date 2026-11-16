@@ -63,7 +63,16 @@ def _conferir(f: Ficha, i: int, ex: dict[str, Any], executar: Executar) -> list[
     if "erro" in lido:
         return erro(f"a equação não se lê: {lido['erro']['mensagem']}")
     simbolos = [{"id": s, "grandeza": declarados.get(s, GRANDEZA_PADRAO)} for s in lido["ok"]["simbolos"]]
-    r = executar("isolar", {"latex": latex, "alvo": simbolo_canonico(ex["pede"]), "simbolos": simbolos})
+    pede = simbolo_canonico(ex["pede"])
+    if "tipo" in ex:
+        # classificação (D-12): o tipo que o motor dá à equação na variável pedida
+        tipos = executar("analisar", {"latex": latex, "simbolos": simbolos})["ok"]["tipos"]
+        obtido = (tipos.get(pede) or {}).get("chave")
+        if obtido != ex["tipo"]:
+            return erro(f"tipo {obtido}, esperado {ex['tipo']}")
+        if ex.get("esperado") is None:
+            return []
+    r = executar("isolar", {"latex": latex, "alvo": pede, "simbolos": simbolos})
     if "erro" in r:
         return erro(f"o motor recusou o pedido: {r['erro']['mensagem']}")
     ok = r["ok"]

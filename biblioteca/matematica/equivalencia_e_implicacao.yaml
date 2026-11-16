@@ -4,17 +4,95 @@
 id: matematica.equivalencia_e_implicacao
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: matematica
 grupo: {pt: "Raciocínio"}
 ordem: 13
 titulo: {pt: "Equivalência, implicação e \"sob hipótese\""}
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "Cada passo de uma resolução liga duas equações. Essa ligação pode ser de dois tipos, e é ela que diz se as soluções se conservam:"}
+  - lista:
+      - {pt: "**Equivalência:** as duas equações têm exatamente as mesmas soluções."}
+      - {pt: "**Implicação:** toda solução da primeira é solução da segunda, mas a segunda pode ter soluções a mais."}
+      - {pt: "**Sob hipótese:** o passo é uma equivalência desde que valha uma condição, que o Amsior mostra ao lado do passo."}
+
+secoes:
+  - titulo: {pt: "Equivalência"}
+    blocos:
+      - texto: {pt: "Duas equações são equivalentes quando têm o mesmo conjunto de soluções. Escreve-se com a seta dupla:"}
+      - equacao: 'x + 3 = 5 \quad\Longleftrightarrow\quad x = 2'
+      - texto: {pt: "Estas operações, feitas dos dois lados, sempre dão uma equação equivalente:"}
+      - lista:
+          - {pt: "somar ou subtrair a mesma expressão;"}
+          - {pt: "multiplicar ou dividir por uma expressão que **não se anula**;"}
+          - {pt: "aplicar uma função que **não junta valores diferentes**, como a exponencial, o logaritmo natural (onde está definido) ou a raiz de índice ímpar."}
+
+  - titulo: {pt: "Implicação"}
+    blocos:
+      - texto: {pt: "Quando a operação junta valores diferentes num só, o caminho só vale num sentido. Elevar ao quadrado é o exemplo típico:"}
+      - equacao: 'x = 2 \quad\Longrightarrow\quad x^{2} = 4'
+      - texto: {pt: "A volta não vale: a equação da direita também tem a solução \\(-2\\), que a da esquerda não tem. Uma implicação **pode criar soluções**, as raízes estranhas, e por isso exige conferir cada candidata no fim."}
+      - texto: {pt: "Multiplicar os dois lados por uma expressão que pode ser zero também só implica. Veja:"}
+      - equacao: 'x = 2 \quad\Longrightarrow\quad x\,(x - 3) = 2\,(x - 3)'
+      - texto: {pt: "A equação da direita tem a solução 2, como a da esquerda, e ganha a solução 3, que anula o fator e deixa os dois lados iguais a zero."}
+
+  - titulo: {pt: "O perigo oposto: perder soluções"}
+    blocos:
+      - texto: {pt: "Dividir por uma expressão que pode ser zero faz o contrário: some com soluções. Na equação"}
+      - equacao: 'x^{2} = x'
+      - texto: {pt: "dividir os dois lados por \\(x\\) deixa só a solução 1 e perde o 0. O caminho seguro é levar tudo para um lado e resolver a equação do 2º grau, que dá as duas soluções:"}
+      - equacao: 'x^{2} - x = 0 \quad\Longleftrightarrow\quad x = 0 \;\;\text{ou}\;\; x = 1'
+      - caixa: atencao
+        titulo: {pt: "O Amsior não divide pela variável"}
+        blocos:
+          - texto: {pt: "Quando o fator de uma divisão contém a variável procurada ou pode ser zero, o Amsior não divide sem declarar a condição. Para equações como esta, ele completa o quadrado e acha as duas raízes."}
+
+  - titulo: {pt: "Sob hipótese"}
+    blocos:
+      - texto: {pt: "Muitos passos são equivalências só sob uma condição. Dividir por \\(a\\), por exemplo:"}
+      - equacao: 'a\,x = b \quad\Longleftrightarrow\quad x = \frac{b}{a}, \qquad\text{se } a \neq 0'
+      - texto: {pt: "Quando as grandezas já garantem a condição (pressão absoluta, volume e temperatura absoluta são positivos), o passo é uma equivalência sem ressalva. Quando não garantem, o Amsior escreve a condição na linha do passo e marca o selo **sob hipótese**."}
+
+  - titulo: {pt: "Os selos do Amsior"}
+    blocos:
+      - texto: {pt: "Todo passo exibido tem certificado. O selo diz como ele foi conferido:"}
+      - tabela:
+          colunas: [{pt: "Selo"}, {pt: "O que significa"}]
+          linhas:
+            - [{pt: "**simbólico**"}, {pt: "a igualdade entre os dois lados foi provada por manipulação simbólica e confirmada numericamente em alta precisão"}]
+            - [{pt: "**numérico**"}, {pt: "a via simbólica não fechou; a igualdade foi conferida numericamente, em alta precisão e em várias escalas"}]
+            - [{pt: "**sob hipótese**"}, {pt: "o passo vale com as condições mostradas na linha"}]
+      - caixa: destaque
+        titulo: {pt: "E no fim"}
+        blocos:
+          - texto: {pt: "Além de cada passo, o resultado é substituído na equação original. Se algum passo da cadeia só implicava, as candidatas que não satisfazem a original são descartadas, com o motivo."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Resolva em \\(x\\) sem dividir por \\(x\\)."}
+    equacao: 'x^2 = x'
+    pede: x
+    esperado: ['x = 0', 'x = 1']
+  - enunciado: {pt: "Resolva em \\(x\\). O passo de elevar ao quadrado só implica, e uma candidata é descartada."}
+    equacao: '\sqrt{x + 2} = x'
+    pede: x
+    esperado: ['x = 2']
+  - enunciado: {pt: "Resolva em \\(x\\). Dividir por \\(a\\) vale sob hipótese."}
+    equacao: 'a x = b'
+    pede: x
+    esperado: ['x = \frac{b}{a}']
+
 animacao: null
+
 referencias:
-  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: reamat_precalculo
+    uso: citacao
+    capitulo: "Equações"
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [matematica.equacao_racional, matematica.equacao_irracional, matematica.equacao_2_grau,
+               matematica.isolar_variavel, matematica.dominio]
 revisao: {humana: null, externo: null}

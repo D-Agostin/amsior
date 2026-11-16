@@ -4,17 +4,127 @@
 id: reatores.conversao_e_tempo_espacial
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: reatores
 grupo: {pt: "Fundamentos"}
 ordem: 2
 titulo: {pt: "Conversão, tempo espacial e velocidade espacial"}
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "Três medidas organizam o projeto de reatores. A **conversão** diz quanto do reagente reagiu:"}
+  - equacao: 'X = \frac{F_{A0} - F_{A}}{F_{A0}}'
+    destaque: true
+  - texto: {pt: "O **tempo espacial** diz quanto tempo leva para passar pelo reator um volume de alimentação igual ao volume do reator, e a **velocidade espacial** é o seu inverso:"}
+  - equacao: '\tau = \frac{V}{v_{0}}, \qquad S_{V} = \frac{1}{\tau}'
+    destaque: true
+
+variaveis:
+  - {simbolo: 'X', grandeza: conversao, nome: {pt: "conversão do reagente A"}}
+  - {simbolo: 'F_{A0}', grandeza: vazao_molar, nome: {pt: "vazão molar de A alimentada"}}
+  - {simbolo: 'F_{A}', grandeza: vazao_molar, nome: {pt: "vazão molar de A que sai"}}
+  - {simbolo: 'N_{A0}', grandeza: quantidade_materia, nome: {pt: "quantidade de A no início (batelada)"}}
+  - {simbolo: 'N_{A}', grandeza: quantidade_materia, nome: {pt: "quantidade de A num instante (batelada)"}}
+  - {simbolo: 'C_{A0}', grandeza: concentracao_molar, nome: {pt: "concentração de A na alimentação"}}
+  - {simbolo: 'C_{A}', grandeza: concentracao_molar, nome: {pt: "concentração de A na saída"}}
+  - {simbolo: 'V', grandeza: volume, nome: {pt: "volume do reator"}}
+  - {simbolo: 'v_{0}', grandeza: vazao_volumetrica, nome: {pt: "vazão volumétrica da alimentação, nas condições de entrada"}}
+  - {simbolo: '\tau', grandeza: tempo_espacial, nome: {pt: "tempo espacial"}}
+  - {simbolo: 'S_{V}', grandeza: frequencia, nome: {pt: "velocidade espacial"}}
+
+secoes:
+  - titulo: {pt: "Conversão"}
+    blocos:
+      - texto: {pt: "A conversão se define para **um reagente**, quase sempre o limitante, chamado de A. É a fração do A alimentado que reagiu. Num reator contínuo, compara as vazões molares de entrada e de saída:"}
+      - equacao: 'X = \frac{F_{A0} - F_{A}}{F_{A0}}'
+      - texto: {pt: "Num reator batelada, compara as quantidades no início e num instante qualquer:"}
+      - equacao: 'X = \frac{N_{A0} - N_{A}}{N_{A0}}'
+      - texto: {pt: "A conversão vai de 0 (nada reagiu) a 1 (todo o A reagiu). Para uma reação reversível, ela para antes, na conversão de equilíbrio."}
+
+  - titulo: {pt: "Escrever o reator em função da conversão"}
+    blocos:
+      - texto: {pt: "Definir a conversão permite escrever tudo o que muda no reator com uma variável só."}
+      - passos:
+          - titulo: {pt: "Vazão de saída"}
+            blocos:
+              - texto: {pt: "Isolando \\(F_{A}\\) na definição:"}
+              - equacao: 'F_{A} = F_{A0}\,(1 - X)'
+          - titulo: {pt: "Concentração de saída, com densidade constante"}
+            blocos:
+              - texto: {pt: "Se a vazão volumétrica não muda (líquidos, ou gases sem variação de mols, temperatura e pressão), basta dividir as vazões molares pela vazão volumétrica:"}
+              - equacao: 'C_{A} = \frac{F_{A}}{v_{0}} = C_{A0}\,(1 - X)'
+                destaque: true
+      - caixa: atencao
+        titulo: {pt: "Gases com variação de mols"}
+        blocos:
+          - texto: {pt: "Quando a reação muda o número de mols de um gás, a vazão volumétrica muda ao longo do reator, e a concentração de saída não é mais \\(C_{A0}(1 - X)\\). A correção entra pela estequiometria em fase gasosa, assunto da ficha de lei de velocidade."}
+
+  - titulo: {pt: "Tempo espacial"}
+    blocos:
+      - texto: {pt: "O tempo espacial é o volume do reator dividido pela vazão volumétrica de entrada:"}
+      - equacao: '\tau = \frac{V}{v_{0}}'
+        onde:
+          - {simbolo: 'V', texto: {pt: "volume do reator"}}
+          - {simbolo: 'v_{0}', texto: {pt: "vazão volumétrica da alimentação, medida nas condições de entrada"}}
+      - texto: {pt: "É o tempo que leva para alimentar um volume de fluido igual ao volume do reator. Um reator de 2 m³ alimentado com 0,5 m³/min tem tempo espacial de 4 min. Fixada a cinética, o tempo espacial é o que decide a conversão de um reator contínuo."}
+      - caixa: atencao
+        titulo: {pt: "Tempo espacial não é tempo de residência"}
+        blocos:
+          - texto: {pt: "Os dois coincidem só quando a densidade é constante. Num gás que se expande ao reagir, o fluido acelera e fica menos tempo no reator do que o tempo espacial sugere. E, mesmo com densidade constante, o tempo espacial é uma média: num CSTR, cada porção de fluido fica um tempo diferente."}
+
+  - titulo: {pt: "Velocidade espacial"}
+    blocos:
+      - texto: {pt: "A velocidade espacial é o inverso do tempo espacial, medida em inverso de tempo:"}
+      - equacao: 'S_{V} = \frac{1}{\tau} = \frac{v_{0}}{V}'
+      - texto: {pt: "Diz quantos volumes de reator de alimentação são processados por unidade de tempo. É a forma mais usada na indústria, muitas vezes com a vazão medida em condições padronizadas, por exemplo como líquido para cargas que entram vaporizadas. Nesses casos, a definição precisa vir junto do número."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Isole a vazão molar de saída \\(F_{A}\\) na definição de conversão."}
+    equacao: 'X = \frac{F_{A0} - F_{A}}{F_{A0}}'
+    simbolos:
+      - {simbolo: X, grandeza: conversao}
+      - {simbolo: 'F_{A0}', grandeza: vazao_molar}
+      - {simbolo: 'F_{A}', grandeza: vazao_molar}
+    pede: 'F_{A}'
+    esperado: ['F_{A} = F_{A0} - X F_{A0}']
+  - enunciado: {pt: "Densidade constante: isole a conversão \\(X\\)."}
+    equacao: 'C_{A} = C_{A0}(1 - X)'
+    simbolos:
+      - {simbolo: 'C_{A}', grandeza: concentracao_molar}
+      - {simbolo: 'C_{A0}', grandeza: concentracao_molar}
+      - {simbolo: X, grandeza: conversao}
+    pede: X
+    esperado: ['X = 1 - \frac{C_{A}}{C_{A0}}']
+  - enunciado: {pt: "Isole o volume do reator \\(V\\) a partir do tempo espacial."}
+    equacao: '\tau = \frac{V}{v_{0}}'
+    simbolos:
+      - {simbolo: '\tau', grandeza: tempo_espacial}
+      - {simbolo: V, grandeza: volume}
+      - {simbolo: 'v_{0}', grandeza: vazao_volumetrica}
+    pede: V
+    esperado: ['V = \tau v_{0}']
+  - enunciado: {pt: "Isole o tempo espacial a partir da velocidade espacial."}
+    equacao: 'S_{V} = \frac{1}{\tau}'
+    simbolos:
+      - {simbolo: 'S_{V}', grandeza: frequencia}
+      - {simbolo: '\tau', grandeza: tempo_espacial}
+    pede: '\tau'
+    esperado: ['\tau = \frac{1}{S_{V}}']
+
 animacao: null
+
 referencias:
-  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: levenspiel
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [reatores.balanco_molar, reatores.cstr, reatores.pfr, reatores.batelada, reatores.lei_de_velocidade]
 revisao: {humana: null, externo: null}

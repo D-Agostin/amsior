@@ -4,17 +4,144 @@
 id: reatores.batelada
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: reatores
 grupo: {pt: "Reatores ideais"}
 ordem: 4
 titulo: {pt: "Reator batelada"}
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "No reator batelada, tudo é carregado de uma vez, reage durante um tempo e só então é descarregado. Nada entra nem sai durante a reação: a composição muda **com o tempo**, igual em todo o tanque. O tempo para atingir uma conversão é"}
+  - equacao: 't = N_{A0} \int_{0}^{X} \frac{dX}{-r_{A}\,V}'
+  - texto: {pt: "e, para reação de 1ª ordem a volume constante,"}
+  - equacao: 'X = 1 - e^{-k t}'
+    destaque: true
+
+variaveis:
+  - {simbolo: 'N_{A0}', grandeza: quantidade_materia, nome: {pt: "quantidade de A carregada"}}
+  - {simbolo: 'N_{A}', grandeza: quantidade_materia, nome: {pt: "quantidade de A no instante t"}}
+  - {simbolo: 'X', grandeza: conversao, nome: {pt: "conversão de A"}}
+  - {simbolo: 'r_{A}', grandeza: taxa_reacao, nome: {pt: "velocidade de formação de A por volume"}, nota: {pt: "negativa para um reagente"}}
+  - {simbolo: 'V', grandeza: volume, nome: {pt: "volume da mistura reacional"}}
+  - {simbolo: 'C_{A0}', grandeza: concentracao_molar, nome: {pt: "concentração inicial de A"}}
+  - {simbolo: 'C_{A}', grandeza: concentracao_molar, nome: {pt: "concentração de A no instante t"}}
+  - {simbolo: 't', grandeza: tempo, nome: {pt: "tempo de reação"}}
+  - {simbolo: 'k', grandeza: constante_velocidade_primeira_ordem, nome: {pt: "constante de velocidade de 1ª ordem"}}
+
+secoes:
+  - titulo: {pt: "Como funciona"}
+    blocos:
+      - texto: {pt: "O ciclo de uma batelada tem etapas que não são reação: carregar, aquecer até a temperatura de reação, reagir, resfriar, descarregar e limpar. Só a etapa de reação entra na equação de projeto."}
+      - caixa: hipoteses
+        titulo: {pt: "Hipóteses do reator batelada ideal"}
+        blocos:
+          - lista:
+              - {pt: "**Sistema fechado:** nada entra nem sai durante a reação."}
+              - {pt: "**Mistura perfeita:** concentração e temperatura iguais em todo o tanque a cada instante."}
+              - {pt: "**Volume constante** (só para a forma de 1ª ordem abaixo): vale bem para líquidos e para gases num vaso rígido."}
+
+  - titulo: {pt: "Equação de projeto"}
+    blocos:
+      - passos:
+          - titulo: {pt: "Balanço molar de A"}
+            blocos:
+              - texto: {pt: "Entrada menos saída mais geração é igual ao acúmulo. Sem entrada nem saída, sobra a geração, que com mistura perfeita é a velocidade de reação vezes o volume:"}
+              - equacao: '\frac{dN_{A}}{dt} = r_{A}\,V'
+          - titulo: {pt: "Escrever com a conversão"}
+            blocos:
+              - texto: {pt: "Com a quantidade de A escrita pela conversão, a derivada vira:"}
+              - equacao: 'N_{A} = N_{A0}\,(1 - X) \quad\Longrightarrow\quad N_{A0}\,\frac{dX}{dt} = -r_{A}\,V'
+          - titulo: {pt: "Separar e integrar"}
+            blocos:
+              - texto: {pt: "A conversão começa em zero no instante zero:"}
+              - equacao: 't = N_{A0} \int_{0}^{X} \frac{dX}{-r_{A}\,V}'
+                destaque: true
+                nota: {pt: "Vale para qualquer lei de velocidade; a integral se resolve à mão, por tabela ou numericamente."}
+          - titulo: {pt: "1ª ordem, volume constante"}
+            blocos:
+              - texto: {pt: "A velocidade é proporcional à concentração, e a concentração segue a conversão:"}
+              - equacao: '-r_{A} = k\,C_{A} = k\,C_{A0}\,(1 - X), \qquad \frac{N_{A0}}{V} = C_{A0}'
+              - texto: {pt: "Substituindo, a concentração inicial se cancela:"}
+              - equacao: 't = \int_{0}^{X} \frac{dX}{k\,(1 - X)} = \frac{1}{k} \ln \frac{1}{1 - X}'
+          - titulo: {pt: "Isolar a conversão"}
+            blocos:
+              - equacao: 'X = 1 - e^{-k t}'
+                destaque: true
+              - texto: {pt: "Em termos de concentração, é o decaimento exponencial:"}
+              - equacao: 'C_{A} = C_{A0}\,e^{-k t}'
+      - caixa: destaque
+        titulo: {pt: "Meia-vida"}
+        blocos:
+          - texto: {pt: "Na 1ª ordem, o tempo para converter metade do reagente não depende da concentração inicial:"}
+          - equacao: 't_{1/2} = \frac{\ln 2}{k}'
+          - texto: {pt: "Esse é um teste prático da ordem: se a meia-vida muda com a concentração inicial, a reação não é de 1ª ordem."}
+
+  - titulo: {pt: "Onde se usa"}
+    blocos:
+      - lista:
+          - {pt: "**Produção em pequena escala** e de muitos produtos no mesmo equipamento: química fina, farmacêutica, aditivos, tintas."}
+          - {pt: "**Reações lentas**, que pediriam um reator contínuo enorme."}
+          - {pt: "**Laboratório:** levantar dados cinéticos medindo a concentração ao longo do tempo."}
+          - {pt: "**Polimerizações e fermentações** em que cada lote precisa de rastreabilidade."}
+
+  - titulo: {pt: "Vantagens e limitações"}
+    blocos:
+      - texto: {pt: "**Vantagens**"}
+      - lista:
+          - {pt: "Flexível: o mesmo tanque serve para produtos e receitas diferentes."}
+          - {pt: "Para reações de ordem positiva, chega a conversões altas: a concentração começa alta e só cai com o tempo."}
+          - {pt: "Cada lote é identificável, o que facilita o controle de qualidade."}
+      - texto: {pt: "**Limitações**"}
+      - lista:
+          - {pt: "O tempo morto de carga, aquecimento, descarga e limpeza reduz a produção por dia."}
+          - {pt: "Mais mão de obra e variação entre lotes."}
+          - {pt: "Em grande escala, o custo por produto fica maior que o de um reator contínuo."}
+      - caixa: atencao
+        titulo: {pt: "Erro comum"}
+        blocos:
+          - texto: {pt: "Dimensionar a produção só com o tempo de reação. O tempo de um ciclo inclui as etapas sem reação, e muitas vezes elas são as mais longas."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "1ª ordem, volume constante: isole a conversão \\(X\\)."}
+    equacao: 't = \frac{1}{k}\ln\frac{1}{1 - X}'
+    simbolos:
+      - {simbolo: t, grandeza: tempo}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+      - {simbolo: X, grandeza: conversao}
+    pede: X
+    esperado: ['X = 1 - \frac{1}{e^{t k}}']
+  - enunciado: {pt: "Decaimento de 1ª ordem: isole o tempo \\(t\\)."}
+    equacao: 'C_{A} = C_{A0} e^{-k t}'
+    simbolos:
+      - {simbolo: 'C_{A}', grandeza: concentracao_molar}
+      - {simbolo: 'C_{A0}', grandeza: concentracao_molar}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+      - {simbolo: t, grandeza: tempo}
+    pede: t
+    esperado: ['t = -\frac{\ln\frac{C_{A}}{C_{A0}}}{k}']
+  - enunciado: {pt: "Meia-vida: o produto \\(kt\\) para 50 % de conversão."}
+    equacao: '\frac{1}{2} = 1 - e^{-D}'
+    simbolos:
+      - {simbolo: D, grandeza: numero_adimensional}
+    pede: D
+    esperado: ['D = \ln 2']
+
 animacao: null
+
 referencias:
-  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: levenspiel
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [reatores.conversao_e_tempo_espacial, reatores.balanco_molar, reatores.semibatelada,
+               reatores.cstr, reatores.pfr, matematica.equacao_exponencial]
 revisao: {humana: null, externo: null}

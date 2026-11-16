@@ -4,18 +4,117 @@
 id: matematica.equacao_1_grau
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: matematica
 grupo: {pt: "Tipos de equação"}
 ordem: 4
 titulo: {pt: "Equação do 1º grau"}
 tipos: [tipo.polinomial_1]
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "Uma equação é do **1º grau** numa variável quando, depois de arrumada, a variável aparece só com expoente 1:"}
+  - equacao: 'a x + b = 0'
+  - texto: {pt: "Com \\(a\\) diferente de zero, ela tem exatamente uma solução:"}
+  - equacao: 'x = -\frac{b}{a}'
+    destaque: true
+
+secoes:
+  - titulo: {pt: "Forma geral"}
+    blocos:
+      - equacao: 'a x + b = 0'
+        onde:
+          - {simbolo: 'x', texto: {pt: "a variável procurada"}}
+          - {simbolo: 'a', texto: {pt: "coeficiente de \\(x\\); não pode ser zero"}}
+          - {simbolo: 'b', texto: {pt: "termo independente, sem \\(x\\)"}}
+      - texto: {pt: "Os coeficientes podem ser números ou expressões em outras letras. O que importa é que não contenham a variável procurada."}
+
+  - titulo: {pt: "Como resolver"}
+    blocos:
+      - texto: {pt: "A ideia é desfazer as operações, sempre fazendo a mesma coisa dos dois lados. Veja a equação"}
+      - equacao: '3x + 5 = 2x - 1'
+      - passos:
+          - titulo: {pt: "Reunir os termos em \\(x\\) de um lado"}
+            blocos:
+              - texto: {pt: "Subtraindo \\(2x\\) dos dois lados:"}
+              - equacao: 'x + 5 = -1'
+          - titulo: {pt: "Levar o resto para o outro lado"}
+            blocos:
+              - texto: {pt: "Subtraindo 5 dos dois lados:"}
+              - equacao: 'x = -6'
+                destaque: true
+      - texto: {pt: "Somar ou subtrair o mesmo termo dos dois lados nunca muda as soluções. Dividir também não, desde que o divisor não seja zero."}
+
+  - titulo: {pt: "Quando o coeficiente se anula"}
+    blocos:
+      - caixa: atencao
+        titulo: {pt: "Dividir por zero não vale"}
+        blocos:
+          - texto: {pt: "O último passo é dividir por \\(a\\). Se \\(a\\) for zero, a variável some e sobra"}
+          - equacao: 'b = 0'
+          - lista:
+              - {pt: "Se \\(b\\) também é zero, a igualdade vale sempre: **todo valor** é solução."}
+              - {pt: "Se \\(b\\) não é zero, a igualdade é falsa: **não há solução**."}
+          - texto: {pt: "Quando o coeficiente é uma expressão em outras letras, o Amsior mostra a condição de que ela não se anula ao lado do passo de dividir."}
+
+  - titulo: {pt: "Linear mesmo com a variável em vários lugares"}
+    blocos:
+      - texto: {pt: "Uma equação pode ser do 1º grau mesmo com a variável aparecendo mais de uma vez, ou dentro de parênteses. O calor trocado por um corpo que muda de temperatura é"}
+      - equacao: 'Q = m\,c_{p}\,(T_{2} - T_{1})'
+        onde:
+          - {simbolo: 'Q', texto: {pt: "calor recebido"}}
+          - {simbolo: 'm', texto: {pt: "massa"}}
+          - {simbolo: 'c_{p}', texto: {pt: "calor específico a pressão constante"}}
+          - {simbolo: 'T_{1}, T_{2}', texto: {pt: "temperaturas inicial e final"}}
+      - texto: {pt: "Em \\(T_{1}\\), a equação é do 1º grau. Isolando:"}
+      - equacao: 'T_{1} = T_{2} - \frac{Q}{m\,c_{p}}'
+        destaque: true
+
+  - titulo: {pt: "Na engenharia"}
+    blocos:
+      - texto: {pt: "Muitas equações de engenharia são do 1º grau na maior parte das variáveis. A lei dos gases ideais é um exemplo:"}
+      - equacao: 'PV = nRT \quad\Longrightarrow\quad T = \frac{PV}{nR}'
+      - caixa: destaque
+        titulo: {pt: "Por que isso importa"}
+        blocos:
+          - texto: {pt: "Isolar uma variável do 1º grau nunca cria nem perde soluções, desde que o coeficiente não se anule. Por isso os passos levam selo de equivalência, sem hipótese, quando as grandezas garantem o sinal (pressão, volume e temperatura absoluta positivos)."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Resolva em \\(x\\)."}
+    equacao: '3x + 5 = 2x - 1'
+    pede: x
+    esperado: ['x = -6']
+  - enunciado: {pt: "Gás ideal: isole a temperatura \\(T\\)."}
+    equacao: 'PV = nRT'
+    simbolos:
+      - {simbolo: P, grandeza: pressao_absoluta}
+      - {simbolo: V, grandeza: volume}
+      - {simbolo: n, grandeza: quantidade_materia}
+      - {simbolo: R, grandeza: constante_gases}
+      - {simbolo: T, grandeza: temperatura_absoluta}
+    pede: T
+    esperado: ['T = \frac{P V}{n R}']
+  - enunciado: {pt: "Calor sensível: isole a temperatura inicial \\(T_{1}\\)."}
+    equacao: 'Q = m c_{p} (T_{2} - T_{1})'
+    simbolos:
+      - {simbolo: Q, grandeza: energia}
+      - {simbolo: m, grandeza: massa}
+      - {simbolo: 'c_{p}', grandeza: calor_especifico}
+      - {simbolo: 'T_{1}', grandeza: temperatura_absoluta}
+      - {simbolo: 'T_{2}', grandeza: temperatura_absoluta}
+    pede: 'T_{1}'
+    esperado: ['T_{1} = T_{2} - \frac{Q}{m c_{p}}']
+
 animacao: null
+
 referencias:
-  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: reamat_precalculo
+    uso: citacao
+    capitulo: "Equações"
+    secao: "Equações do 1º grau"
+    conferido: {por: null, em: null}
+
+relacionadas: [matematica.expressoes_algebricas, matematica.equacao_2_grau, matematica.equacao_racional,
+               matematica.isolar_variavel]
 revisao: {humana: null, externo: null}

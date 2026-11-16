@@ -4,17 +4,124 @@
 id: matematica.expressoes_algebricas
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: matematica
 grupo: {pt: "Linguagem"}
 ordem: 1
 titulo: {pt: "Expressões algébricas e sua classificação"}
-resumo: null
-secoes: []
+
+resumo:
+  - texto: {pt: "Uma expressão algébrica junta números e letras por meio de operações. Para resolver uma equação, o que importa é **onde a variável procurada aparece**, e é isso que a classificação diz:"}
+  - lista:
+      - {pt: "**Racional inteira (polinomial):** só em numeradores, com expoentes naturais. O grau decide o método."}
+      - {pt: "**Racional fracionária:** em algum denominador."}
+      - {pt: "**Irracional:** sob raiz ou com expoente fracionário."}
+      - {pt: "**Transcendente:** dentro de exponencial, logaritmo ou função trigonométrica. O módulo tem ficha própria."}
+      - {pt: "**Mista:** ao mesmo tempo fora e dentro de uma função transcendente; em geral não há forma fechada."}
+
+secoes:
+  - titulo: {pt: "Monômio, polinômio e grau"}
+    blocos:
+      - texto: {pt: "Um **monômio** em \\(x\\) é um número multiplicado por uma potência natural de \\(x\\):"}
+      - equacao: 'a\,x^{n}'
+        onde:
+          - {simbolo: 'a', texto: {pt: "coeficiente, um número ou uma expressão sem \\(x\\)"}}
+          - {simbolo: 'n', texto: {pt: "expoente natural (0, 1, 2, 3...): é o grau do monômio"}}
+      - texto: {pt: "Um **polinômio** é uma soma de monômios. Escrito do maior expoente para o menor, ele fica"}
+      - equacao: 'a_{n} x^{n} + a_{n-1} x^{n-1} + \cdots + a_{1} x + a_{0}'
+      - texto: {pt: "com o coeficiente líder \\(a_{n}\\) diferente de zero. O **grau** do polinômio é \\(n\\), o maior expoente que aparece. Por exemplo, o polinômio abaixo tem grau 2:"}
+      - equacao: '3x^{2} - 5x + 2'
+
+  - titulo: {pt: "As famílias de expressões"}
+    blocos:
+      - texto: {pt: "A classificação olha para a forma em que a variável aparece:"}
+      - tabela:
+          colunas: [{pt: "Tipo"}, {pt: "Onde está a variável"}, {pt: "Exemplo"}]
+          linhas:
+            - [{pt: "Racional inteira"}, {pt: "só em numeradores, com expoentes naturais"}, {pt: "\\(3x^{2} - 5x + 2\\)"}]
+            - [{pt: "Racional fracionária"}, {pt: "em algum denominador"}, {pt: "\\(\\frac{1}{x} + 2\\)"}]
+            - [{pt: "Irracional"}, {pt: "sob raiz ou com expoente fracionário"}, {pt: "\\(\\sqrt{x + 1}\\) e \\(x^{0{,}8}\\)"}]
+            - [{pt: "Exponencial"}, {pt: "no expoente"}, {pt: "\\(e^{x}\\) e \\(2^{x}\\)"}]
+            - [{pt: "Logarítmica"}, {pt: "dentro de um logaritmo"}, {pt: "\\(\\ln x\\)"}]
+            - [{pt: "Trigonométrica"}, {pt: "dentro de seno, cosseno ou tangente"}, {pt: "\\(\\sin x\\)"}]
+            - [{pt: "Modular"}, {pt: "dentro de um módulo"}, {pt: "\\(|x - 1|\\)"}]
+      - texto: {pt: "As três primeiras são **algébricas**: só usam soma, produto, divisão e raízes. As outras são **transcendentes**: envolvem funções que não se escrevem com essas operações."}
+
+  - titulo: {pt: "A variável escolhida decide"}
+    blocos:
+      - texto: {pt: "A mesma equação muda de tipo conforme a variável que se quer achar. Veja a equação de Arrhenius:"}
+      - equacao: 'k = A\, e^{-\frac{E_{a}}{RT}}'
+        onde:
+          - {simbolo: 'k', texto: {pt: "constante de velocidade"}}
+          - {simbolo: 'A', texto: {pt: "fator pré-exponencial"}}
+          - {simbolo: 'E_{a}', texto: {pt: "energia de ativação"}}
+          - {simbolo: 'R', texto: {pt: "constante dos gases"}}
+          - {simbolo: 'T', texto: {pt: "temperatura absoluta"}}
+      - lista:
+          - {pt: "Em \\(A\\), a equação é do **1º grau**: \\(A\\) só multiplica."}
+          - {pt: "Em \\(E_{a}\\) e em \\(T\\), é **exponencial**: as duas estão no expoente."}
+      - texto: {pt: "Por isso o Amsior mostra o tipo junto com a variável escolhida, e não da equação inteira."}
+
+  - titulo: {pt: "Equações mistas"}
+    blocos:
+      - texto: {pt: "Quando a variável aparece ao mesmo tempo fora e dentro de uma função transcendente, a equação é **mista**. O exemplo mais simples é"}
+      - equacao: 'x + \ln x = a'
+      - caixa: atencao
+        titulo: {pt: "Em geral, não há fórmula"}
+        blocos:
+          - texto: {pt: "Nenhuma sequência de operações elementares isola \\(x\\) numa equação mista. A saída é o cálculo numérico, que entra no Amsior na fase 3. Na engenharia, o caso clássico é a média logarítmica das diferenças de temperatura, quando a incógnita é uma das diferenças."}
+
+  - titulo: {pt: "No Amsior"}
+    blocos:
+      - caixa: destaque
+        titulo: {pt: "A etiqueta do tipo"}
+        blocos:
+          - texto: {pt: "Ao escolher a variável para isolar, a resolução mostra o tipo da equação naquela variável. Quando há ficha para o tipo, o link **Ver a ficha** leva direto a ela."}
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Arrhenius, classificada em \\(A\\)."}
+    equacao: 'k = A e^{-\frac{E_{a}}{R T}}'
+    simbolos: &arrhenius
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+      - {simbolo: A, grandeza: constante_velocidade_primeira_ordem}
+      - {simbolo: 'E_{a}', grandeza: energia_ativacao}
+      - {simbolo: R, grandeza: constante_gases}
+      - {simbolo: T, grandeza: temperatura_absoluta}
+    pede: A
+    tipo: tipo.polinomial_1
+  - enunciado: {pt: "Arrhenius, classificada em \\(E_{a}\\)."}
+    equacao: 'k = A e^{-\frac{E_{a}}{R T}}'
+    simbolos: *arrhenius
+    pede: 'E_{a}'
+    tipo: tipo.exponencial
+    esperado: ['E_{a} = -R T \ln\frac{k}{A}']
+  - enunciado: {pt: "Arrhenius, classificada em \\(T\\)."}
+    equacao: 'k = A e^{-\frac{E_{a}}{R T}}'
+    simbolos: *arrhenius
+    pede: T
+    tipo: tipo.exponencial
+  - enunciado: {pt: "Uma equação mista em \\(x\\)."}
+    equacao: 'x + \ln x = a'
+    pede: x
+    tipo: tipo.mista
+
 animacao: null
+
 referencias:
-  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: reamat_precalculo
+    uso: citacao
+    capitulo: "Expressões algébricas"
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: iezzi_fme
+    uso: citacao
+    volume: 6
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [matematica.equacao_1_grau, matematica.equacao_2_grau, matematica.equacao_racional,
+               matematica.equacao_irracional, matematica.equacoes_mistas]
 revisao: {humana: null, externo: null}

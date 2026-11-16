@@ -90,6 +90,8 @@ def _exemplo(e: dict[str, Any]) -> dict[str, Any]:
         "pede": simbolo_canonico(e["pede"]),
         "simbolos": [{"id": s, "grandeza": declarados.get(s, GRANDEZA_PADRAO)} for s in lido["simbolos"]],
         "passos": e.get("passos", True),
+        "tipo": e.get("tipo"),
+        "tem_resultado": e.get("esperado") is not None,
     }
 
 
