@@ -1,0 +1,19 @@
+[
+  {"nome": "Python (CPython)", "licenca": "PSF-2.0", "origem": "python"},
+  {"nome": "Pyodide", "licenca": "MPL-2.0", "origem": "npm:pyodide"},
+  {"nome": "SymPy", "licenca": "BSD", "origem": "pypi:sympy"},
+  {"nome": "mpmath", "licenca": "BSD", "origem": "pypi:mpmath"},
+  {"nome": "Pint", "licenca": "BSD-3-Clause", "origem": "pypi:pint"},
+  {"nome": "flexcache", "licenca": "BSD", "origem": "pypi:flexcache"},
+  {"nome": "flexparser", "licenca": "BSD-3-Clause", "origem": "pypi:flexparser"},
+  {"nome": "platformdirs", "licenca": "MIT", "origem": "pypi:platformdirs"},
+  {"nome": "typing_extensions", "licenca": "PSF-2.0", "origem": "pypi:typing_extensions"},
+  {"nome": "React", "licenca": "MIT", "origem": "npm:react"},
+  {"nome": "Zustand", "licenca": "MIT", "origem": "npm:zustand"},
+  {"nome": "KaTeX", "licenca": "MIT", "origem": "npm:katex"},
+  {"nome": "MathLive", "licenca": "MIT", "origem": "npm:mathlive"},
+  {"nome": "Inter", "licenca": "OFL-1.1", "origem": "npm:@fontsource/inter"},
+  {"nome": "STIX Two Text", "licenca": "OFL-1.1", "origem": "npm:@fontsource/stix-two-text"},
+  {"nome": "Atkinson Hyperlegible Next", "licenca": "OFL-1.1", "origem": "npm:@fontsource/atkinson-hyperlegible-next"},
+  {"nome": "Atkinson Hyperlegible Mono", "licenca": "OFL-1.1", "origem": "npm:@fontsource/atkinson-hyperlegible-mono"}
+]

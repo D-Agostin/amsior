@@ -96,7 +96,8 @@ def compilar(arquivos: dict[str, bytes], python: str) -> dict[str, bytes]:
                 (raiz / nome).write_bytes(conteudo)
         terceiros = [str(d) for d in raiz.iterdir() if d.is_dir() and d.name != "amsior"]
         terceiros += [str(f) for f in raiz.glob("*.py")]
-        base = [python, "-m", "compileall", "-q", "-j", "0", "--invalidation-mode", "unchecked-hash"]
+        base = [python, "-W", "ignore::SyntaxWarning", "-m", "compileall", "-q", "-j", "0",
+                "--invalidation-mode", "unchecked-hash"]
         # Sem -O/-OO: tirar asserts e docstrings encolheria o zip, mas muda o comportamento
         # das bibliotecas, e o motor tem de ser o mesmo do Python nativo (seção 10.1).
         subprocess.run([*base, "-b", "-s", str(raiz), *terceiros], check=True)

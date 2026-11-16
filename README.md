@@ -18,9 +18,10 @@ Em desenvolvimento; ainda não há versão pública para uso.
   passos certificados, primeira tela (equação, resolução e tabela de
   variáveis) e dois sistemas visuais com modo claro e escuro, aprovados na
   revisão visual.
-- **Fase 1C (navegador), em andamento:** o Amsior passa a rodar inteiro no
-  navegador, sem instalação. O motor já roda no navegador e dá as mesmas
-  respostas do Python nativo; versão de teste em
+- **Fase 1C (navegador), quase concluída:** o Amsior roda inteiro no
+  navegador, sem instalação, e dá as mesmas respostas do Python nativo.
+  Funciona sem internet depois da primeira visita e pode ser instalado como
+  aplicativo pelo navegador. Versão de teste em
   <https://d-agostin.github.io/amsior/>. Veja a
   [decisão 0006](docs/decisoes/0006-navegador-e-software-livre.md).
 

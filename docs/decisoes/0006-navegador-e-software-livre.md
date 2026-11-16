@@ -121,6 +121,27 @@ claro e escuro (critério da fase 1B, D-11). **A fase 1B está concluída.**
 O tempo limite de 30 s continua provisório: falta medir num computador de
 aluno mais modesto, onde o pior caso do corpus pode passar de 10 s.
 
-Falta, para fechar a fase 1C: funcionar sem internet (service worker),
-instalação como aplicativo, a tela "Sobre", medições em máquinas de aluno e a
-revisão visual de Ruan.
+## Uso sem internet, instalação e tela "Sobre" (15/11/2026)
+
+1. **Service worker** gerado na compilação, com a lista dos 104 arquivos do
+   site e o hash de cada um. Ficam fora só os formatos de fonte que o
+   navegador não usa e os sons do MathLive. Ele se registra depois de o motor
+   ficar pronto; na versão nova, copia do cache velho o que não mudou e só
+   baixa o resto. A barra de estado avisa da versão nova, com o botão
+   "Atualizar".
+2. **Instalação como aplicativo**: manifesto, ícones (192, 512 e "maskable")
+   e um botão "Instalar como aplicativo" na tela "Sobre", quando o navegador
+   oferece.
+3. **Tela "Sobre"**: autoria e propósito, verificação dos passos,
+   privacidade, uso sem internet, licença AGPL-3.0 com ligações para o código e
+   o texto da licença, e as bibliotecas e fontes de terceiros com suas
+   licenças. Testes conferem essa lista contra os arquivos de trava (npm) e os
+   metadados dos pacotes (Python).
+4. **Teste no navegador na integração contínua**: o Chrome abre o site,
+   isola um exemplo e confere que todos os passos vêm certificados, que não
+   há erro no console e que nenhum pedido sai para fora do site; depois
+   desliga a rede, recarrega e isola outro exemplo.
+
+Falta, para fechar a fase 1C: a revisão de Ruan no Firefox (critério da seção
+10.1) e uma medição num computador de aluno mais modesto, para fixar o tempo
+limite.

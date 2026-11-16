@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-13/11/2026 · v1.6 em 15/11/2026
+13/11/2026 · v1.7 em 15/11/2026
 
 O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
 
@@ -87,8 +87,9 @@ O módulo em destaque é o verificador: nada gerado pelo motor de passos volta �
 ### Partes em execução
 
 1. **Página** (React): mostra a interface e guarda o estado da folha. Pode ser instalada como aplicativo pelo próprio navegador (PWA), com janela própria.
-2. **Trabalhador de cálculo** (Web Worker): carrega o Pyodide e o pacote `amsior` uma vez e responde aos pedidos. Cada pedido tem limite de tempo (padrão 10 s, 30 s para EDOs); ao estourar, a página encerra o trabalhador, cria outro e mostra um erro explicado (T-06).
-3. **Service worker**: guarda em cache a interface, o Pyodide e as bibliotecas Python, com a versão no nome. Depois da primeira visita o Amsior abre sem internet; versão nova é baixada em segundo plano e entra na abertura seguinte.
+2. **Trabalhador de cálculo** (Web Worker): carrega o Pyodide e o pacote `amsior` uma vez e responde aos pedidos. Cada pedido tem limite de tempo, contado a partir de quando começa a rodar (padrão 30 s, provisório até a medição em computadores de aluno; decisão 0006); ao estourar, a página encerra o trabalhador, cria outro e mostra um erro explicado (T-06). Pedidos repetidos de análise substituem o que ainda espera na fila.
+3. **Service worker**: guarda em cache a interface, o Pyodide e o motor, cada arquivo identificado pelo hash do seu conteúdo. Ele se registra só depois de o motor ficar pronto, para a cópia sair do cache do navegador e a primeira visita não baixar tudo duas vezes. Depois da primeira visita o Amsior abre sem internet. Versão nova é baixada em segundo plano, aproveitando os arquivos que não mudaram; a barra de estado avisa e o botão "Atualizar" a põe em uso (senão, ela entra na abertura seguinte).
+4. **Partida sem espera**: textos e glossário vêm prontos do site (`motor/dados.json`, gerados na montagem pelas mesmas rotas do motor); a tela abre na hora e os pedidos esperam o motor na fila, com o estado na barra inferior.
 
 Não há servidor de aplicação: a hospedagem só entrega arquivos. O servidor local da fase 1B (`amsior.api.app`, `amsior.janela`) continua existindo como modo de desenvolvimento e como referência dos testes: o mesmo pedido tem de dar a mesma resposta no Python nativo e no navegador.
 
@@ -801,3 +802,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.4 | 14/11/2026 | D-11 (design visual como requisito, modos claro e escuro, seção 9.4); critério visual na fase 1B; `verify` antes de `rules` e `steps` na ordem de dependência (decisão 0004) |
 | 1.5 | 14/11/2026 | Sistemas visuais D (padrão) e H; D-12 (tipo da equação, seção 4.7); D-13 (fichas de conceito, seções de Matemática e Reatores, seções 3.5, 8.7 e 9.3) |
 | 1.6 | 15/11/2026 | D-14: o Amsior passa a rodar no navegador (D-02 revista; seções 2, 3.3, 9.1, 9.2 e 10; T-06 revista; T-07 nova; fase 1C nova; riscos de empacotamento trocados pelos da versão web). D-15: software livre sob AGPL-3.0, sem contribuições externas por enquanto. Decisão 0006 do repositório |
+| 1.7 | 15/11/2026 | Fase 1C: tempo limite de 30 s provisório no navegador (seção 2, item 2), service worker e partida sem espera (itens 3 e 4); medições registradas na decisão 0006 |

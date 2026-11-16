@@ -262,5 +262,21 @@
   "ui.medir.col.total": "Total",
   "ui.medir.rodando": "Medindo… {n} de {total}",
   "ui.medir.copiar": "Copiar o resultado",
-  "ui.medir.do_cache": "Lido do cache do navegador"
+  "ui.medir.do_cache": "Lido do cache do navegador",
+  "ui.sobre.abrir": "Sobre o Amsior",
+  "ui.sobre.titulo": "Amsior {versao}",
+  "ui.sobre.ideia": "Idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.",
+  "ui.sobre.verificacao": "Cada passo exibido foi verificado por máquina antes de aparecer.",
+  "ui.sobre.privacidade": "Tudo roda no seu navegador: o que você digita não sai do seu dispositivo. Não há conta, anúncio nem coleta de dados.",
+  "ui.sobre.sem_internet": "Depois da primeira visita, o Amsior abre e calcula sem internet.",
+  "ui.sobre.instalar": "Instalar como aplicativo",
+  "ui.sobre.licenca_titulo": "Licença",
+  "ui.sobre.licenca": "Software livre sob a GNU Affero General Public License, versão 3 (AGPL-3.0). Você pode usar, estudar, copiar e modificar; quem distribuir ou hospedar uma versão modificada tem de oferecer o código-fonte sob a mesma licença. Oferecido sem nenhuma garantia.",
+  "ui.sobre.codigo": "Código-fonte",
+  "ui.sobre.licenca_texto": "Texto da licença",
+  "ui.sobre.licenca_url": "https://github.com/D-Agostin/amsior/blob/main/LICENSE",
+  "ui.sobre.terceiros_titulo": "Bibliotecas e fontes de terceiros",
+  "ui.sobre.terceiros": "O Amsior usa estes projetos livres, cada um com a sua licença:",
+  "ui.versao.nova": "Versão nova do Amsior pronta.",
+  "ui.versao.atualizar": "Atualizar"
 }

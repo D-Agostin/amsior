@@ -4,7 +4,8 @@ import { useEstado } from "../estado";
 import { modoEfetivo } from "../preferencias";
 import { t } from "../textos";
 import { Configuracoes } from "./Configuracoes";
-import { IconeAjustes, IconeLua, IconeSol } from "./icones";
+import { IconeAjustes, IconeLua, IconeSobre, IconeSol } from "./icones";
+import { Sobre } from "./Sobre";
 
 function Marca() {
   const nome = t("ui.marca");
@@ -41,12 +42,17 @@ export function Cabecalho() {
           title={t("ui.modo.trocar", { modo: t(`ui.modo.${outro}`) })} onClick={() => definirPrefs({ modo: outro })}>
           {atual === "claro" ? <IconeLua /> : <IconeSol />}
         </button>
+        <button type="button" className="botao-icone" aria-label={t("ui.sobre.abrir")} title={t("ui.sobre.abrir")}
+          aria-haspopup="dialog" popoverTarget="sobre">
+          <IconeSobre />
+        </button>
         <button type="button" className="botao-icone" aria-label={t("ui.config.abrir")} title={t("ui.config.abrir")}
           aria-haspopup="dialog" popoverTarget="configuracoes">
           <IconeAjustes />
         </button>
       </div>
       <Configuracoes />
+      <Sobre />
     </header>
   );
 }

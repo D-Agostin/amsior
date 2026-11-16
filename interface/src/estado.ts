@@ -26,6 +26,10 @@ interface Estado {
   sistemaEscuro: boolean;
   glossario: Grandeza[];
   motor: EstadoDoMotor;
+  /** Versão nova do site esperando: chamar põe em uso e recarrega. */
+  atualizar: (() => void) | null;
+  /** O navegador ofereceu instalar como aplicativo. */
+  instalar: (() => void) | null;
 
   exemplo: string | null;
   latex: string;
@@ -119,6 +123,8 @@ export const useEstado = create<Estado>((set, get) => {
     sistemaEscuro: false,
     glossario: [],
     motor: { estado: "carregando", etapa: "python", fracao: null },
+    atualizar: null,
+    instalar: null,
     exemplo: null,
     latex: "",
     simbolos: {},

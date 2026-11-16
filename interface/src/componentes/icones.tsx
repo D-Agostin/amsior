@@ -22,3 +22,6 @@ export const IconeBusca = () => (
 export const IconeFechar = () => (
   <svg {...base} width={16} height={16}><path d="M6 6l12 12M18 6L6 18" /></svg>
 );
+export const IconeSobre = () => (
+  <svg {...base} width={16} height={16}><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.01" /></svg>
+);

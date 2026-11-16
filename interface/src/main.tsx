@@ -21,6 +21,7 @@ import { api, motor } from "./api";
 import { App } from "./App";
 import { useEstado } from "./estado";
 import { aplicar } from "./preferencias";
+import { registrarServiceWorker } from "./sw-registro";
 import { carregarTextos, t } from "./textos";
 
 const raiz = createRoot(document.getElementById("raiz")!);
@@ -44,11 +45,27 @@ function precarregarFontes(): void {
   for (const f of familias) void document.fonts?.load(f).catch(() => undefined);
 }
 
+// Instalar como aplicativo: o navegador oferece; o botão fica na tela "Sobre".
+interface PedidoDeInstalacao extends Event { prompt: () => Promise<void> }
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  const pedido = e as PedidoDeInstalacao;
+  useEstado.setState({ instalar: () => { void pedido.prompt(); useEstado.setState({ instalar: null }); } });
+});
+window.addEventListener("appinstalled", () => useEstado.setState({ instalar: null }));
+
 async function partir(): Promise<void> {
   precarregarFontes();
   // O motor começa a carregar já; a tela abre com os textos e o glossário do site
   // e os pedidos esperam na fila até o motor ficar pronto.
-  motor.ouvir((e) => useEstado.setState({ motor: e }));
+  let registrado = false;
+  motor.ouvir((e) => {
+    useEstado.setState({ motor: e });
+    if (e.estado === "pronto" && !registrado) {
+      registrado = true;
+      void registrarServiceWorker((atualizar) => useEstado.setState({ atualizar }));
+    }
+  });
   motor.iniciar();
   try {
     const dados = await api.dados();

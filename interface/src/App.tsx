@@ -22,12 +22,19 @@ export function textoDoMotor(m: EstadoDoMotor): string {
 
 function Rodape() {
   const motor = useEstado((s) => s.motor);
+  const atualizar = useEstado((s) => s.atualizar);
   return (
     <footer className="rodape">
       <span className={`estado-motor estado-${motor.estado}`} role="status">
         <span aria-hidden="true">●</span> {textoDoMotor(motor)}
       </span>
       <span>{t("ui.estado.si")}</span>
+      {atualizar ? (
+        <span className="rodape-versao" role="status">
+          {t("ui.versao.nova")}{" "}
+          <button type="button" className="rodape-botao" onClick={atualizar}>{t("ui.versao.atualizar")}</button>
+        </span>
+      ) : null}
       <span className="espaco" />
       <a className="rodape-link" href={t("ui.codigo.url")} target="_blank" rel="noreferrer">{t("ui.codigo.rotulo")}</a>
       <span>{t("ui.marca")} {__VERSAO__}</span>

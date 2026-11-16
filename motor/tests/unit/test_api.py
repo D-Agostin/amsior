@@ -225,3 +225,18 @@ def test_glossario_em_json_e_o_mesmo_do_yaml(tmp_path: Any) -> None:
 def test_textos_tambem_saem_pelo_executar() -> None:
     """O trabalhador do navegador só fala por executar(rota, dados)."""
     assert executar("textos", {})["ok"] == rota_textos()
+
+
+@pytest.mark.skipif(not INTERFACE.exists(), reason="interface fora do repositório")
+def test_terceiros_python_na_tela_sobre() -> None:
+    """Toda biblioteca Python que vai ao navegador aparece na tela Sobre, com a licença do pacote."""
+    import importlib.metadata as md
+    import sys
+    sys.path.insert(0, str(RAIZ / "ferramentas" / "web"))
+    from montar_motor import PACOTES  # type: ignore[import-not-found]
+    terceiros = json.loads((INTERFACE / "dados" / "terceiros.json").read_text(encoding="utf-8"))
+    pypi = {b["origem"][5:]: b["licenca"] for b in terceiros if b["origem"].startswith("pypi:")}
+    assert set(pypi) == set(PACOTES)
+    for nome, licenca in pypi.items():
+        meta = md.metadata(nome)
+        assert licenca == (meta.get("License-Expression") or meta.get("License")), nome
