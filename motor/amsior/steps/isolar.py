@@ -194,7 +194,7 @@ class Isolador:
             if p.operacao.nome == "reescrever" or troca_sinal else ()
         passo = Passo(antes=cam.eq, depois=p.depois, operacao=p.operacao, relacao=p.relacao,
                       tipo="algebra", indice=len(cam.passos) + 1, regra=p.regra,
-                      condicoes=p.condicoes + tuple(c for c in extra if c not in p.condicoes),
+                      condicoes=tuple(dict.fromkeys(p.condicoes + extra)),
                       justificativa={**p.justificativa, "fundivel": p.fundivel})
         cert = self.verificador.certificar(passo)
         if cert.estado != "aprovado":
@@ -254,11 +254,8 @@ class Isolador:
             if quad is not None:
                 return quad
             raise _Falha(Motivo("isolar.sem_regra_reunir"))
-        termo_u = Mul((de_sympy(a, self.tabela), Sym(ctx.alvo))) if a != 1 else Sym(ctx.alvo)
-        if b == 0:
-            agrupado: Expr = termo_u
-        else:
-            agrupado = Add((termo_u, de_sympy(b, self.tabela)))
+        # coeficiente na frente e sinais à mostra: "−3x − 1", não "(−3)x + (−1)"
+        agrupado: Expr = _soma([(a, Sym(ctx.alvo)), (b, None)], self.tabela)
         return [Proposta("agrupar_no_alvo", Eq(agrupado, eq.dir),
                          Operacao("reescrever", lado="esquerdo"),
                          justificativa=_j("regra.agrupar_no_alvo", alvo=Sym(ctx.alvo)))]
