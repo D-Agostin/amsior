@@ -89,6 +89,7 @@ class Biblioteca:
     fichas: dict[str, Ficha] = field(default_factory=dict)
     problemas: list[Problema] = field(default_factory=list)  # da leitura e do esquema
     glossario: Glossario | None = None
+    raiz: Path | None = None  # pasta lida; as figuras ficam em <raiz>/figuras
 
     def da_area(self, area: str) -> list[Ficha]:
         """Fichas de uma área na ordem da lista da seção 8.7 (``ordem``), depois por id."""
@@ -109,7 +110,7 @@ class Biblioteca:
 def carregar_biblioteca(pasta: str | Path | None = None, glossario: Glossario | None = None) -> Biblioteca:
     """Lê fontes, hipóteses e fichas (``<area>/<nome>.yaml``) e valida tudo."""
     raiz = Path(pasta) if pasta is not None else pasta_biblioteca()
-    b = Biblioteca(glossario=glossario if glossario is not None else carregar_glossario())
+    b = Biblioteca(glossario=glossario if glossario is not None else carregar_glossario(), raiz=raiz)
     _ler_fontes(b, raiz)
     _ler_hipoteses(b, raiz)
     for arq in sorted(raiz.glob("*/*.yaml")) + sorted(raiz.glob("*/*.json")):
@@ -419,6 +420,8 @@ def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> N
         fig = s.get("figura")
         if fig is not None and (not isinstance(fig, str) or not fig.endswith(".svg")):
             v.erro(f"{campo}.figura", "caminho de um .svg da pasta de figuras")
+        elif fig is not None and b.raiz is not None and not (b.raiz / "figuras" / fig).is_file():
+            v.erro(f"{campo}.figura", f"figura ausente: figuras/{fig}")
     for i, e in enumerate(v.lista(d, "equacoes")):
         _ligacao(b, f, v, f"equacoes[{i}]", e, "equacao")
     for i, ex in enumerate(v.lista(d, "exemplos")):
@@ -426,11 +429,30 @@ def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> N
         if not isinstance(ex, dict):
             v.erro(campo, "esperado um mapa")
             continue
-        v.chaves(ex, {"enunciado", "usa", "dados", "pede", "esperado", "tolerancia_rel"}, campo)
+        v.chaves(ex, {"enunciado", "usa", "equacao", "simbolos", "dados", "pede", "esperado",
+                      "passos", "tolerancia_rel"}, campo)
         _Validador(f.arquivo, campo, v.saida).multilingue(ex, "enunciado", obrigatorio=True)
-        _ligacao(b, f, v, f"{campo}.usa", ex.get("usa"), "equacao")
+        # a conta vem de uma ficha de equação (usa) ou é uma equação escrita na própria ficha
+        if ("usa" in ex) == ("equacao" in ex):
+            v.erro(campo, "exatamente um de usa (ficha de equação) ou equacao (LaTeX)")
+        elif "usa" in ex:
+            _ligacao(b, f, v, f"{campo}.usa", ex.get("usa"), "equacao")
+        elif not isinstance(ex.get("equacao"), str) or not ex["equacao"].strip():
+            v.erro(f"{campo}.equacao", "LaTeX da equação")
+        for k, s_ in enumerate(v.lista(ex, "simbolos")):
+            if not isinstance(s_, dict) or not isinstance(s_.get("simbolo"), str):
+                v.erro(f"{campo}.simbolos[{k}]", "esperado {simbolo, grandeza}")
+            elif b.glossario is not None and s_.get("grandeza") not in b.glossario:
+                v.erro(f"{campo}.simbolos[{k}].grandeza", f"grandeza fora do glossário: {s_.get('grandeza')}")
         if not isinstance(ex.get("pede"), str):
             v.erro(f"{campo}.pede", "símbolo pedido")
+        esp = ex.get("esperado")
+        if esp is not None and (not isinstance(esp, list) or not all(isinstance(e, str) for e in esp)):
+            v.erro(f"{campo}.esperado", "lista de resultados em LaTeX, como o motor os escreve")
+        if pronta and "equacao" in ex and esp is None:
+            v.erro(f"{campo}.esperado", "obrigatório fora de rascunho: é o que o motor confere")
+        if "passos" in ex and not isinstance(ex["passos"], bool):
+            v.erro(f"{campo}.passos", "verdadeiro (com passos) ou falso (resultado sem passos)")
     tipos = v.lista(d, "tipos")
     if tipos and f.area != "matematica":
         v.erro("tipos", "só fichas de Matemática explicam tipos de equação (D-12)")

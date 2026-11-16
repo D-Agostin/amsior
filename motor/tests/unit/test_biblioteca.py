@@ -45,7 +45,9 @@ def test_todo_tipo_de_equacao_leva_a_uma_ficha(biblioteca) -> None:  # type: ign
 
 def test_licenca_de_cada_arquivo() -> None:
     """D-16: conteúdo sob CC BY-SA 4.0; o glossário é parte do motor (AGPL-3.0)."""
-    for arq in sorted(BIB.rglob("*.yaml")):
+    arquivos = sorted(BIB.rglob("*.yaml")) + sorted(BIB.rglob("*.svg"))
+    assert any(a.suffix == ".svg" for a in arquivos)
+    for arq in arquivos:
         cabecalho = "".join(arq.read_text(encoding="utf-8").splitlines(keepends=True)[:3])
         esperado = "AGPL-3.0-only" if arq.name == "_glossario.yaml" else "CC-BY-SA-4.0"
         assert f"SPDX-License-Identifier: {esperado}" in cabecalho, arq
@@ -214,3 +216,56 @@ def test_ficha_de_equacao_le_a_equacao_e_confere_simbolos(pasta: Path) -> None:
     assert any("declarado e ausente da equação: n" in x for x in p)
     p = _equacao(pasta, hipoteses="gas_perfeito")
     assert any("hipótese fora de _hipoteses.yaml: gas_perfeito" in x for x in p)
+
+
+# ------------------------------------------------------------------ exemplos conferidos pelo motor
+
+
+def test_exemplos_das_fichas_conferidos_pelo_motor(biblioteca) -> None:  # type: ignore[no-untyped-def]
+    from amsior.biblioteca.exemplos import conferir_exemplos
+
+    assert [str(p) for p in conferir_exemplos(biblioteca)] == []
+
+
+def test_ficha_modelo_de_reatores(biblioteca) -> None:  # type: ignore[no-untyped-def]
+    f = biblioteca.fichas["reatores.cstr"]
+    assert f.visivel and f.dados["secoes"][0]["figura"] == "reatores/cstr_esquema.svg"
+    titulos = [s["titulo"]["pt"] for s in f.dados["secoes"]]
+    assert titulos == ["Como funciona", "Equação de projeto", "Onde se usa", "Vantagens e limitações"]
+
+
+def test_figura_ausente_e_apontada(pasta: Path) -> None:
+    p = _conceito(pasta, secoes='[{titulo: {pt: "A"}, texto: {pt: "B"}, figura: nada/sumiu.svg}]')
+    assert any("figura ausente: figuras/nada/sumiu.svg" in x for x in p)
+
+
+def test_ficha_modelo_de_matematica(biblioteca) -> None:  # type: ignore[no-untyped-def]
+    f = biblioteca.fichas["matematica.equacao_racional"]
+    assert f.visivel and f.estado == "auto_verificada"
+    assert len(f.dados["secoes"]) >= 4 and len(f.dados["exemplos"]) >= 3
+    assert biblioteca.ficha_do_tipo("tipo.racional") is f
+    ref = f.dados["referencias"][0]
+    assert ref["fonte"] == "reamat_precalculo" and ref["uso"] == "adaptacao"
+
+
+def test_exemplo_com_resultado_errado_e_apontado(pasta: Path) -> None:
+    from amsior.biblioteca.exemplos import conferir_exemplos
+
+    _ficha(pasta, "matematica/teste.yaml", """\
+        id: matematica.teste
+        tipo: conceito
+        versao: 1
+        estado: rascunho
+        area: matematica
+        titulo: {pt: "Teste"}
+        exemplos:
+          - {enunciado: {pt: "a"}, equacao: 'x^2 - 2x - 8 = 0', pede: x, esperado: ['x = 4']}
+          - {enunciado: {pt: "b"}, equacao: '2x = 6', pede: x, passos: false, esperado: ['x = 3']}
+          - {enunciado: {pt: "c"}, equacao: '2x = 6', pede: x, esperado: ['x = 3']}
+        """)
+    b = carregar_biblioteca(pasta)
+    assert b.problemas == []
+    p = [str(x) for x in conferir_exemplos(b)]
+    assert len(p) == 2
+    assert "exemplos[0]" in p[0] and "esperados ['x = 4']" in p[0]
+    assert "exemplos[1]" in p[1] and "agora tem passos" in p[1]

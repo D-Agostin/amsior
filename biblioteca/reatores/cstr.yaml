@@ -1,20 +1,126 @@
 # SPDX-License-Identifier: CC-BY-SA-4.0
 # Amsior — Ficha de conceito (Reatores). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo da seção de Reatores (seção 8.7 da especificação).
 
 id: reatores.cstr
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: reatores
 grupo: {pt: "Reatores ideais"}
 ordem: 6
 titulo: {pt: "Reator contínuo de tanque agitado (CSTR)"}
-resumo: null
-secoes: []
+
+resumo:
+  pt: >-
+    No CSTR, a mistura reacional entra e sai sem parar de um tanque bem agitado. Como
+    a mistura é perfeita, o conteúdo do tanque tem a mesma composição da corrente de
+    saída, e a reação acontece toda na concentração de saída, a mais baixa do processo.
+
+secoes:
+  - titulo: {pt: "Como funciona"}
+    figura: reatores/cstr_esquema.svg
+    texto:
+      pt: |
+        Um tanque com agitador recebe a alimentação de forma contínua e descarrega o
+        produto pela saída. Em regime permanente, a vazão de saída acompanha a de
+        entrada e nada dentro do tanque muda com o tempo.
+
+        A hipótese que define o CSTR ideal é a **mistura perfeita**: concentração e
+        temperatura são as mesmas em todo o volume e iguais às da corrente de saída. O
+        reagente que acaba de entrar é diluído na hora em toda a massa do tanque.
+
+        Disso sai a propriedade mais importante do CSTR: a velocidade de reação tem um
+        valor só no tanque inteiro, o da composição de saída. Por isso o balanço molar do
+        CSTR é uma equação algébrica, sem derivada e sem integral.
+
+  - titulo: {pt: "Equação de projeto"}
+    texto:
+      pt: |
+        O balanço molar da espécie \(A\) num volume \(V\), em regime permanente, diz que
+        o que entra menos o que sai mais o que se forma por reação é zero:
+        \(F_{A0} - F_A + r_A V = 0\). Com a conversão \(X\), a vazão molar de saída é
+        \(F_A = F_{A0}(1 - X)\), e o volume necessário fica
+
+        \[V = \frac{F_{A0}\,X}{-r_A},\]
+
+        com \(-r_A\) calculada nas condições de saída.
+
+        Para uma reação de 1ª ordem, \(-r_A = k C_A\). Com densidade constante,
+        \(C_A = C_{A0}(1 - X)\) e a vazão volumétrica não muda. Usando o tempo espacial
+        \(\tau = V/v_0\) e \(F_{A0} = C_{A0} v_0\), a equação de projeto vira
+
+        \[\tau = \frac{X}{k(1 - X)} \qquad\text{ou}\qquad X = \frac{\tau k}{1 + \tau k}.\]
+
+        O produto \(\tau k\) é o número de Damköhler da reação de 1ª ordem: compara o
+        tempo que o fluido passa no reator com o tempo característico da reação, \(1/k\).
+
+  - titulo: {pt: "Onde se usa"}
+    texto:
+      pt: |
+        O CSTR é o reator típico de reações em fase líquida em produção contínua. A
+        agitação e a camisa (ou uma serpentina) facilitam o controle de temperatura, o
+        que pesa em reações muito exotérmicas: a alimentação é diluída na massa do tanque
+        e o calor sai por uma superfície de troca bem molhada.
+
+        O mesmo modelo descreve equipamentos de outras áreas. O quimiostato, de
+        fermentação contínua, é um CSTR. Tanques de aeração de lodo ativado, no
+        tratamento de efluentes, costumam ser modelados como de mistura completa.
+
+        Quando é preciso mais conversão do que um tanque dá, usam-se vários CSTRs em
+        série. Com muitos tanques, o conjunto se aproxima do reator tubular (PFR).
+
+  - titulo: {pt: "Vantagens e limitações"}
+    texto:
+      pt: |
+        **Vantagens.** Temperatura uniforme e fácil de controlar. Operação contínua, com
+        produto de qualidade constante. Equipamento simples de instrumentar, de limpar e
+        de inspecionar. A concentração baixa do reagente favorece a seletividade quando a
+        reação indesejada tem ordem maior no reagente do que a desejada.
+
+        **Limitações.** Toda a reação acontece na concentração de saída, a mais baixa.
+        Para reações de ordem positiva, isso significa velocidade menor e, para a mesma
+        conversão, volume maior do que o de um PFR. Conversões altas custam caro: pela
+        equação de 1ª ordem, \(X\) só chega a 1 com \(\tau\) infinito. Parte do fluido sai
+        logo depois de entrar, porque os tempos de residência se espalham; e o agitador
+        consome energia o tempo todo.
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Reação de 1ª ordem, densidade constante: isole a conversão \\(X\\) em \\(\\tau = \\frac{X}{k(1 - X)}\\)."}
+    equacao: '\tau = \frac{X}{k(1 - X)}'
+    simbolos:
+      - {simbolo: '\tau', grandeza: tempo_espacial}
+      - {simbolo: X, grandeza: conversao}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+    pede: X
+    esperado: ['X = \frac{\tau k}{\tau k + 1}']
+  - enunciado: {pt: "Na equação de projeto de 1ª ordem escrita com o volume, isole a conversão \\(X\\)."}
+    equacao: 'V = \frac{F_{A0} X}{k C_{A0} (1 - X)}'
+    simbolos:
+      - {simbolo: V, grandeza: volume}
+      - {simbolo: 'F_{A0}', grandeza: vazao_molar}
+      - {simbolo: X, grandeza: conversao}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+      - {simbolo: 'C_{A0}', grandeza: concentracao_molar}
+    pede: X
+    esperado: ['X = \frac{C_{A0} V k}{C_{A0} V k + F_{A0}}']
+
 animacao: null
+
 referencias:
-  - {fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: levenspiel
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [reatores.balanco_molar, reatores.conversao_e_tempo_espacial, reatores.pfr,
+               reatores.levenspiel, reatores.associacao_de_reatores, matematica.equacao_racional]
 revisao: {humana: null, externo: null}

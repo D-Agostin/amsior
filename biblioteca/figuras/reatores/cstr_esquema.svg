@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 290" role="img" aria-labelledby="t d" font-family="sans-serif" font-size="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- SPDX-License-Identifier: CC-BY-SA-4.0 · Amsior · Copyright (c) 2026 Ruan D'Agostin -->
+  <title id="t">Esquema de um CSTR</title>
+  <desc id="d">Tanque com agitador e camisa de troca térmica. A alimentação entra pelo topo e o produto sai pela lateral, na mesma vazão; dentro do tanque a concentração é a mesma da saída.</desc>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="currentColor" stroke="none"/>
+    </marker>
+  </defs>
+  <!-- camisa -->
+  <path d="M106 80 V210 Q106 236 132 236 H248 Q274 236 274 210 V80" stroke-dasharray="5 4" opacity="0.6"/>
+  <!-- tanque -->
+  <path d="M116 70 V206 Q116 226 136 226 H244 Q264 226 264 206 V70"/>
+  <line x1="110" y1="70" x2="270" y2="70"/>
+  <!-- nível do líquido -->
+  <path d="M116 102 Q140 96 164 102 T212 102 T264 102" opacity="0.7"/>
+  <!-- agitador -->
+  <rect x="180" y="16" width="20" height="14" rx="2"/>
+  <line x1="190" y1="30" x2="190" y2="186"/>
+  <rect x="160" y="180" width="60" height="12" rx="2"/>
+  <!-- alimentação -->
+  <path d="M30 46 H140 V92" marker-end="url(#seta)"/>
+  <text x="30" y="36" fill="currentColor" stroke="none">alimentação: v<tspan baseline-shift="sub" font-size="9">0</tspan>, C<tspan baseline-shift="sub" font-size="9">A0</tspan></text>
+  <!-- saída, atravessando a camisa -->
+  <path d="M264 150 H370" marker-end="url(#seta)"/>
+  <text x="286" y="140" fill="currentColor" stroke="none">saída: v, C<tspan baseline-shift="sub" font-size="9">A</tspan></text>
+  <!-- fluido térmico -->
+  <path d="M66 216 H106" opacity="0.6" marker-end="url(#seta)"/>
+  <path d="M274 216 H314" opacity="0.6" marker-end="url(#seta)"/>
+  <text x="30" y="262" fill="currentColor" stroke="none" opacity="0.8">camisa com fluido térmico</text>
+  <text x="30" y="282" fill="currentColor" stroke="none">mistura perfeita: no tanque, C<tspan baseline-shift="sub" font-size="9">A</tspan> é a mesma da saída</text>
+</svg>

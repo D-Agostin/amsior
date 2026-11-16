@@ -1,21 +1,144 @@
 # SPDX-License-Identifier: CC-BY-SA-4.0
 # Amsior — Ficha de conceito (Matemática). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo da seção de Matemática (seção 8.7 da especificação).
 
 id: matematica.equacao_racional
 tipo: conceito
 versao: 1
-estado: rascunho
+estado: auto_verificada
 area: matematica
 grupo: {pt: "Tipos de equação"}
 ordem: 7
 titulo: {pt: "Equação racional"}
 tipos: [tipo.racional]
-resumo: null
-secoes: []
+
+resumo:
+  pt: >-
+    Uma equação é racional fracionária numa variável quando essa variável aparece
+    em algum denominador. A resolução tem três tempos: achar o domínio, eliminar os
+    denominadores e conferir cada candidata contra o domínio.
+
+secoes:
+  - titulo: {pt: "O que é"}
+    texto:
+      pt: |
+        Uma expressão racional é um quociente de polinômios. Numa equação, o que importa
+        é onde está a variável que se quer achar.
+
+        Se a variável aparece em algum denominador, a equação é **racional fracionária**
+        nessa variável. Em \(\frac{1}{x} = \frac{4}{3x} + 1\), o \(x\) está embaixo da
+        fração. Se a variável só aparece em numeradores, a equação é **racional inteira**,
+        isto é, polinomial, e o que conta é o grau.
+
+        A classificação depende da variável escolhida. Em \(\tau = \frac{X}{k(1 - X)}\),
+        a equação é racional em \(X\) e em \(k\), mas é do 1º grau em \(\tau\).
+
+        Ao lado do tipo, o Amsior mostra o grau que a equação ganha depois de tirar os
+        denominadores. É esse grau que diz o que vem depois: uma equação do 1º grau, do
+        2º grau ou de grau maior.
+
+  - titulo: {pt: "Primeiro o domínio"}
+    texto:
+      pt: |
+        Não existe divisão por zero. Por isso, antes de qualquer conta, ficam de fora os
+        valores da variável que anulam algum denominador. O que sobra é o **domínio** da
+        equação, e toda solução precisa estar nele.
+
+        Em \(\frac{1}{x} = \frac{4}{3x} + 1\), os denominadores são \(x\) e \(3x\). Os
+        dois se anulam só em \(x = 0\), então o domínio é \(\{x \in \mathbb{R} \mid x \neq 0\}\).
+
+  - titulo: {pt: "Eliminar os denominadores"}
+    texto:
+      pt: |
+        Multiplicar os dois lados por uma expressão que contenha todos os denominadores
+        (o mínimo múltiplo comum deles) troca a equação por outra sem frações.
+
+        Esse passo tem um preço. Multiplicar os dois lados por algo só preserva as
+        soluções onde esse algo é diferente de zero. Dentro do domínio, é o caso; fora
+        dele, não. Por isso o Amsior escreve a condição ao lado do passo, como
+        \(x \neq 0\), e o selo do passo diz que ele vale **sob hipótese**.
+
+        Na prática, o Amsior leva tudo para um lado, multiplica pelo denominador e
+        reúne os termos na variável. Se o que sobra é do 1º grau, basta dividir pelo
+        coeficiente. Se é do 2º grau, ele completa o quadrado e abre os dois ramos.
+
+  - titulo: {pt: "Raízes estranhas"}
+    texto:
+      pt: |
+        A equação sem denominadores pode ter raízes que a original não tem. Elas
+        aparecem justamente nos pontos excluídos do domínio, e por isso se chamam
+        **raízes estranhas**.
+
+        Veja \(\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0\). Uma fração é zero quando o
+        numerador é zero e o denominador não é. O numerador se fatora como
+        \((x - 2)^2(x - 3)\) e se anula em \(x = 2\) e em \(x = 3\). Só que \(x = 2\)
+        também anula o denominador: está fora do domínio. A única solução é \(x = 3\).
+
+        A regra vale para qualquer equação racional: toda candidata é conferida contra o
+        domínio, e a que estiver fora é descartada. O Amsior faz essa conferência
+        substituindo cada resultado na equação original.
+
+  - titulo: {pt: "Na engenharia"}
+    texto:
+      pt: |
+        Equações racionais aparecem sempre que a incógnita está no denominador de uma
+        equação de projeto. No reator contínuo de tanque agitado com reação de 1ª ordem
+        e densidade constante, o tempo espacial e a conversão se ligam por
+        \(\tau = \frac{X}{k(1 - X)}\).
+
+        Para achar a conversão que um reator dá, isola-se \(X\). O Amsior multiplica os
+        dois lados por \(k(1 - X)\), com a condição \(k(1 - X) \neq 0\), reúne os termos
+        em \(X\) e chega a \(X = \frac{\tau k}{\tau k + 1}\).
+
+        A condição tem sentido físico. Ela exclui \(X = 1\): a conversão completa só
+        seria alcançada com tempo espacial infinito. O resultado confirma isso: com
+        \(\tau\) e \(k\) positivos, \(\frac{\tau k}{\tau k + 1}\) fica entre 0 e 1.
+
 equacoes: []
-exemplos: []
+
+exemplos:
+  - enunciado: {pt: "Resolva em \\(x\\): \\(\\frac{1}{x} = \\frac{4}{3x} + 1\\)."}
+    equacao: '\frac{1}{x} = \frac{4}{3x} + 1'
+    pede: x
+    esperado: ['x = -\frac{1}{3}']
+  - enunciado: {pt: "Resolva em \\(x\\): \\(1 - \\frac{2}{x} = \\frac{8}{x^2}\\). Depois de eliminar \\(x^2\\), a equação é do 2º grau."}
+    equacao: '1 - \frac{2}{x} = \frac{8}{x^2}'
+    pede: x
+    esperado: ['x = -2', 'x = 4']
+  - enunciado: {pt: "Resolva em \\(x\\): \\(\\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0\\). A candidata \\(x = 2\\) é raiz estranha."}
+    equacao: '\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0'
+    pede: x
+    passos: false
+    esperado: ['x = 3']
+  - enunciado: {pt: "No CSTR de 1ª ordem, isole a conversão \\(X\\) em \\(\\tau = \\frac{X}{k(1 - X)}\\)."}
+    equacao: '\tau = \frac{X}{k(1 - X)}'
+    simbolos:
+      - {simbolo: '\tau', grandeza: tempo_espacial}
+      - {simbolo: X, grandeza: conversao}
+      - {simbolo: k, grandeza: constante_velocidade_primeira_ordem}
+    pede: X
+    esperado: ['X = \frac{\tau k}{\tau k + 1}']
+
 animacao: null
+
 referencias:
-  - {fonte: reamat_precalculo, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
-relacionadas: []
+  - fonte: reamat_precalculo
+    uso: adaptacao
+    capitulo: "Equações e inequações"
+    secao: "Equações racionais"
+    adaptacao:
+      pt: >-
+        Do livro vêm a ordem da explicação (o domínio antes de resolver e a conferência
+        das candidatas contra ele) e três exemplos: 1/x = 4/(3x) + 1, 1 − 2/x = 8/x² e a
+        raiz estranha de (x³ − 7x² + 16x − 12)/(x − 2) = 0. O texto foi reescrito; o caso
+        do CSTR e a explicação dos selos do Amsior são novos.
+    conferido: {por: null, em: null}
+  - fonte: fogler
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [matematica.dominio, matematica.equacao_1_grau, matematica.equacao_2_grau,
+               matematica.equivalencia_e_implicacao, reatores.cstr]
 revisao: {humana: null, externo: null}

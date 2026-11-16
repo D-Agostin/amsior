@@ -27,7 +27,9 @@ Em desenvolvimento; ainda não há versão pública para uso.
 - **Fase 2 (biblioteca), em andamento:** esquema das fichas de equação e de
   conceito conferido pelos testes, registro de fontes, vocabulário de
   hipóteses e as 28 fichas de conceito de Matemática e de Reatores criadas
-  como rascunho, na ordem da especificação.
+  na ordem da especificação. As duas fichas-modelo (equação racional e CSTR)
+  estão escritas, com exemplos que o motor refaz nos testes; as demais são
+  rascunho. O motor passou a isolar equações do 2º grau com passos.
 
 ## O que existe
 
