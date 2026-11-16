@@ -211,13 +211,22 @@ def _num_fracao(q: Fraction) -> Expr:
     return Neg(e) if q < 0 else e
 
 
-def _raiz_inteira(eq: Eq, n: int, c: Contexto) -> list[Ramo]:
+def _raiz_inteira(eq: Eq, n: int, c: Contexto) -> list[Ramo] | Recusa:
     base = eq.esq.base if isinstance(eq.esq, Pow) else eq.esq
     indice = Num(str(n))
     raiz: Expr = Sqrt(eq.dir) if n == 2 else Root(eq.dir, indice)
     if n % 2 == 1:
         return [Ramo([Proposta("raiz_impar", Eq(base, raiz), Operacao("raiz_ambos", indice),
                                justificativa=_j("regra.raiz_impar", indice=str(n)))])]
+    valor = _valor_numerico(eq.dir, c)
+    if valor is not None and n % 2 == 0 and valor.is_negative:
+        return Recusa("isolar.potencia_par_negativa", {"indice": str(n)})
+    if n % 2 == 0 and (eq.dir == _ZERO or valor is not None and valor.is_zero):
+        # u^n = 0: os dois ramos da raiz dão a mesma raiz, u = 0 (raiz dupla do 2º grau
+        # com Δ = 0). Um ramo só; a condição u ≥ 0 da raiz positiva vale na raiz.
+        return [Ramo([Proposta("raiz_de_zero", Eq(base, _ZERO), Operacao("raiz_ambos", indice),
+                               condicoes=c.condicao(base, "nao_negativo"),
+                               justificativa=_j("regra.raiz_de_zero", indice=str(n)))])]
     cond_b = c.condicao(eq.dir, "nao_negativo")
     pos = Ramo([Proposta("raiz_par", Eq(base, raiz), Operacao("raiz_ambos", indice),
                          condicoes=cond_b + c.condicao(base, "nao_negativo"),
@@ -231,6 +240,37 @@ def _raiz_inteira(eq: Eq, n: int, c: Contexto) -> list[Ramo]:
     if c.garantido(base, "positivo"):
         neg.descartado = "ramo.descartado_pelas_suposicoes"
     return [pos, neg]
+
+
+def _valor_numerico(e: Expr, c: Contexto) -> Any | None:
+    """Valor exato de uma expressão sem símbolos (``√9 + 1`` → 4), ou None."""
+    if livres(e):
+        return None
+    try:
+        v = c.conv(e)
+    except Exception:
+        return None
+    return v if v.is_number and v.is_real else None
+
+
+def passo_de_calculo(eq: Eq, c: Contexto) -> Proposta | None:
+    """Acabamento: o lado direito só com números é calculado na forma exata, se fica mais curto."""
+    v = _valor_numerico(eq.dir, c)
+    if v is None:
+        return None
+    try:
+        novo = apresentar(de_sympy(v, c.tabela))
+    except Exception:
+        return None
+    if novo == eq.dir or _tamanho(novo) >= _tamanho(eq.dir):
+        return None
+    return Proposta("calcular", Eq(eq.esq, novo), Operacao("reescrever", lado="direito"),
+                    justificativa=_j("regra.calcular"), fundivel=True)
+
+
+def _tamanho(e: Expr) -> int:
+    from amsior.verify.arvore import percorrer
+    return sum(1 for _ in percorrer(e))
 
 
 def _expoente(eq: Eq, c: Contexto) -> list[Ramo]:
@@ -338,5 +378,5 @@ def trocar_lados(eq: Eq) -> Proposta:
                     justificativa=_j("regra.trocar_lados"), fundivel=True)
 
 
-__all__ = ["Contexto", "Proposta", "Ramo", "Recusa", "descascar", "passo_de_cancelamento",
-           "trocar_lados"]
+__all__ = ["Contexto", "Proposta", "Ramo", "Recusa", "descascar", "passo_de_calculo",
+           "passo_de_cancelamento", "trocar_lados"]

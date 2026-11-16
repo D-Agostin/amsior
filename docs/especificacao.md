@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-13/11/2026 · v1.9 em 15/11/2026
+13/11/2026 · v1.10 em 15/11/2026
 
 O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
 
@@ -323,10 +323,10 @@ Uma condição é confrontada com as suposições dos símbolos. Se já está ga
 1. **Pré-checagem**: a equação é dimensionalmente homogênea e contém o alvo.
 2. **Contagem** de ocorrências do alvo.
 3. **Uma ocorrência — descascar**: percorre-se o caminho da raiz até o alvo, desfazendo a operação mais externa a cada passo, conforme a tabela abaixo (n inteiro positivo).
-4. **Várias ocorrências — reunir**, tentando nesta ordem: combinar logaritmos ou potências que fundem ocorrências; eliminar denominadores que contêm o alvo; expandir e agrupar; se linear no alvo, fatorar e dividir; se quadrática, fórmula resolutiva com análise do discriminante; se a mesma função do alvo se repete (e^x, x^n, ln x), substituição u.
+4. **Várias ocorrências — reunir**, tentando nesta ordem: combinar logaritmos ou potências que fundem ocorrências; eliminar denominadores que contêm o alvo; expandir e agrupar; se linear no alvo, fatorar e dividir; se quadrática, fórmula resolutiva com análise do discriminante, obtida completando o quadrado (forma padrão, divisão pelo coeficiente de u², soma do que falta para o quadrado perfeito, raiz par com os dois ramos), para que cada passo seja uma operação que o verificador refaz; Δ numérico negativo é recusado com o motivo, e Δ = 0 dá a raiz dupla; se a mesma função do alvo se repete (e^x, x^n, ln x), substituição u.
 5. **Acabamento**: simplificações de apresentação (cancelar fatores, fração de frações, sinais), cada uma como passo. Nada é expandido sem necessidade.
 6. **Raízes**: se algum passo teve relação `implica`, cada candidata é testada na equação original; raízes múltiplas são filtradas pelas suposições (pressão positiva descarta a raiz negativa) e o descarte é explicado.
-7. **Recusa**: sem forma fechada elementar, o motor diz isso. Se o oráculo encontrar solução, ela aparece rotulada “resultado sem passos”, ainda sujeita à verificação de ponta a ponta. Limite: 40 passos.
+7. **Recusa**: sem forma fechada elementar, o motor diz isso; quando a forma fechada pode existir mas o motor não tem regra para ela (grau 3 ou mais depois de reunir os termos), diz que ainda não tem passos, sem afirmar que não há solução elementar. Se o oráculo encontrar solução, ela aparece rotulada “resultado sem passos”, ainda sujeita à verificação de ponta a ponta. Limite: 40 passos.
 
 | Forma (u contém o alvo) | Passo | Relação e condição |
 | --- | --- | --- |
@@ -833,3 +833,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.7 | 15/11/2026 | Fase 1C: tempo limite de 30 s provisório no navegador (seção 2, item 2), service worker e partida sem espera (itens 3 e 4); medições registradas na decisão 0006 |
 | 1.8 | 15/11/2026 | Fase 1C concluída: revisão de Ruan em Chrome e Firefox; endereço de publicação definido; tempo limite do navegador fica como ponto em aberto (seção 10.4) |
 | 1.9 | 15/11/2026 | Início da fase 2. D-16: conteúdo da biblioteca sob CC BY-SA 4.0. Livro-base de Matemática: REAMAT, com Iezzi e OpenStax de apoio (seção 8.1). Regra para adaptar obras abertas (seção 8.6). Listas de fichas de conceito aprovadas: 16 de Matemática, 12 de Reatores e 5 para depois, com as primeiras levas (seção 8.7). Registro de fontes em `biblioteca/_fontes.yaml` |
+| 1.10 | 15/11/2026 | Isolar do 2º grau com passos (seção 4.2, itens 4 e 7), exigido pelas fichas de Matemática: completar o quadrado, raiz dupla, recusa por discriminante negativo, passo de cálculo do valor exato. Correção: equações que chegavam ao 2º grau eram recusadas com "não há forma fechada elementar", o que era falso; a recusa agora distingue falta de regra de falta de forma fechada |

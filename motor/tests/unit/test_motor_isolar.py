@@ -123,3 +123,54 @@ def test_eliminar_denominador_sem_zero_carregado(glossario: Glossario) -> None:
     assert para_latex(elim.depois).endswith(r"\left(1 + k \tau\right) = 0")
     assert not any(r"0 \left(" in para_latex(p.depois) for p in passos)
     assert [p.regra for p in passos].count("levar_para_a_esquerda") == 1
+
+
+# ------------------------------------------------------------------ 2º grau (seção 4.2, item 4)
+
+
+def _resultados(r) -> list[str]:  # type: ignore[no-untyped-def]
+    return sorted(para_latex(ramo.resultado) for ramo in r.ramos)
+
+
+@pytest.mark.parametrize(("latex", "esperado"), [
+    ("x^2 - 2x - 8 = 0", ["x = -2", "x = 4"]),
+    ("2x^2 + 3x - 2 = 0", [r"x = -2", r"x = \frac{1}{2}"]),
+    ("-x^2 + 4 x = 3", ["x = 1", "x = 3"]),
+    (r"1 - \frac{2}{x} = \frac{8}{x^2}", ["x = -2", "x = 4"]),  # racional que vira do 2º grau
+    (r"\frac{x+1}{x-1} = x", [r"x = 1 - \sqrt{2}", r"x = \sqrt{2} + 1"]),
+])
+def test_segundo_grau_com_passos(latex: str, esperado: list[str], tab: TabelaDeSimbolos,
+                                 glossario: Glossario) -> None:
+    r = isolar(analisar(latex, tab), Sym("x"), tab, glossario)
+    assert r.estado == "com_passos", r.motivo
+    assert _resultados(r) == esperado
+    for ramo in r.ramos:
+        assert "completar_quadrado" in [p.regra for p in ramo.passos]
+        assert all(p.certificado is not None and p.certificado.estado == "aprovado" for p in ramo.passos)
+
+
+def test_segundo_grau_literal_da_a_formula(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
+    r = isolar(analisar("a x^2 + b x + c = 0", tab), Sym("x"), tab, glossario)
+    assert [ramo.rotulo for ramo in r.ramos] == ["ramo.positivo", "ramo.negativo"]
+    assert para_latex(r.ramos[0].resultado) == r"x = \sqrt{\frac{b^{2} - 4 a c}{4 a^{2}}} - \frac{b}{2 a}"
+    regras = [p.regra for p in r.ramos[0].passos]
+    assert regras[:3] == ["dividir_pelo_coeficiente", "simplificar", "completar_quadrado"]
+
+
+def test_raiz_dupla_e_discriminante_negativo(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
+    r = isolar(analisar("x^2 - 2x + 1 = 0", tab), Sym("x"), tab, glossario)
+    assert r.estado == "com_passos" and _resultados(r) == ["x = 1"]
+    r = isolar(analisar("x^2 + x + 1 = 0", tab), Sym("x"), tab, glossario)
+    assert r.estado == "recusado" and r.motivo is not None
+    assert r.motivo.chave == "isolar.discriminante_negativo"
+    r = isolar(analisar("x^2 + 1 = 0", tab), Sym("x"), tab, glossario)
+    assert r.estado == "recusado" and r.motivo is not None
+    assert r.motivo.chave == "isolar.potencia_par_negativa"
+
+
+def test_recusa_honesta_sem_regra(tab: TabelaDeSimbolos, glossario: Glossario) -> None:
+    """Grau 3 depois de reunir: o motor diz que não tem passos, não que não há forma fechada."""
+    r = isolar(analisar(r"\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0", tab), Sym("x"), tab, glossario)
+    assert r.estado == "sem_passos" and r.motivo is not None
+    assert r.motivo.chave == "isolar.sem_regra_reunir"
+    assert [para_latex(e) for e in r.sem_passos] == ["x = 3"]  # x = 2 é raiz estranha

@@ -7,7 +7,8 @@ Fluxo:
 2. alvo uma vez só: descascar, desfazendo a operação mais externa
    (``rules.isolar``), com um passo de cancelamento depois de cada operação;
 3. alvo várias vezes: levar tudo para a esquerda, eliminar denominadores com
-   o alvo e, se a expressão for linear no alvo, agrupar e dividir;
+   o alvo e, se a expressão for linear no alvo, agrupar e dividir; se for do
+   2º grau, escrever na forma padrão e completar o quadrado;
 4. ramos (raiz par, módulo): cada um segue sozinho; um ramo excluído pelas
    suposições (pressão positiva descarta a raiz negativa) é descartado com
    motivo;
@@ -27,12 +28,14 @@ from typing import Any, Literal
 import sympy as sp
 
 from amsior.expr.latex import para_latex
-from amsior.expr.nos import Add, Div, Eq, Expr, Mul, Num, Sub, Sym
+from amsior.expr.nos import Add, Div, Eq, Expr, Mul, Neg, Num, Pow, Sub, Sym
 from amsior.expr.ponte_sympy import de_sympy
 from amsior.expr.simbolos import TabelaDeSimbolos
 from amsior.rules.classificar import Classificacao, classificar
+from amsior.rules.simplificar import apresentar
 from amsior.rules.isolar import (
-    Contexto, Proposta, Ramo, Recusa, _j, descascar, passo_de_cancelamento, trocar_lados,
+    Contexto, Proposta, Ramo, Recusa, _j, descascar, passo_de_calculo, passo_de_cancelamento,
+    trocar_lados,
 )
 from amsior.units.glossario import Glossario
 from amsior.units.homogeneidade import verificar_homogeneidade
@@ -169,6 +172,9 @@ class Isolador:
             canc = passo_de_cancelamento(cam.eq)
             if canc is not None:
                 self._certificar(cam, canc)
+            calc = passo_de_calculo(cam.eq, self._ctx)
+            if calc is not None:
+                self._certificar(cam, calc)
 
     def _dominio_perdido(self, antes: Expr, depois: Expr, ctx: Contexto) -> tuple[Condicao, ...]:
         """Obrigações de "antes" que somem em "depois" (``a/x · x → a``): o motor
@@ -181,8 +187,11 @@ class Isolador:
         return tuple(out)
 
     def _certificar(self, cam: _Caminho, p: Proposta) -> None:
+        # reescrever (ou trocar o sinal) pode sumir com um denominador: o domínio da
+        # equação de antes vira condição declarada
+        troca_sinal = p.operacao.nome == "multiplicar_ambos" and p.operacao.argumento == Neg(Num("1"))
         extra = self._dominio_perdido(cam.eq, p.depois, self._ctx) \
-            if p.operacao.nome == "reescrever" else ()
+            if p.operacao.nome == "reescrever" or troca_sinal else ()
         passo = Passo(antes=cam.eq, depois=p.depois, operacao=p.operacao, relacao=p.relacao,
                       tipo="algebra", indice=len(cam.passos) + 1, regra=p.regra,
                       condicoes=p.condicoes + tuple(c for c in extra if c not in p.condicoes),
@@ -239,9 +248,12 @@ class Isolador:
             a = sp.diff(alvo_f, u)
             b = alvo_f.subs(u, 0)
         except Exception:
-            raise _Falha(Motivo("isolar.sem_forma_fechada")) from None
+            raise _Falha(Motivo("isolar.sem_regra_reunir")) from None
         if a.has(u) or a == 0 or sp.expand(alvo_f - (a * u + b), log=False) != 0:
-            raise _Falha(Motivo("isolar.sem_forma_fechada"))
+            quad = self._quadratica(eq, alvo_f, u, ctx)
+            if quad is not None:
+                return quad
+            raise _Falha(Motivo("isolar.sem_regra_reunir"))
         termo_u = Mul((de_sympy(a, self.tabela), Sym(ctx.alvo))) if a != 1 else Sym(ctx.alvo)
         if b == 0:
             agrupado: Expr = termo_u
@@ -250,6 +262,81 @@ class Isolador:
         return [Proposta("agrupar_no_alvo", Eq(agrupado, eq.dir),
                          Operacao("reescrever", lado="esquerdo"),
                          justificativa=_j("regra.agrupar_no_alvo", alvo=Sym(ctx.alvo)))]
+
+    def _quadratica(self, eq: Eq, f: Any, u: Any, ctx: Contexto) -> list[Proposta] | None:
+        """Do 2º grau no alvo: forma padrão e completar o quadrado (seção 4.2, item 4).
+
+        ``a u² + b u + c = 0`` é dividida por a (a ≠ 0) e vira ``(u + b/2a)² = Δ/4a²``,
+        com Δ = b² − 4ac, somando aos dois lados o que falta para o quadrado perfeito.
+        Daí em diante o alvo aparece uma vez só, e as regras de sempre (raiz par com os
+        dois ramos, subtrair) levam à fórmula resolutiva, cada passo certificado.
+        A condição Δ/4a² ≥ 0 da raiz par é a análise do discriminante; Δ numérico
+        negativo é recusado antes, e Δ = 0 dá a raiz dupla.
+        """
+        try:
+            poli = sp.Poly(f, u)
+        except Exception:
+            return None
+        if poli.degree() != 2:
+            return None
+        a, b, c = poli.all_coeffs()
+        if any(co.has(u) for co in (a, b, c)):
+            return None
+        delta = sp.expand(b**2 - 4 * a * c)
+        tab = self.tabela
+        if delta.is_number and delta.is_negative:
+            raise _Falha(Motivo("isolar.discriminante_negativo", {"delta": para_latex(de_sympy(delta, tab))}))
+        x = Sym(ctx.alvo)
+        out: list[Proposta] = []
+        # a numérico negativo: multiplica por −1 primeiro, para o termo em u² ficar positivo
+        trocar_sinal = bool(a.is_number and a.is_negative)
+        if trocar_sinal:
+            a, b, c = -a, -b, -c
+        padrao = _soma([(a, Pow(x, Num("2"))), (b, x), (c, None)], tab)
+        if trocar_sinal:
+            out.append(Proposta("forma_padrao_quadratica", Eq(padrao, Num("0")),
+                                Operacao("multiplicar_ambos", Neg(Num("1"))),
+                                justificativa=_j("regra.forma_padrao_quadratica_sinal", alvo=x)))
+        elif eq.esq != padrao:
+            out.append(Proposta("forma_padrao_quadratica", Eq(padrao, eq.dir),
+                                Operacao("reescrever", lado="esquerdo"),
+                                justificativa=_j("regra.forma_padrao_quadratica", alvo=x)))
+        if a != 1:
+            # dividir por a: o termo em u² fica com coeficiente 1 (u² + pu + q = 0)
+            a_expr = de_sympy(a, tab)
+            b, c = sp.simplify(b / a), sp.simplify(c / a)
+            out.append(Proposta("dividir_pelo_coeficiente",
+                                Eq(_soma([(sp.Integer(1), Pow(x, Num("2"))), (b, x), (c, None)], tab), Num("0")),
+                                Operacao("dividir_ambos", a_expr),
+                                condicoes=ctx.condicao(a_expr, "nao_nulo"),
+                                justificativa=_j("regra.dividir_pelo_coeficiente", alvo=x, coeficiente=a_expr)))
+        # u² + pu + q = 0  →  (u + p/2)² = p²/4 − q = Δ/4a²
+        h = sp.simplify(b / 2)
+        quadrado = Pow(_soma([(sp.Integer(1), x), (h, None)], tab), Num("2"))
+        resto = sp.together(b**2 / 4 - c)
+        j = _j("regra.completar_quadrado", alvo=x, delta=de_sympy(delta, tab))
+        if resto == 0:
+            out.append(Proposta("completar_quadrado", Eq(quadrado, Num("0")),
+                                Operacao("reescrever", lado="esquerdo"), justificativa=j))
+            return out
+        # o que falta somar, na forma Δ/4a² quando é literal (b² − 4ac sobre 4a²)
+        num, den = sp.fraction(resto)
+        # negativo só se todas as parcelas são (−4ac + b² fica como b² − 4ac, somado)
+        negativo = all(t.could_extract_minus_sign() for t in sp.Add.make_args(sp.expand(num)))
+        if negativo:
+            num = -num
+        if resto.is_number:
+            termo = de_sympy(-resto if negativo else resto, tab)
+        else:
+            numerador = _positivos_primeiro(sp.expand(num), tab)
+            termo = Div(numerador, de_sympy(den, tab)) if den != 1 else numerador
+        if negativo:
+            out.append(Proposta("completar_quadrado", Eq(quadrado, Neg(termo)),
+                                Operacao("subtrair_ambos", termo), justificativa=j))
+        else:
+            out.append(Proposta("completar_quadrado", Eq(quadrado, termo),
+                                Operacao("somar_ambos", termo), justificativa=j))
+        return out
 
     @staticmethod
     def _denominador_como_escrito(e: Expr, den: Any, ctx: Contexto) -> Expr | None:
@@ -281,6 +368,43 @@ class Isolador:
                 res.sem_passos.append(Eq(alvo, e))
         res.estado = "sem_passos" if res.sem_passos else "recusado"
         return res
+
+
+def _positivos_primeiro(e: Any, tabela: TabelaDeSimbolos) -> Expr:
+    """``−4ac + b²`` → ``b² − 4ac``: parcelas positivas, depois as negativas subtraídas."""
+    pos = [t for t in sp.Add.make_args(e) if not t.could_extract_minus_sign()]
+    neg = [-t for t in sp.Add.make_args(e) if t.could_extract_minus_sign()]
+    if not pos or not neg:
+        return de_sympy(e, tabela)
+    return Sub(de_sympy(sp.Add(*pos), tabela), de_sympy(sp.Add(*neg), tabela))
+
+
+def _soma(termos: list[tuple[Any, Expr | None]], tabela: TabelaDeSimbolos) -> Expr:
+    """Σ coeficiente·monômio na ordem dada (grau decrescente), sem termos nulos e com
+    subtração no lugar de "+ −"; mesma forma que ``simplificar.soma`` produz."""
+    partes: list[tuple[int, Expr]] = []
+    for coef, mono in termos:
+        if coef == 0:
+            continue
+        neg = bool(coef.could_extract_minus_sign())
+        mag = -coef if neg else coef
+        if mono is None:
+            termo: Expr = de_sympy(mag, tabela)
+        elif mag == 1:
+            termo = mono
+        else:
+            termo = Mul((de_sympy(mag, tabela), mono))
+        partes.append((-1 if neg else 1, termo))
+    if not partes:
+        return Num("0")
+    s0, t0 = partes[0]
+    acc: Expr = t0 if s0 > 0 else Neg(t0)
+    for sinal, t in partes[1:]:
+        if sinal < 0:
+            acc = Sub(acc, t)
+        else:
+            acc = Add((*acc.termos, t)) if isinstance(acc, Add) else Add((acc, t))
+    return acc
 
 
 def isolar(equacao: Expr, alvo: Sym, tabela: TabelaDeSimbolos,
