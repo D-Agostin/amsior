@@ -38,6 +38,8 @@ Em desenvolvimento; ainda não há versão pública para uso.
 - `motor/amsior/i18n`: catálogo de textos (pt-BR).
 - `interface/`: interface em React e TypeScript.
 - `biblioteca/_glossario.yaml`: 60 grandezas com unidade SI e suposições.
+- `biblioteca/_fontes.yaml`: livros-base e de apoio, na última edição, com o
+  estado da conferência.
 
 ## Como rodar (desenvolvimento)
 
@@ -81,6 +83,12 @@ O Amsior é software livre sob a [GNU Affero General Public License, versão 3](
 hospedar uma versão modificada tem de oferecer o código-fonte sob a mesma
 licença. O programa é oferecido sem nenhuma garantia. As bibliotecas de
 terceiros mantêm as suas próprias licenças.
+
+O conteúdo didático da [biblioteca](biblioteca/) (fichas, figuras, hipóteses e
+fontes) está sob a [Creative Commons Atribuição-CompartilhaIgual 4.0](biblioteca/LICENSE)
+(CC BY-SA 4.0). O livro-base da seção de Matemática é o livro aberto
+*Pré-cálculo: um livro colaborativo*, do [REAMAT](https://www.ufrgs.br/reamat/PreCalculo)
+(UFRGS), sob a mesma licença.
 
 O projeto não aceita contribuições externas por enquanto. Veja
 [CONTRIBUTING.md](CONTRIBUTING.md).

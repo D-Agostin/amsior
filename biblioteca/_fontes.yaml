@@ -1,0 +1,255 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Registro de fontes. Copyright (c) 2026 Ruan D'Agostin.
+#
+# Cada fonte uma vez, na última edição (D-09, seção 8.1 da especificação).
+# As fichas citam pelo id. Números de equação e de página só valem para a
+# edição registrada aqui.
+#
+# Regra D-05: nada é preenchido de memória. Edição e ano vêm da consulta às
+# editoras de 13/11/2026 (seção 8.1); ISBN fica nulo até Ruan conferir com o
+# livro em mãos e preencher `conferido`.
+#
+# Campos:
+#   papel     base (livro-base de uma área) | apoio
+#   uso       citacao (só cita; texto próprio) | adaptacao (licença aberta:
+#             pode adaptar texto, exemplos e figuras, com crédito)
+#   licenca   identificador SPDX, só para obras abertas
+#   versao    obras sem edição numerada: data publicada e versão do código-fonte
+formato: 1
+fontes:
+
+  # Matemática (D-13; decisão de 15/11/2026)
+  reamat_precalculo:
+    papel: base
+    area: matematica
+    uso: adaptacao
+    titulo: "Pré-cálculo: um livro colaborativo"
+    autores: [Francieli Triches (org.), Helder Geovane Gomes de Lima (org.), colaboradores do REAMAT]
+    editora: REAMAT, Universidade Federal do Rio Grande do Sul
+    idioma: pt-BR
+    licenca: CC-BY-SA-4.0
+    url: https://www.ufrgs.br/reamat/PreCalculo
+    codigo_fonte: https://github.com/reamat/PreCalculo
+    versao:
+      publicada: 2022-07-18            # data da versão em HTML e PDF
+      repositorio: ec3c17a41b7be1c6b38de8b30e1a58201d97a232   # último commit em 15/11/2026, de 2024-08-17
+    edicao: null
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+
+  iezzi_fme:
+    papel: apoio
+    area: matematica
+    uso: citacao
+    titulo: "Fundamentos de Matemática Elementar"
+    autores: [Gelson Iezzi, e outros]
+    editora: Atual
+    idioma: pt-BR
+    nota: Coleção; vol. 6 (complexos, polinômios, equações), 8ª ed., 2013, a conferir. Cada ficha cita o volume.
+    edicao: null
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+
+  openstax_algebra:
+    papel: apoio
+    area: matematica
+    uso: adaptacao
+    titulo: "College Algebra 2e"
+    autores: [OpenStax]
+    editora: OpenStax, Rice University
+    idioma: en
+    licenca: CC-BY-4.0
+    url: https://openstax.org/details/books/college-algebra-2e
+    edicao: 2
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+
+  openstax_precalculo:
+    papel: apoio
+    area: matematica
+    uso: adaptacao
+    titulo: "Precalculus 2e"
+    autores: [OpenStax]
+    editora: OpenStax, Rice University
+    idioma: en
+    licenca: CC-BY-4.0
+    url: https://openstax.org/details/books/precalculus-2e
+    edicao: 2
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+
+  # Engenharia química: livros-base (seção 8.1)
+  svna:
+    papel: base
+    area: termodinamica
+    uso: citacao
+    titulo: "Introduction to Chemical Engineering Thermodynamics"
+    autores: [J. M. Smith, H. C. Van Ness, M. M. Abbott, M. T. Swihart]
+    editora: McGraw-Hill
+    idioma: en
+    edicao: 9
+    ano: 2022
+    isbn: null
+    conferido: {por: null, em: null}
+
+  felder:
+    papel: base
+    area: balancos
+    uso: citacao
+    titulo: "Elementary Principles of Chemical Processes"
+    autores: [R. M. Felder, R. W. Rousseau, L. G. Bullard]
+    editora: Wiley
+    idioma: en
+    edicao: 4
+    ano: 2016
+    nota: 5ª edição anunciada para 2028.
+    isbn: null
+    conferido: {por: null, em: null}
+
+  fogler:
+    papel: base
+    area: reatores
+    uso: citacao
+    titulo: "Elements of Chemical Reaction Engineering"
+    autores: [H. S. Fogler, B. R. Goldsmith, E. Nikolla, N. Singh]
+    editora: Pearson
+    idioma: en
+    edicao: 7
+    ano: 2025
+    isbn: null
+    conferido: {por: null, em: null}
+
+  fox:
+    papel: base
+    area: mecanica_dos_fluidos
+    uso: citacao
+    titulo: "Fox and McDonald's Introduction to Fluid Mechanics"
+    autores: [R. W. Fox, A. T. McDonald, J. W. Mitchell]
+    editora: Wiley
+    idioma: en
+    edicao: 10
+    ano: 2020
+    isbn: null
+    conferido: {por: null, em: null}
+
+  incropera:
+    papel: base
+    area: transferencia_de_calor
+    uso: citacao
+    titulo: "Fundamentals of Heat and Mass Transfer"
+    autores: [T. L. Bergman, A. S. Lavine, F. P. Incropera, D. P. DeWitt]
+    editora: Wiley
+    idioma: en
+    edicao: 8
+    ano: 2017
+    isbn: null
+    conferido: {por: null, em: null}
+
+  bsl:
+    papel: base
+    area: transferencia_de_massa
+    uso: citacao
+    titulo: "Transport Phenomena"
+    autores: [R. B. Bird, W. E. Stewart, E. N. Lightfoot]
+    editora: Wiley
+    idioma: en
+    edicao: 2               # 2ª revisada
+    ano: 2007
+    isbn: null
+    conferido: {por: null, em: null}
+
+  mccabe:
+    papel: base
+    area: operacoes_unitarias
+    uso: citacao
+    titulo: "Unit Operations of Chemical Engineering"
+    autores: [W. L. McCabe, J. C. Smith, P. Harriott]
+    editora: McGraw-Hill
+    idioma: en
+    edicao: 7
+    ano: 2004
+    isbn: null
+    conferido: {por: null, em: null}
+
+  # Engenharia química: apoio (seção 8.1)
+  sandler:
+    papel: apoio
+    area: termodinamica
+    uso: citacao
+    titulo: "Chemical, Biochemical, and Engineering Thermodynamics"
+    autores: [S. I. Sandler]
+    editora: Wiley
+    idioma: en
+    edicao: 5
+    ano: 2017
+    isbn: null
+    conferido: {por: null, em: null}
+
+  propriedades_gases_liquidos:
+    papel: apoio
+    area: termodinamica
+    uso: citacao
+    titulo: "The Properties of Gases and Liquids"
+    autores: [J. R. Elliott, V. Diky, T. A. Knotts, W. V. Wilding]
+    editora: McGraw-Hill
+    idioma: en
+    edicao: 6
+    ano: 2023
+    isbn: null
+    conferido: {por: null, em: null}
+
+  himmelblau:
+    papel: apoio
+    area: balancos
+    uso: citacao
+    titulo: "Basic Principles and Calculations in Chemical Engineering"
+    autores: [D. M. Himmelblau, J. B. Riggs]
+    editora: Pearson
+    idioma: en
+    edicao: 9
+    ano: 2022
+    isbn: null
+    conferido: {por: null, em: null}
+
+  perry:
+    papel: apoio
+    area: geral
+    uso: citacao
+    titulo: "Perry's Chemical Engineers' Handbook"
+    autores: [D. W. Green (ed.), M. Z. Southard (ed.)]
+    editora: McGraw-Hill
+    idioma: en
+    edicao: 9
+    ano: 2018
+    isbn: null
+    conferido: {por: null, em: null}
+
+  levenspiel:
+    papel: apoio
+    area: reatores
+    uso: citacao
+    titulo: "Chemical Reaction Engineering"
+    autores: [O. Levenspiel]
+    editora: Wiley
+    idioma: en
+    edicao: null            # a confirmar (seção 10.3)
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+
+  treybal:
+    papel: apoio
+    area: transferencia_de_massa
+    uso: citacao
+    titulo: "Mass-Transfer Operations"
+    autores: [R. E. Treybal]
+    editora: McGraw-Hill
+    idioma: en
+    edicao: null            # a confirmar (seção 10.3)
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}

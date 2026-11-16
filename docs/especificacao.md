@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-13/11/2026 · v1.8 em 15/11/2026
+13/11/2026 · v1.9 em 15/11/2026
 
 O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
 
@@ -42,6 +42,7 @@ Duas decisões foram acrescentadas por Ruan em 15/11/2026, depois do primeiro ex
 | --- | --- | --- |
 | D-14 | Navegador | O Amsior passa a rodar no navegador (D-02 revista). Motivo: o Controle Inteligente de Aplicativos do Windows bloqueia executáveis sem assinatura digital e não oferece exceção ao usuário; assinar custa dinheiro ou depende de terceiros, e um site não precisa de assinatura, funciona em qualquer sistema e não exige instalação. O executável da fase 1B deixa de ser entregue |
 | D-15 | Software livre | Código público sob a licença AGPL-3.0, de uso gratuito. O projeto não aceita contribuições externas por enquanto (pull requests fechados); relatos de erro são bem-vindos |
+| D-16 | Licença do conteúdo | O texto didático da biblioteca (fichas de equação e de conceito, figuras, enunciados de hipóteses, registro de fontes) fica sob CC BY-SA 4.0; o código e o glossário do motor seguem a AGPL-3.0. Permite adaptar obras abertas sob a mesma licença, como o livro-base de Matemática, dando o crédito (seções 8.1 e 8.6) |
 
 ### Decisões técnicas derivadas
 
@@ -291,6 +292,8 @@ revisao: {humana: null, externo: null}
 ```
 
 Afirmações quantitativas do texto entram como `exemplos`, para que o motor as confira; o restante passa pela revisão humana (V7).
+
+Quando a ficha adapta trecho, exemplo ou figura de obra aberta (seção 8.6), a referência traz `uso: adaptacao` e o campo `adaptacao: {pt: "..."}` diz o que veio da obra e o que foi mudado; a licença e os autores vêm do registro de fontes. Sem esse campo, a referência é só citação.
 
 ## 4. Motor de passos
 
@@ -593,7 +596,7 @@ Cada área segue a notação de um livro-base (D-06), sempre na última edição
 | Transferência de calor | [Incropera (Bergman, Lavine, Incropera e DeWitt)](https://www.wileyplus.com/incropera-fundamentals-heat-mass-transfer-8e/) | 8ª, 2017 |
 | Transferência de massa | [Bird, Stewart e Lightfoot](https://gov.wiley.com/WileyCDA/WileyTitle/productCd-0470115394.html) | 2ª revisada, 2007 |
 | Operações unitárias | [McCabe, Smith e Harriott](https://Www.Wikipedia.org/wiki/Unit_Operations_of_Chemical_Engineering) | 7ª, 2004 |
-| Matemática (D-13) | A definir (seção 10.3) | — |
+| Matemática (D-13) | [REAMAT, *Pré-cálculo: um livro colaborativo*](https://www.ufrgs.br/reamat/PreCalculo) (UFRGS; org. Triches e Lima), sob CC BY-SA 4.0 | Versão de 18/07/2022; código-fonte no commit `ec3c17a` de 17/08/2024 |
 
 Fontes de apoio, também na última edição:
 
@@ -604,8 +607,12 @@ Fontes de apoio, também na última edição:
 | [Himmelblau e Riggs](https://www.oreilly.com/library/view/-/9780137327164/), balanços | 9ª, 2022 |
 | [Perry (Green e Southard)](https://wikipedia.com/wiki/Perry%27s_Handbook), manual | 9ª, 2018 |
 | Levenspiel, reatores; Treybal, transferência de massa | A confirmar (seção 10.3) |
+| Iezzi e outros, *Fundamentos de Matemática Elementar*, nomenclatura escolar brasileira | Vol. 6, 8ª, 2013, a conferir |
+| [OpenStax, *College Algebra 2e*](https://openstax.org/details/books/college-algebra-2e) e [*Precalculus 2e*](https://openstax.org/details/books/precalculus-2e), gráficos e exemplos, sob CC BY 4.0 | 2ª |
 
 A tabela traz as edições originais, em inglês. Quando a tradução brasileira mais recente for de edição anterior, numeração e páginas diferem; a escolha entre citar o original ou a tradução está na seção 10.3. Fogler mudou de autoria na 7ª edição, e a conferência das fichas de reatores deve ser feita nela.
+
+O livro-base de Matemática não tem edição numerada: é um livro vivo, mantido num repositório público. A citação registra a versão publicada e o commit do código-fonte, e muda de versão como as outras fontes mudam de edição (seção 8.4). A cobertura foi conferida no código-fonte: expressões racionais, modulares e irracionais; polinômios; equações do 1º e do 2º grau, exponenciais, modulares, racionais e irracionais; funções exponenciais, logarítmicas e trigonométricas. Os mesmos tipos do adendo "Tipo" (D-12).
 
 ### 8.2 Glossário e divergências de notação
 
@@ -659,7 +666,9 @@ O campo `revisao.externo` aceita o nome de um professor revisor, sem ser exigido
 
 ### 8.6 Redação e direitos autorais
 
-Equações, leis físicas e dados são usados livremente; o texto das demonstrações e dos exemplos é sempre próprio, com dados de exemplo próprios, citando a fonte. Figuras de livros não são reproduzidas; tabelas de propriedades seguem a seção 7.5. Padrão de redação: frases curtas, voz de professor no quadro, um motivo por passo.
+Equações, leis físicas e dados são usados livremente. De livros comerciais, o texto das demonstrações e dos exemplos é sempre próprio, com dados de exemplo próprios, citando a fonte; figuras não são reproduzidas; tabelas de propriedades seguem a seção 7.5.
+
+De obras abertas com licença compatível (CC BY-SA 4.0 ou CC BY 4.0, como o REAMAT e a OpenStax), a ficha pode adaptar texto, exemplos e figuras (D-16). Nesse caso a referência leva `uso: adaptacao`, a ficha diz o que foi adaptado e o que foi mudado, e a interface mostra o crédito com título, autores, licença e ligação. O que vem de obra CC BY 4.0 entra no Amsior sob CC BY-SA 4.0. Obras sob licença NC (não comercial) ou ND (sem derivadas) não são adaptadas, só citadas. Padrão de redação: frases curtas, voz de professor no quadro, um motivo por passo.
 
 ### 8.7 Lista candidata de fichas
 
@@ -675,12 +684,25 @@ São 56 candidatas; a lista final (cerca de 50) fecha no início da fase 2. As c
 | Transferência de massa (1) | 1ª lei de Fick |
 | Operações unitárias (5) | Volatilidade relativa; linha de operação de McCabe-Thiele; Fenske; Kremser; Rachford-Rice (implícita, sem isolamento na v1) |
 
-Fichas de conceito candidatas (D-13), a confirmar com a lista final. Em negrito, as duas fichas-modelo.
+Fichas de conceito (D-13), lista aprovada por Ruan em 15/11/2026, com revisão mais aprofundada prevista para durante a fase 2. Em negrito, as duas fichas-modelo; com asterisco, a primeira leva de cada seção.
 
-| Seção | Fichas de conceito |
+**Matemática (16).** Uma ficha para cada tipo que o adendo "Tipo" mostra (D-12), para que a etiqueta leve direto à ficha do tipo.
+
+| Grupo | Fichas |
 | --- | --- |
-| Matemática (12) | Expressões algébricas e sua classificação (racionais inteiras, fracionárias, irracionais; monômios, polinômios e grau); equação do 1º grau; equação do 2º grau (discriminante, dois ramos); polinomiais de grau maior; **equação racional** (domínio, eliminar denominadores, raízes estranhas); equação irracional (elevar ao quadrado cria raízes estranhas); exponenciais e logaritmos (propriedades, mudança de base, por que o argumento precisa ser adimensional); equação exponencial e logarítmica; módulo e trigonométricas com ramo principal; equações mistas e por que não têm forma fechada; domínio, equivalência e implicação (o que significa "sob hipótese"); grandezas, dimensões e homogeneidade |
-| Reatores (9) | Batelada; semibatelada; **CSTR**; PFR; leito fixo (PBR); CSTRs em série e a aproximação do PFR; reator com reciclo; isotérmico, adiabático e com troca térmica; o gráfico de Levenspiel e a escolha entre CSTR e PFR |
+| Linguagem (3) | 1\* Expressões algébricas e sua classificação (racional inteira e fracionária, irracional, modular, transcendente; monômio, polinômio e grau); 2 Domínio (divisão por zero, raiz de índice par, logaritmo); 3 Grandezas, dimensões e homogeneidade (por que o argumento de ln e de exp é adimensional) |
+| Um tipo de equação por ficha (9) | 4\* Equação do 1º grau; 5\* Equação do 2º grau (discriminante e dois ramos); 6 Polinomial de grau maior (cúbica; quando não há fórmula prática); 7\* **Equação racional** (eliminar denominadores, raízes estranhas); 8\* Equação irracional (elevar ao quadrado cria soluções falsas); 9 Equação exponencial; 10 Equação logarítmica (propriedades, mudança de base); 11 Equação modular (dois casos); 12 Trigonométrica (ramo principal; infinitas soluções) |
+| Raciocínio (4) | 13\* Equivalência, implicação e "sob hipótese" (o que significam os selos do Amsior); 14 Como o Amsior isola uma variável (operações de fora para dentro, inversa, ramos); 15 Propriedades de potências e logaritmos; 16 Equações mistas e transcendentes (por que não têm forma fechada; cálculo numérico na fase 3) |
+
+**Reatores (12, mais 5 depois).** Seguem o Fogler (7ª edição); os números de capítulo entram só na conferência (D-05).
+
+| Grupo | Fichas |
+| --- | --- |
+| Fundamentos (3) | 1 Balanço molar geral; 2\* Conversão, tempo espacial e velocidade espacial; 3 Lei de velocidade, ordem e Arrhenius (estequiometria em fase líquida e em fase gasosa com variação de volume) |
+| Reatores ideais (5) | 4\* Batelada; 5 Semibatelada; 6\* **CSTR**; 7\* PFR; 8 Leito fixo (PBR) com perda de carga |
+| Arranjos e escolha (2) | 9\* Gráfico de Levenspiel e a escolha entre CSTR e PFR (animação interativa: arrastar a conversão e ver os volumes); 10 CSTRs em série, em paralelo e com reciclo (animação: mais tanques, mais perto do PFR) |
+| Operação (2) | 11 Isotérmico, adiabático e com troca térmica (balanço de energia, reta de operação adiabática); 12 Reações múltiplas: seletividade e rendimento |
+| Depois da fase 3 (5) | Múltiplos estados estacionários e estabilidade do CSTR; reatores reais e distribuição de tempos de residência; catálise heterogênea; biorreatores; reatores multifásicos e leito fluidizado |
 
 Cada ficha de Reatores traz o esquema do equipamento, como funciona, onde se usa na indústria, vantagens e limitações, a equação de projeto ligada e uma animação (seção 9.3).
 
@@ -697,7 +719,7 @@ A interface tem três regiões fixas: a folha no centro, a tabela de variáveis 
 - **Biblioteca**: busca por nome, área, grandeza e hipótese; a ficha abre em painel com equação, hipóteses, demonstração, referência, exemplo e o botão “usar na folha”. Uma aba separada lista os pacotes de propriedades dos livros, com liga e desliga e a ordem de preferência (seção 7.5).
 - **Arquivo**: novo, abrir, salvar, salvamento automático, desfazer e refazer; exportar para PDF (folha de estilo de impressão) e HTML autossuficiente. As folhas ficam no armazenamento do navegador (IndexedDB), no dispositivo do usuário; "baixar" e "abrir" trocam arquivos `.amsior` com o disco. Como limpar os dados do navegador apaga as folhas, a interface avisa e oferece baixar uma cópia.
 - **Sem internet**: depois da primeira visita, tudo funciona desligado da rede; a barra de estado mostra quando há versão nova pronta.
-- **Sobre**: autoria e propósito do projeto, licença (AGPL-3.0) e ligação para o código-fonte.
+- **Sobre**: autoria e propósito do projeto, licenças (AGPL-3.0 do código, CC BY-SA 4.0 do conteúdo) e ligação para o código-fonte. As obras abertas adaptadas aparecem com crédito na própria ficha e na lista do Sobre.
 - **Acessibilidade**: operação completa por teclado; cada equação tem texto alternativo falado gerado da árvore; selos não dependem só de cor.
 - **Textos**: nenhum texto de interface ou de justificativa no código; tudo em catálogos por idioma (`pt-BR` agora, `en` depois).
 
@@ -779,15 +801,15 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 ### 10.3 Pontos em aberto (não bloqueiam a fase 1)
 
 - [ ] Acesso de Ruan à última edição de cada fonte (seção 8.1), com edição, ano e ISBN registrados em `_fontes.yaml` antes da fase 2.
-- [x] Licença do código do Amsior: AGPL-3.0 (D-15, 15/11/2026). O conteúdo das fichas segue a mesma licença por ora.
-- [ ] Avaliar uma licença de conteúdo (Creative Commons) para o texto didático das fichas, antes da fase 2.
+- [x] Licença do código do Amsior: AGPL-3.0 (D-15, 15/11/2026).
+- [x] Licença do conteúdo: CC BY-SA 4.0 para o texto didático da biblioteca (D-16, 15/11/2026).
 - [x] Assinatura digital: deixa de ser necessária com a versão de navegador (D-14). Se o executável voltar, a SignPath Foundation assina projetos de código aberto sem custo.
 - [x] Endereço de publicação: GitHub Pages, em https://d-agostin.github.io/amsior/ (fase 1C). Domínio próprio continua possível.
 - [ ] Tempo limite no navegador: medir num computador de aluno mais modesto e fixar o valor (hoje 30 s provisórios; decisão 0006).
 - [ ] Confirmar CoolProp e chemicals/thermo no Pyodide, antes da fase 3B.
 - [ ] Quando reabrir o projeto a contribuições externas, e sob quais regras (D-15).
 - [ ] Lista final das cerca de 50 fichas, a fechar no início da fase 2.
-- [ ] Livro-base da seção de Matemática e lista final das fichas de conceito de Matemática e de Reatores (proposta na seção 8.7).
+- [x] Livro-base da seção de Matemática: REAMAT (seção 8.1). Fichas de conceito de Matemática e de Reatores: lista aprovada (seção 8.7), com revisão mais aprofundada durante a fase 2.
 - [ ] Escopo exato da v1.1: solução numérica com método exibido, EDO linear de 2ª ordem, derivação implícita.
 
 * [ ] Direitos de reprodução das tabelas de propriedades dos livros (seção 7.5), a resolver antes de distribuir pacotes a alunos. Com o repositório público (D-15), vale também antes de enviar qualquer tabela transcrita ao repositório.
@@ -805,3 +827,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.6 | 15/11/2026 | D-14: o Amsior passa a rodar no navegador (D-02 revista; seções 2, 3.3, 9.1, 9.2 e 10; T-06 revista; T-07 nova; fase 1C nova; riscos de empacotamento trocados pelos da versão web). D-15: software livre sob AGPL-3.0, sem contribuições externas por enquanto. Decisão 0006 do repositório |
 | 1.7 | 15/11/2026 | Fase 1C: tempo limite de 30 s provisório no navegador (seção 2, item 2), service worker e partida sem espera (itens 3 e 4); medições registradas na decisão 0006 |
 | 1.8 | 15/11/2026 | Fase 1C concluída: revisão de Ruan em Chrome e Firefox; endereço de publicação definido; tempo limite do navegador fica como ponto em aberto (seção 10.4) |
+| 1.9 | 15/11/2026 | Início da fase 2. D-16: conteúdo da biblioteca sob CC BY-SA 4.0. Livro-base de Matemática: REAMAT, com Iezzi e OpenStax de apoio (seção 8.1). Regra para adaptar obras abertas (seção 8.6). Listas de fichas de conceito aprovadas: 16 de Matemática, 12 de Reatores e 5 para depois, com as primeiras levas (seção 8.7). Registro de fontes em `biblioteca/_fontes.yaml` |
