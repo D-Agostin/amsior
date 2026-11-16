@@ -16,10 +16,12 @@ Em desenvolvimento; ainda não há versão pública para uso.
   verificador aprova 44 de 44 passos certos e reprova 73 de 73 passos errados.
 - **Fase 1B (isolar variável), concluída:** motor que isola uma variável com
   passos certificados, primeira tela (equação, resolução e tabela de
-  variáveis) e dois sistemas visuais com modo claro e escuro.
+  variáveis) e dois sistemas visuais com modo claro e escuro, aprovados na
+  revisão visual.
 - **Fase 1C (navegador), em andamento:** o Amsior passa a rodar inteiro no
   navegador, sem instalação. O motor já roda no navegador e dá as mesmas
-  respostas do Python nativo. Veja a
+  respostas do Python nativo; versão de teste em
+  <https://d-agostin.github.io/amsior/>. Veja a
   [decisão 0006](docs/decisoes/0006-navegador-e-software-livre.md).
 
 ## O que existe

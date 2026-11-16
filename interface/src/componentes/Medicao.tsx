@@ -41,10 +41,12 @@ export function Medicao() {
   }, []);
 
   const partida = motor.partida;
-  const baixados = partida?.recursos.reduce((n, r) => n + (r.transferidos || r.bytes), 0) ?? 0;
+  // transferSize é 0 quando o arquivo vem do cache do navegador: esses contam à parte.
+  const baixados = partida?.recursos.reduce((n, r) => n + r.transferidos, 0) ?? 0;
+  const doCache = partida?.recursos.reduce((n, r) => n + (r.transferidos === 0 ? r.bytes : 0), 0) ?? 0;
   const relatorio = {
     navegador: navigator.userAgent, nucleos: navigator.hardwareConcurrency,
-    partida_ms: partida ? Math.round(partida.ms) : null, baixados_bytes: baixados,
+    partida_ms: partida ? Math.round(partida.ms) : null, baixados_bytes: baixados, cache_bytes: doCache,
     recursos: partida?.recursos.map((r) => ({ ...r, ms: Math.round(r.ms) })),
     isolar: linhas.map((l) => ({ ...l, motorMs: Math.round(l.motorMs), totalMs: Math.round(l.totalMs) })),
   };
@@ -57,6 +59,7 @@ export function Medicao() {
         <dt>{t("ui.medir.estado")}</dt><dd role="status">{textoDoMotor(estado)}</dd>
         <dt>{t("ui.medir.partida")}</dt><dd>{partida ? `${s1(partida.ms)} s` : "—"}</dd>
         <dt>{t("ui.medir.baixados")}</dt><dd>{partida ? `${mb(baixados)} MB` : "—"}</dd>
+        <dt>{t("ui.medir.do_cache")}</dt><dd>{partida ? `${mb(doCache)} MB` : "—"}</dd>
         <dt>{t("ui.medir.aberta_em")}</dt><dd>{`${s1(aberturaMs)} s`}</dd>
       </dl>
       <table className="tabela medicao-tabela">

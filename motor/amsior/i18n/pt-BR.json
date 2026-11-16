@@ -253,7 +253,7 @@
   "ui.medir.nota": "Isola os exemplos do painel, um por vez, e mede o tempo nesta máquina. Na primeira visita inclui o download; recarregue a página para medir a abertura com o cache.",
   "ui.medir.estado": "Motor",
   "ui.medir.partida": "Partida do motor",
-  "ui.medir.baixados": "Transferido na partida",
+  "ui.medir.baixados": "Baixado da internet na partida",
   "ui.medir.aberta_em": "Página aberta em",
   "ui.medir.col.exemplo": "Exemplo",
   "ui.medir.col.estado": "Resultado",
@@ -261,5 +261,6 @@
   "ui.medir.col.motor": "No motor",
   "ui.medir.col.total": "Total",
   "ui.medir.rodando": "Medindo… {n} de {total}",
-  "ui.medir.copiar": "Copiar o resultado"
+  "ui.medir.copiar": "Copiar o resultado",
+  "ui.medir.do_cache": "Lido do cache do navegador"
 }

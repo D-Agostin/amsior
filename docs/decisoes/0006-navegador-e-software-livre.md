@@ -101,6 +101,26 @@ site só é publicado se não houver diferença.
 4. **PyYAML fora do navegador.** O glossário vai em JSON; o motor lê YAML ou
    JSON pela extensão.
 
+## Medição no computador do autor e revisão visual (15/11/2026)
+
+Site publicado no GitHub Pages, aberto no Chrome 156 no Windows:
+
+| Medida | Primeira visita | Segunda visita (cache) |
+| --- | --- | --- |
+| Baixado da internet | 16,9 MB (o servidor comprime o Python e o JavaScript; os dois zips já vêm comprimidos) | 0 MB |
+| Partida do motor | 3,3 s | 1,7 s |
+| Isolar os 12 exemplos | de 0,01 s a 1,0 s (Arrhenius) | igual |
+
+Os 12 exemplos saíram com passos certificados. Os tempos de isolar ficaram
+iguais aos da máquina de desenvolvimento. O painel de medição somava o que veio
+do cache como se tivesse sido baixado; corrigido para mostrar os dois à parte.
+
+Ruan aprovou a revisão visual da primeira tela nos sistemas D e H, nos modos
+claro e escuro (critério da fase 1B, D-11). **A fase 1B está concluída.**
+
+O tempo limite de 30 s continua provisório: falta medir num computador de
+aluno mais modesto, onde o pior caso do corpus pode passar de 10 s.
+
 Falta, para fechar a fase 1C: funcionar sem internet (service worker),
 instalação como aplicativo, a tela "Sobre", medições em máquinas de aluno e a
 revisão visual de Ruan.
