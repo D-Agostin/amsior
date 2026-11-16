@@ -142,6 +142,8 @@ aluno mais modesto, onde o pior caso do corpus pode passar de 10 s.
    há erro no console e que nenhum pedido sai para fora do site; depois
    desliga a rede, recarrega e isola outro exemplo.
 
-Falta, para fechar a fase 1C: a revisão de Ruan no Firefox (critério da seção
-10.1) e uma medição num computador de aluno mais modesto, para fixar o tempo
-limite.
+Ruan aprovou a revisão no Firefox em 15/11/2026, e o teste automático passa
+no Chrome e no Firefox. **A fase 1C está concluída.**
+
+Fica em aberto (especificação, seção 10.4): medir num computador de aluno mais
+modesto para fixar o tempo limite, hoje em 30 s provisórios.

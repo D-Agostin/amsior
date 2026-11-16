@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-13/11/2026 · v1.7 em 15/11/2026
+13/11/2026 · v1.8 em 15/11/2026
 
 O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
 
@@ -782,7 +782,8 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 - [x] Licença do código do Amsior: AGPL-3.0 (D-15, 15/11/2026). O conteúdo das fichas segue a mesma licença por ora.
 - [ ] Avaliar uma licença de conteúdo (Creative Commons) para o texto didático das fichas, antes da fase 2.
 - [x] Assinatura digital: deixa de ser necessária com a versão de navegador (D-14). Se o executável voltar, a SignPath Foundation assina projetos de código aberto sem custo.
-- [ ] Endereço de publicação (GitHub Pages ou domínio próprio), a definir na fase 1C.
+- [x] Endereço de publicação: GitHub Pages, em https://d-agostin.github.io/amsior/ (fase 1C). Domínio próprio continua possível.
+- [ ] Tempo limite no navegador: medir num computador de aluno mais modesto e fixar o valor (hoje 30 s provisórios; decisão 0006).
 - [ ] Confirmar CoolProp e chemicals/thermo no Pyodide, antes da fase 3B.
 - [ ] Quando reabrir o projeto a contribuições externas, e sob quais regras (D-15).
 - [ ] Lista final das cerca de 50 fichas, a fechar no início da fase 2.
@@ -803,3 +804,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.5 | 14/11/2026 | Sistemas visuais D (padrão) e H; D-12 (tipo da equação, seção 4.7); D-13 (fichas de conceito, seções de Matemática e Reatores, seções 3.5, 8.7 e 9.3) |
 | 1.6 | 15/11/2026 | D-14: o Amsior passa a rodar no navegador (D-02 revista; seções 2, 3.3, 9.1, 9.2 e 10; T-06 revista; T-07 nova; fase 1C nova; riscos de empacotamento trocados pelos da versão web). D-15: software livre sob AGPL-3.0, sem contribuições externas por enquanto. Decisão 0006 do repositório |
 | 1.7 | 15/11/2026 | Fase 1C: tempo limite de 30 s provisório no navegador (seção 2, item 2), service worker e partida sem espera (itens 3 e 4); medições registradas na decisão 0006 |
+| 1.8 | 15/11/2026 | Fase 1C concluída: revisão de Ruan em Chrome e Firefox; endereço de publicação definido; tempo limite do navegador fica como ponto em aberto (seção 10.4) |
