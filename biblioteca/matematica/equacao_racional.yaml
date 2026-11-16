@@ -4,7 +4,7 @@
 
 id: matematica.equacao_racional
 tipo: conceito
-versao: 1
+versao: 2
 estado: auto_verificada
 area: matematica
 grupo: {pt: "Tipos de equação"}
@@ -13,104 +13,140 @@ titulo: {pt: "Equação racional"}
 tipos: [tipo.racional]
 
 resumo:
-  pt: >-
-    Uma equação é racional fracionária numa variável quando essa variável aparece
-    em algum denominador. A resolução tem três tempos: achar o domínio, eliminar os
-    denominadores e conferir cada candidata contra o domínio.
+  - texto: {pt: "Uma equação é **racional fracionária** numa variável quando essa variável aparece em algum denominador. A forma geral é"}
+  - equacao: '\frac{p(x)}{q(x)} = 0'
+  - texto: {pt: "e a resolução tem três tempos:"}
+  - lista:
+      - {pt: "**Domínio:** tirar os valores que anulam algum denominador."}
+      - {pt: "**Eliminar os denominadores:** multiplicar os dois lados pelo mínimo múltiplo comum deles, o que só vale dentro do domínio."}
+      - {pt: "**Conferir:** descartar toda candidata que caia fora do domínio (as raízes estranhas)."}
 
 secoes:
   - titulo: {pt: "O que é"}
-    texto:
-      pt: |
-        Uma expressão racional é um quociente de polinômios. Numa equação, o que importa
-        é onde está a variável que se quer achar.
-
-        Se a variável aparece em algum denominador, a equação é **racional fracionária**
-        nessa variável. Em \(\frac{1}{x} = \frac{4}{3x} + 1\), o \(x\) está embaixo da
-        fração. Se a variável só aparece em numeradores, a equação é **racional inteira**,
-        isto é, polinomial, e o que conta é o grau.
-
-        A classificação depende da variável escolhida. Em \(\tau = \frac{X}{k(1 - X)}\),
-        a equação é racional em \(X\) e em \(k\), mas é do 1º grau em \(\tau\).
-
-        Ao lado do tipo, o Amsior mostra o grau que a equação ganha depois de tirar os
-        denominadores. É esse grau que diz o que vem depois: uma equação do 1º grau, do
-        2º grau ou de grau maior.
+    blocos:
+      - texto: {pt: "Uma expressão racional é um quociente de polinômios. Numa equação racional, a variável procurada aparece no denominador:"}
+      - equacao: '\frac{p(x)}{q(x)} = 0'
+        onde:
+          - {simbolo: 'p(x)', texto: {pt: "polinômio do numerador"}}
+          - {simbolo: 'q(x)', texto: {pt: "polinômio do denominador, de grau 1 ou mais em \\(x\\); não pode se anular"}}
+      - texto: {pt: "Se a variável só aparece em numeradores, a equação é **racional inteira**, isto é, polinomial, e o que conta é o grau."}
+      - texto: {pt: "A classificação depende da variável escolhida. A mesma equação pode ser racional numa variável e polinomial em outra:"}
+      - equacao: '\tau = \frac{X}{k(1 - X)}'
+        nota: {pt: "Racional em \\(X\\) e em \\(k\\), que estão no denominador; do 1º grau em \\(\\tau\\)."}
+      - caixa: destaque
+        titulo: {pt: "O que o Amsior mostra"}
+        blocos:
+          - texto: {pt: "Ao lado do tipo, o Amsior informa o grau que a equação ganha depois de tirar os denominadores. É esse grau que decide o resto da resolução: 1º grau, 2º grau ou grau maior."}
 
   - titulo: {pt: "Primeiro o domínio"}
-    texto:
-      pt: |
-        Não existe divisão por zero. Por isso, antes de qualquer conta, ficam de fora os
-        valores da variável que anulam algum denominador. O que sobra é o **domínio** da
-        equação, e toda solução precisa estar nele.
-
-        Em \(\frac{1}{x} = \frac{4}{3x} + 1\), os denominadores são \(x\) e \(3x\). Os
-        dois se anulam só em \(x = 0\), então o domínio é \(\{x \in \mathbb{R} \mid x \neq 0\}\).
+    blocos:
+      - texto: {pt: "Não existe divisão por zero. Antes de qualquer conta, ficam de fora os valores da variável que anulam algum denominador. O que sobra é o **domínio** da equação:"}
+      - equacao: 'D = \{\, x \in \mathbb{R} \mid q(x) \neq 0 \,\}'
+      - texto: {pt: "Toda solução precisa estar no domínio. Por exemplo, na equação"}
+      - equacao: '\frac{1}{x} = \frac{4}{3x} + 1'
+      - texto: {pt: "os denominadores são \\(x\\) e \\(3x\\). Os dois se anulam no mesmo ponto, e o domínio é"}
+      - equacao: 'D = \{\, x \in \mathbb{R} \mid x \neq 0 \,\}'
 
   - titulo: {pt: "Eliminar os denominadores"}
-    texto:
-      pt: |
-        Multiplicar os dois lados por uma expressão que contenha todos os denominadores
-        (o mínimo múltiplo comum deles) troca a equação por outra sem frações.
-
-        Esse passo tem um preço. Multiplicar os dois lados por algo só preserva as
-        soluções onde esse algo é diferente de zero. Dentro do domínio, é o caso; fora
-        dele, não. Por isso o Amsior escreve a condição ao lado do passo, como
-        \(x \neq 0\), e o selo do passo diz que ele vale **sob hipótese**.
-
-        Na prática, o Amsior leva tudo para um lado, multiplica pelo denominador e
-        reúne os termos na variável. Se o que sobra é do 1º grau, basta dividir pelo
-        coeficiente. Se é do 2º grau, ele completa o quadrado e abre os dois ramos.
+    blocos:
+      - texto: {pt: "Continuando com a mesma equação, a resolução segue em quatro passos."}
+      - passos:
+          - titulo: {pt: "Levar tudo para um lado"}
+            blocos:
+              - equacao: '\frac{1}{x} - \frac{4}{3x} - 1 = 0'
+          - titulo: {pt: "Multiplicar pelo mínimo múltiplo comum dos denominadores"}
+            blocos:
+              - texto: {pt: "O mínimo múltiplo comum de \\(x\\) e \\(3x\\) é \\(3x\\). Multiplicando os dois lados por ele, as frações somem:"}
+              - equacao: '3x \left( \frac{1}{x} - \frac{4}{3x} - 1 \right) = 0 \quad\Longrightarrow\quad 3 - 4 - 3x = 0'
+              - texto: {pt: "Esse passo só preserva as soluções onde o fator multiplicado não é zero:"}
+              - equacao: '3x \neq 0'
+          - titulo: {pt: "Resolver a equação sem frações"}
+            blocos:
+              - texto: {pt: "Sobrou uma equação do 1º grau:"}
+              - equacao: '-3x - 1 = 0 \quad\Longrightarrow\quad x = -\frac{1}{3}'
+          - titulo: {pt: "Conferir contra o domínio"}
+            blocos:
+              - texto: {pt: "A candidata é diferente de zero, portanto está no domínio e é a solução:"}
+              - equacao: 'S = \left\{ -\tfrac{1}{3} \right\}'
+                destaque: true
+      - caixa: atencao
+        titulo: {pt: "Por que o passo vale sob hipótese"}
+        blocos:
+          - texto: {pt: "Multiplicar os dois lados por uma expressão só preserva as soluções onde essa expressão não se anula. Dentro do domínio isso é garantido; fora dele, não. Por isso o Amsior escreve a condição ao lado do passo, e o selo diz **verificado sob hipótese**."}
 
   - titulo: {pt: "Raízes estranhas"}
-    texto:
-      pt: |
-        A equação sem denominadores pode ter raízes que a original não tem. Elas
-        aparecem justamente nos pontos excluídos do domínio, e por isso se chamam
-        **raízes estranhas**.
+    blocos:
+      - texto: {pt: "A equação sem denominadores pode ter raízes que a original não tem. Elas caem justamente nos pontos excluídos do domínio e se chamam **raízes estranhas**. Veja esta equação:"}
+      - equacao: '\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0'
+      - passos:
+          - titulo: {pt: "Domínio"}
+            blocos:
+              - equacao: 'x - 2 \neq 0 \quad\Longrightarrow\quad D = \mathbb{R} \setminus \{2\}'
+          - titulo: {pt: "Fatorar o numerador"}
+            blocos:
+              - equacao: 'x^3 - 7x^2 + 16x - 12 = (x - 2)^2 (x - 3)'
+          - titulo: {pt: "Zerar o numerador"}
+            blocos:
+              - texto: {pt: "Uma fração é zero quando o numerador é zero e o denominador não é. O numerador se anula em duas candidatas:"}
+              - equacao: 'x = 2 \qquad \text{ou} \qquad x = 3'
+          - titulo: {pt: "Conferir contra o domínio"}
+            blocos:
+              - texto: {pt: "A candidata 2 anula o denominador: está fora do domínio e é descartada. Sobra uma solução:"}
+              - equacao: 'S = \{3\}'
+                destaque: true
+      - caixa: atencao
+        titulo: {pt: "Cancelar o fator não resolve"}
+        blocos:
+          - texto: {pt: "Cancelar um fator \\(x - 2\\) em cima e embaixo antes de resolver não elimina o problema. Sobra"}
+          - equacao: '(x - 2)(x - 3) = 0'
+          - texto: {pt: "que ainda tem a raiz 2. A conferência é sempre contra o domínio da equação **original**. O Amsior faz isso substituindo cada resultado nela."}
 
-        Veja \(\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0\). Uma fração é zero quando o
-        numerador é zero e o denominador não é. O numerador se fatora como
-        \((x - 2)^2(x - 3)\) e se anula em \(x = 2\) e em \(x = 3\). Só que \(x = 2\)
-        também anula o denominador: está fora do domínio. A única solução é \(x = 3\).
-
-        A regra vale para qualquer equação racional: toda candidata é conferida contra o
-        domínio, e a que estiver fora é descartada. O Amsior faz essa conferência
-        substituindo cada resultado na equação original.
-
-  - titulo: {pt: "Na engenharia"}
-    texto:
-      pt: |
-        Equações racionais aparecem sempre que a incógnita está no denominador de uma
-        equação de projeto. No reator contínuo de tanque agitado com reação de 1ª ordem
-        e densidade constante, o tempo espacial e a conversão se ligam por
-        \(\tau = \frac{X}{k(1 - X)}\).
-
-        Para achar a conversão que um reator dá, isola-se \(X\). O Amsior multiplica os
-        dois lados por \(k(1 - X)\), com a condição \(k(1 - X) \neq 0\), reúne os termos
-        em \(X\) e chega a \(X = \frac{\tau k}{\tau k + 1}\).
-
-        A condição tem sentido físico. Ela exclui \(X = 1\): a conversão completa só
-        seria alcançada com tempo espacial infinito. O resultado confirma isso: com
-        \(\tau\) e \(k\) positivos, \(\frac{\tau k}{\tau k + 1}\) fica entre 0 e 1.
+  - titulo: {pt: "Na engenharia: a conversão de um CSTR"}
+    blocos:
+      - texto: {pt: "No reator contínuo de tanque agitado, com reação de 1ª ordem e densidade constante, o tempo espacial e a conversão se ligam pela equação de projeto:"}
+      - equacao: '\tau = \frac{X}{k(1 - X)}'
+        onde:
+          - {simbolo: '\tau', texto: {pt: "tempo espacial (volume do reator dividido pela vazão volumétrica de entrada)"}}
+          - {simbolo: 'X', texto: {pt: "conversão do reagente"}}
+          - {simbolo: 'k', texto: {pt: "constante de velocidade de 1ª ordem"}}
+      - texto: {pt: "Achar a conversão que um reator dá é isolar \\(X\\), uma equação racional em \\(X\\):"}
+      - passos:
+          - titulo: {pt: "Domínio"}
+            blocos:
+              - texto: {pt: "Com \\(k\\) positivo, o denominador só se anula na conversão completa:"}
+              - equacao: 'k(1 - X) \neq 0 \quad\Longleftrightarrow\quad X \neq 1'
+          - titulo: {pt: "Eliminar o denominador"}
+            blocos:
+              - equacao: '\tau k (1 - X) = X'
+          - titulo: {pt: "Reunir os termos em \\(X\\)"}
+            blocos:
+              - equacao: '\tau k = X (1 + \tau k)'
+          - titulo: {pt: "Isolar a conversão"}
+            blocos:
+              - equacao: 'X = \frac{\tau k}{1 + \tau k}'
+                destaque: true
+      - caixa: destaque
+        titulo: {pt: "A condição tem sentido físico"}
+        blocos:
+          - texto: {pt: "A condição exclui a conversão completa, que só seria alcançada com tempo espacial infinito. O resultado confirma: com \\(\\tau\\) e \\(k\\) positivos, a fração fica sempre entre 0 e 1."}
 
 equacoes: []
 
 exemplos:
-  - enunciado: {pt: "Resolva em \\(x\\): \\(\\frac{1}{x} = \\frac{4}{3x} + 1\\)."}
+  - enunciado: {pt: "Resolva em \\(x\\)."}
     equacao: '\frac{1}{x} = \frac{4}{3x} + 1'
     pede: x
     esperado: ['x = -\frac{1}{3}']
-  - enunciado: {pt: "Resolva em \\(x\\): \\(1 - \\frac{2}{x} = \\frac{8}{x^2}\\). Depois de eliminar \\(x^2\\), a equação é do 2º grau."}
+  - enunciado: {pt: "Resolva em \\(x\\). Depois de eliminar \\(x^2\\), a equação fica do 2º grau."}
     equacao: '1 - \frac{2}{x} = \frac{8}{x^2}'
     pede: x
     esperado: ['x = -2', 'x = 4']
-  - enunciado: {pt: "Resolva em \\(x\\): \\(\\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0\\). A candidata \\(x = 2\\) é raiz estranha."}
+  - enunciado: {pt: "Resolva em \\(x\\). A candidata 2 é raiz estranha."}
     equacao: '\frac{x^3 - 7x^2 + 16x - 12}{x - 2} = 0'
     pede: x
     passos: false
     esperado: ['x = 3']
-  - enunciado: {pt: "No CSTR de 1ª ordem, isole a conversão \\(X\\) em \\(\\tau = \\frac{X}{k(1 - X)}\\)."}
+  - enunciado: {pt: "No CSTR de 1ª ordem, isole a conversão \\(X\\)."}
     equacao: '\tau = \frac{X}{k(1 - X)}'
     simbolos:
       - {simbolo: '\tau', grandeza: tempo_espacial}
@@ -129,9 +165,9 @@ referencias:
     adaptacao:
       pt: >-
         Do livro vêm a ordem da explicação (o domínio antes de resolver e a conferência
-        das candidatas contra ele) e três exemplos: 1/x = 4/(3x) + 1, 1 − 2/x = 8/x² e a
-        raiz estranha de (x³ − 7x² + 16x − 12)/(x − 2) = 0. O texto foi reescrito; o caso
-        do CSTR e a explicação dos selos do Amsior são novos.
+        das candidatas contra ele), três exemplos e a observação de que cancelar o fator
+        comum não elimina a raiz estranha. O texto foi reescrito e organizado em passos;
+        o caso do CSTR e a explicação dos selos do Amsior são novos.
     conferido: {por: null, em: null}
   - fonte: fogler
     uso: citacao

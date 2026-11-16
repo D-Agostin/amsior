@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-13/11/2026 · v1.10 em 15/11/2026
+13/11/2026 · v1.11 em 15/11/2026
 
 O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
 
@@ -280,17 +280,35 @@ grupo: {pt: "Reatores ideais"}  # grupo e posição na lista da seção 8.7
 ordem: 6
 titulo: {pt: "Reator contínuo de tanque agitado (CSTR)"}
 # tipos: [tipo.racional]      # só em Matemática: tipos de equação (D-12) que a ficha explica
-resumo: {pt: "..."}
-secoes:                       # texto em Markdown com LaTeX; cada seção pode ter figura
-  - {titulo: {pt: "Como funciona"}, texto: {pt: "..."}, figura: reatores/cstr_esquema.svg}
-  - {titulo: {pt: "Quando se usa"}, texto: {pt: "..."}}
-  - {titulo: {pt: "Vantagens e limitações"}, texto: {pt: "..."}}
+resumo:                       # a resposta em poucas linhas, em caixa no topo (blocos)
+  - texto: {pt: "..."}
+  - equacao: 'X = \frac{\tau k}{1 + \tau k}'
+    destaque: true
+variaveis:                    # tabela de variáveis; unidade e nome da grandeza vêm do glossário
+  - {simbolo: '\tau', grandeza: tempo_espacial, nome: {pt: "tempo espacial"}}
+secoes:                       # cada seção é uma lista de blocos (seção 8.6)
+  - titulo: {pt: "Equação de projeto"}
+    blocos:
+      - texto: {pt: "..."}
+      - passos:
+          - titulo: {pt: "Balanço molar de A"}
+            blocos:
+              - equacao: 'F_{A0} - F_A + r_A V = 0'
+                onde: [{simbolo: 'F_{A0}', texto: {pt: "vazão molar de A na entrada"}}]
+          - titulo: {pt: "..."}
+            blocos: [...]
+      - caixa: atencao        # resumo | destaque | atencao | hipoteses
+        titulo: {pt: "Erro comum"}
+        blocos: [...]
+      - figura: reatores/cstr_esquema.svg
+        legenda: {pt: "..."}
 equacoes: [reatores.cstr_projeto, reatores.tempo_espacial]   # fichas de equação ligadas
-exemplos:                     # contas verificadas pelo motor, como nas fichas de equação
+exemplos:                     # contas refeitas pelo motor nos testes
+  - {enunciado: {pt: "..."}, equacao: '\tau = \frac{X}{k(1 - X)}', pede: X, esperado: ['...']}
   - {enunciado: {pt: "..."}, usa: reatores.cstr_projeto, pede: V}
 animacao: {cena: reatores/cstr_mistura, interativa: reatores/levenspiel}
 referencias: [{fonte: fogler, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}]
-relacionadas: [reatores.pfr, reatores.cstr_em_serie]
+relacionadas: [reatores.pfr, reatores.associacao_de_reatores]
 revisao: {humana: null, externo: null}
 ```
 
@@ -675,6 +693,15 @@ Equações, leis físicas e dados são usados livremente. De livros comerciais, 
 
 De obras abertas com licença compatível (CC BY-SA 4.0 ou CC BY 4.0, como o REAMAT e a OpenStax), a ficha pode adaptar texto, exemplos e figuras (D-16). Nesse caso a referência leva `uso: adaptacao`, a ficha diz o que foi adaptado e o que foi mudado, e a interface mostra o crédito com título, autores, licença e ligação. O que vem de obra CC BY 4.0 entra no Amsior sob CC BY-SA 4.0. Obras sob licença NC (não comercial) ou ND (sem derivadas) não são adaptadas, só citadas. Padrão de redação: frases curtas, voz de professor no quadro, um motivo por passo.
 
+Padrão de apresentação das fichas de conceito (revisão de Ruan em 15/11/2026, a partir de deduções de referência que ele forneceu), imposto pelo esquema de blocos (`amsior.biblioteca.blocos`):
+
+- **Resposta primeiro:** o resumo abre a ficha, em caixa, com o resultado central em destaque.
+- **Nenhuma equação no texto corrido:** toda relação (=, ≠, <, ≤, ≈, ⇒...) fica num bloco `equacao`, em linha própria e numerada. No texto entram só símbolos e expressões curtas. Uma relação dentro de `\( \)` em qualquer texto da ficha (parágrafo, lista, nota, resumo, enunciado) é erro de esquema.
+- **Símbolos explicados onde aparecem:** a equação que introduz símbolos traz `onde:`, um por linha; a ficha pode ter uma tabela de variáveis, com unidade e grandeza tiradas do glossário.
+- **Dedução em passos:** cada passo tem título e uma ideia só, com as equações em blocos; o resultado de cada etapa importante vai em destaque (caixa em volta).
+- **Caixas com papel fixo:** `resumo`, `destaque` (a ideia central ou o sentido físico), `atencao` (pegadinha, erro comum, limite de validade) e `hipoteses` (premissas adotadas). Caixa não fica dentro de caixa nem de passo.
+- **Seções numeradas** na tela, na ordem do arquivo.
+
 ### 8.7 Lista candidata de fichas
 
 São 56 candidatas; a lista final (cerca de 50) fecha no início da fase 2. As cinco primeiras, em negrito, servem de modelo.
@@ -834,3 +861,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.8 | 15/11/2026 | Fase 1C concluída: revisão de Ruan em Chrome e Firefox; endereço de publicação definido; tempo limite do navegador fica como ponto em aberto (seção 10.4) |
 | 1.9 | 15/11/2026 | Início da fase 2. D-16: conteúdo da biblioteca sob CC BY-SA 4.0. Livro-base de Matemática: REAMAT, com Iezzi e OpenStax de apoio (seção 8.1). Regra para adaptar obras abertas (seção 8.6). Listas de fichas de conceito aprovadas: 16 de Matemática, 12 de Reatores e 5 para depois, com as primeiras levas (seção 8.7). Registro de fontes em `biblioteca/_fontes.yaml` |
 | 1.10 | 15/11/2026 | Isolar do 2º grau com passos (seção 4.2, itens 4 e 7), exigido pelas fichas de Matemática: completar o quadrado, raiz dupla, recusa por discriminante negativo, passo de cálculo do valor exato. Correção: equações que chegavam ao 2º grau eram recusadas com "não há forma fechada elementar", o que era falso; a recusa agora distingue falta de regra de falta de forma fechada |
+| 1.11 | 15/11/2026 | Fichas de conceito em blocos estruturados (seções 3.5 e 8.6): resumo em caixa, equações numeradas em linha própria, `onde:`, dedução em passos, caixas de destaque, atenção e hipóteses, tabela de variáveis. Nenhuma equação no texto corrido, conferido pelo esquema. Pedido de Ruan na revisão das fichas-modelo |

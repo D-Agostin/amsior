@@ -114,12 +114,12 @@ def test_fora_de_rascunho_exige_conteudo(pasta: Path) -> None:
 
 
 def test_verificada_exige_conferencia_e_revisao(pasta: Path) -> None:
-    p = _conceito(pasta, estado="verificada", resumo='{pt: "R"}',
-                  secoes='[{titulo: {pt: "A"}, texto: {pt: "B"}}]')
+    p = _conceito(pasta, estado="verificada", resumo='[{texto: {pt: "R"}}]',
+                  secoes='[{titulo: {pt: "A"}, blocos: [{texto: {pt: "B"}}]}]')
     assert any("conferido: obrigatório" in x for x in p)
     assert any("revisao.humana: obrigatória" in x for x in p)
-    ok = _conceito(pasta, estado="verificada", resumo='{pt: "R"}',
-                   secoes='[{titulo: {pt: "A"}, texto: {pt: "B"}}]',
+    ok = _conceito(pasta, estado="verificada", resumo='[{texto: {pt: "R"}}]',
+                   secoes='[{titulo: {pt: "A"}, blocos: [{texto: {pt: "B"}}]}]',
                    referencias='[{fonte: reamat_precalculo, conferido: {por: Ruan, em: 2026-11-15}}]',
                    revisao="{humana: {por: Ruan, em: 2026-11-15}}")
     assert ok == []
@@ -140,8 +140,8 @@ def test_numero_de_pagina_so_com_conferencia(pasta: Path) -> None:
 def test_adaptacao_so_de_obra_aberta(pasta: Path) -> None:
     p = _conceito(pasta, referencias="[{fonte: fogler, uso: adaptacao}]")
     assert any("não tem licença que permita adaptar" in x for x in p)
-    p = _conceito(pasta, estado="auto_verificada", resumo='{pt: "R"}',
-                  secoes='[{titulo: {pt: "A"}, texto: {pt: "B"}}]',
+    p = _conceito(pasta, estado="auto_verificada", resumo='[{texto: {pt: "R"}}]',
+                  secoes='[{titulo: {pt: "A"}, blocos: [{texto: {pt: "B"}}]}]',
                   referencias="[{fonte: reamat_precalculo, uso: adaptacao}]")
     assert any("diga o que veio da obra" in x for x in p)
 
@@ -174,8 +174,8 @@ def test_ficha_visivel_nao_depende_de_rascunho(pasta: Path) -> None:
         area: matematica
         titulo: {pt: "Rascunho"}
         """)
-    p = _conceito(pasta, estado="auto_verificada", resumo='{pt: "R"}',
-                  secoes='[{titulo: {pt: "A"}, texto: {pt: "B"}}]')
+    p = _conceito(pasta, estado="auto_verificada", resumo='[{texto: {pt: "R"}}]',
+                  secoes='[{titulo: {pt: "A"}, blocos: [{texto: {pt: "B"}}]}]')
     assert p == []
     texto = (pasta / "matematica/teste.yaml").read_text(encoding="utf-8")
     (pasta / "matematica/teste.yaml").write_text(texto + "equacoes: [matematica.rasc]\n", encoding="utf-8")
@@ -229,13 +229,14 @@ def test_exemplos_das_fichas_conferidos_pelo_motor(biblioteca) -> None:  # type:
 
 def test_ficha_modelo_de_reatores(biblioteca) -> None:  # type: ignore[no-untyped-def]
     f = biblioteca.fichas["reatores.cstr"]
-    assert f.visivel and f.dados["secoes"][0]["figura"] == "reatores/cstr_esquema.svg"
+    assert f.visivel and f.dados["secoes"][0]["blocos"][0]["figura"] == "reatores/cstr_esquema.svg"
+    assert len(f.dados["variaveis"]) >= 8
     titulos = [s["titulo"]["pt"] for s in f.dados["secoes"]]
     assert titulos == ["Como funciona", "Equação de projeto", "Onde se usa", "Vantagens e limitações"]
 
 
 def test_figura_ausente_e_apontada(pasta: Path) -> None:
-    p = _conceito(pasta, secoes='[{titulo: {pt: "A"}, texto: {pt: "B"}, figura: nada/sumiu.svg}]')
+    p = _conceito(pasta, secoes='[{titulo: {pt: "A"}, blocos: [{figura: nada/sumiu.svg}]}]')
     assert any("figura ausente: figuras/nada/sumiu.svg" in x for x in p)
 
 
@@ -269,3 +270,39 @@ def test_exemplo_com_resultado_errado_e_apontado(pasta: Path) -> None:
     assert len(p) == 2
     assert "exemplos[0]" in p[0] and "esperados ['x = 4']" in p[0]
     assert "exemplos[1]" in p[1] and "agora tem passos" in p[1]
+
+
+# ------------------------------------------------------------------ blocos (padrão de redação, seção 8.6)
+
+
+@pytest.mark.parametrize(("bloco", "trecho"), [
+    (r"{texto: {pt: 'Como \(x = 2\), segue'}}", "equação no texto corrido"),
+    (r"{texto: {pt: 'vale \(a \leq b\)'}}", "equação no texto corrido"),
+    (r"{lista: [{pt: 'com \(X \neq 1\)'}]}", "equação no texto corrido"),
+    (r"{equacao: 'x = 2', nota: {pt: 'e \(y = 3\)'}}", "equação no texto corrido"),
+    ("{equacao: 'x = 2', onde: [{simbolo: x}]}", "esperado {simbolo"),
+    ("{texto: {pt: a}, equacao: x}", "exatamente um destes campos"),
+    ("{passos: [{titulo: {pt: 'só um'}, blocos: [{texto: {pt: a}}]}]}", "pelo menos dois passos"),
+    ("{caixa: aviso, blocos: [{texto: {pt: a}}]}", "tipo de caixa fora de"),
+    ("{tabela: {colunas: [{pt: a}, {pt: b}], linhas: [[{pt: '1'}]]}}", "esperadas 2 células"),
+])
+def test_blocos_invalidos(pasta: Path, bloco: str, trecho: str) -> None:
+    p = _conceito(pasta, secoes=f'[{{titulo: {{pt: "A"}}, blocos: [{bloco}]}}]')
+    assert any(trecho in x for x in p), p
+
+
+def test_simbolos_curtos_em_linha_sao_aceitos(pasta: Path) -> None:
+    ok = _conceito(pasta, secoes=r"[{titulo: {pt: A}, blocos: [{texto: {pt: 'com \(\tau k\) e \(1/k\)'}}]}]")
+    assert ok == []
+
+
+def test_caixa_dentro_de_passo_e_recusada(pasta: Path) -> None:
+    passos = ('{passos: [{titulo: {pt: "a"}, blocos: [{caixa: atencao, blocos: [{texto: {pt: "x"}}]}]},'
+              ' {titulo: {pt: "b"}, blocos: [{texto: {pt: "y"}}]}]}')
+    p = _conceito(pasta, secoes=f'[{{titulo: {{pt: "A"}}, blocos: [{passos}]}}]')
+    assert any("caixa dentro de caixa ou de passo" in x for x in p)
+
+
+def test_fichas_do_repositorio_sem_equacao_no_texto(biblioteca) -> None:  # type: ignore[no-untyped-def]
+    """A regra vale para todo o conteúdo, inclusive enunciados de exemplos."""
+    assert not [str(p) for p in biblioteca.problemas if "texto corrido" in p.mensagem]

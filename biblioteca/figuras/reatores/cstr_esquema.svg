@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 290" role="img" aria-labelledby="t d" font-family="sans-serif" font-size="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" role="img" aria-labelledby="t d" font-family="sans-serif" font-size="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <!-- SPDX-License-Identifier: CC-BY-SA-4.0 · Amsior · Copyright (c) 2026 Ruan D'Agostin -->
   <title id="t">Esquema de um CSTR</title>
   <desc id="d">Tanque com agitador e camisa de troca térmica. A alimentação entra pelo topo e o produto sai pela lateral, na mesma vazão; dentro do tanque a concentração é a mesma da saída.</desc>
@@ -27,6 +27,4 @@
   <!-- fluido térmico -->
   <path d="M66 216 H106" opacity="0.6" marker-end="url(#seta)"/>
   <path d="M274 216 H314" opacity="0.6" marker-end="url(#seta)"/>
-  <text x="30" y="262" fill="currentColor" stroke="none" opacity="0.8">camisa com fluido térmico</text>
-  <text x="30" y="282" fill="currentColor" stroke="none">mistura perfeita: no tanque, C<tspan baseline-shift="sub" font-size="9">A</tspan> é a mesma da saída</text>
 </svg>

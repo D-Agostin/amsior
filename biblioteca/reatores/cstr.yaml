@@ -4,7 +4,7 @@
 
 id: reatores.cstr
 tipo: conceito
-versao: 1
+versao: 2
 estado: auto_verificada
 area: reatores
 grupo: {pt: "Reatores ideais"}
@@ -12,83 +12,111 @@ ordem: 6
 titulo: {pt: "Reator contínuo de tanque agitado (CSTR)"}
 
 resumo:
-  pt: >-
-    No CSTR, a mistura reacional entra e sai sem parar de um tanque bem agitado. Como
-    a mistura é perfeita, o conteúdo do tanque tem a mesma composição da corrente de
-    saída, e a reação acontece toda na concentração de saída, a mais baixa do processo.
+  - texto: {pt: "No CSTR, a mistura reacional entra e sai sem parar de um tanque bem agitado. A mistura é perfeita: o tanque inteiro tem a composição da corrente de saída. Por isso o balanço molar é algébrico, e o volume necessário é"}
+  - equacao: 'V = \frac{F_{A0}\, X}{-r_A}'
+  - texto: {pt: "com a velocidade de reação calculada na saída. Para reação de 1ª ordem com densidade constante, a conversão é"}
+  - equacao: 'X = \frac{\tau k}{1 + \tau k}'
+    destaque: true
+
+variaveis:
+  - {simbolo: 'V', grandeza: volume, nome: {pt: "volume de mistura reacional no tanque"}}
+  - {simbolo: 'F_{A0}', grandeza: vazao_molar, nome: {pt: "vazão molar de A na entrada"}}
+  - {simbolo: 'F_A', grandeza: vazao_molar, nome: {pt: "vazão molar de A na saída"}}
+  - {simbolo: 'r_A', grandeza: taxa_reacao, nome: {pt: "velocidade de formação de A por volume"}, nota: {pt: "negativa para um reagente; \\(-r_A\\) é a velocidade de consumo"}}
+  - {simbolo: 'X', grandeza: conversao, nome: {pt: "conversão de A"}}
+  - {simbolo: 'C_{A0}', grandeza: concentracao_molar, nome: {pt: "concentração de A na entrada"}}
+  - {simbolo: 'C_A', grandeza: concentracao_molar, nome: {pt: "concentração de A no tanque e na saída"}}
+  - {simbolo: 'v_0', grandeza: vazao_volumetrica, nome: {pt: "vazão volumétrica de entrada"}}
+  - {simbolo: '\tau', grandeza: tempo_espacial, nome: {pt: "tempo espacial"}}
+  - {simbolo: 'k', grandeza: constante_velocidade_primeira_ordem, nome: {pt: "constante de velocidade de 1ª ordem"}}
 
 secoes:
   - titulo: {pt: "Como funciona"}
-    figura: reatores/cstr_esquema.svg
-    texto:
-      pt: |
-        Um tanque com agitador recebe a alimentação de forma contínua e descarrega o
-        produto pela saída. Em regime permanente, a vazão de saída acompanha a de
-        entrada e nada dentro do tanque muda com o tempo.
-
-        A hipótese que define o CSTR ideal é a **mistura perfeita**: concentração e
-        temperatura são as mesmas em todo o volume e iguais às da corrente de saída. O
-        reagente que acaba de entrar é diluído na hora em toda a massa do tanque.
-
-        Disso sai a propriedade mais importante do CSTR: a velocidade de reação tem um
-        valor só no tanque inteiro, o da composição de saída. Por isso o balanço molar do
-        CSTR é uma equação algébrica, sem derivada e sem integral.
+    blocos:
+      - figura: reatores/cstr_esquema.svg
+        legenda: {pt: "Tanque com agitador e camisa de troca térmica. A alimentação entra pelo topo e o produto sai pela lateral, na mesma vazão; dentro do tanque, a concentração é a mesma da saída."}
+      - texto: {pt: "Um tanque com agitador recebe a alimentação de forma contínua e descarrega o produto pela saída. Em regime permanente, a vazão de saída acompanha a de entrada, e nada dentro do tanque muda com o tempo."}
+      - texto: {pt: "O reagente que acaba de entrar é diluído na hora em toda a massa do tanque. Daí sai a propriedade mais importante do CSTR: a velocidade de reação tem um valor só no tanque inteiro, o da composição de saída. Por isso o balanço molar é uma equação algébrica, sem derivada e sem integral."}
+      - caixa: hipoteses
+        titulo: {pt: "Hipóteses do CSTR ideal"}
+        blocos:
+          - lista:
+              - {pt: "**Regime permanente:** nenhuma propriedade do tanque varia com o tempo."}
+              - {pt: "**Mistura perfeita:** concentração e temperatura são as mesmas em todo o volume e iguais às da corrente de saída."}
+              - {pt: "**Densidade constante** (só para a forma de 1ª ordem abaixo): a vazão volumétrica de saída é igual à de entrada. Vale bem para líquidos."}
 
   - titulo: {pt: "Equação de projeto"}
-    texto:
-      pt: |
-        O balanço molar da espécie \(A\) num volume \(V\), em regime permanente, diz que
-        o que entra menos o que sai mais o que se forma por reação é zero:
-        \(F_{A0} - F_A + r_A V = 0\). Com a conversão \(X\), a vazão molar de saída é
-        \(F_A = F_{A0}(1 - X)\), e o volume necessário fica
-
-        \[V = \frac{F_{A0}\,X}{-r_A},\]
-
-        com \(-r_A\) calculada nas condições de saída.
-
-        Para uma reação de 1ª ordem, \(-r_A = k C_A\). Com densidade constante,
-        \(C_A = C_{A0}(1 - X)\) e a vazão volumétrica não muda. Usando o tempo espacial
-        \(\tau = V/v_0\) e \(F_{A0} = C_{A0} v_0\), a equação de projeto vira
-
-        \[\tau = \frac{X}{k(1 - X)} \qquad\text{ou}\qquad X = \frac{\tau k}{1 + \tau k}.\]
-
-        O produto \(\tau k\) é o número de Damköhler da reação de 1ª ordem: compara o
-        tempo que o fluido passa no reator com o tempo característico da reação, \(1/k\).
+    blocos:
+      - texto: {pt: "A dedução parte do balanço molar de A no tanque e chega à conversão em cinco passos."}
+      - passos:
+          - titulo: {pt: "Balanço molar de A"}
+            blocos:
+              - texto: {pt: "Entrada menos saída mais geração é igual ao acúmulo. Em regime permanente o acúmulo é zero, e a mistura perfeita deixa a geração igual à velocidade de reação na saída vezes o volume inteiro:"}
+              - equacao: '\underbrace{F_{A0}}_{\text{entra}} - \underbrace{F_A}_{\text{sai}} + \underbrace{r_A V}_{\text{gerado}} = 0'
+          - titulo: {pt: "Escrever a saída com a conversão"}
+            blocos:
+              - texto: {pt: "A conversão é a fração de A alimentado que reagiu, de modo que a vazão de saída é"}
+              - equacao: 'F_A = F_{A0}\,(1 - X)'
+              - texto: {pt: "Substituindo no balanço e isolando o volume:"}
+              - equacao: 'V = \frac{F_{A0}\, X}{-r_A}'
+                destaque: true
+                nota: {pt: "Equação de projeto do CSTR. Vale para qualquer lei de velocidade, sempre com \\(-r_A\\) avaliada nas condições de saída."}
+          - titulo: {pt: "Lei de velocidade de 1ª ordem, densidade constante"}
+            blocos:
+              - texto: {pt: "Para reação de 1ª ordem, a velocidade de consumo é proporcional à concentração de A no tanque:"}
+              - equacao: '-r_A = k\, C_A'
+              - texto: {pt: "Com densidade constante, a concentração de saída segue a conversão:"}
+              - equacao: 'C_A = C_{A0}\,(1 - X)'
+          - titulo: {pt: "Passar para o tempo espacial"}
+            blocos:
+              - texto: {pt: "O tempo espacial é o volume dividido pela vazão volumétrica de entrada, e a vazão molar de entrada é a concentração vezes essa vazão:"}
+              - equacao: '\tau = \frac{V}{v_0} \qquad\qquad F_{A0} = C_{A0}\, v_0'
+              - texto: {pt: "Levando tudo à equação de projeto, a concentração de entrada se cancela:"}
+              - equacao: '\tau = \frac{V}{v_0} = \frac{C_{A0}\, X}{k\, C_{A0}\,(1 - X)} = \frac{X}{k\,(1 - X)}'
+          - titulo: {pt: "Isolar a conversão"}
+            blocos:
+              - texto: {pt: "É uma equação racional em \\(X\\). Eliminando o denominador e reunindo os termos em \\(X\\):"}
+              - equacao: 'X = \frac{\tau k}{1 + \tau k}'
+                destaque: true
+      - caixa: destaque
+        titulo: {pt: "O número de Damköhler"}
+        blocos:
+          - texto: {pt: "O produto \\(\\tau k\\) compara o tempo que o fluido passa no reator com o tempo característico da reação, \\(1/k\\). Para a reação de 1ª ordem, é o número de Damköhler:"}
+          - equacao: '\mathrm{Da} = \tau k \qquad\Longrightarrow\qquad X = \frac{\mathrm{Da}}{1 + \mathrm{Da}}'
+          - texto: {pt: "Com \\(\\mathrm{Da}\\) pequeno, quase nada reage. Com \\(\\mathrm{Da}\\) grande, a conversão se aproxima de 1, mas devagar: passar de 50 % para 90 % de conversão exige um \\(\\mathrm{Da}\\) nove vezes maior, de 1 para 9."}
 
   - titulo: {pt: "Onde se usa"}
-    texto:
-      pt: |
-        O CSTR é o reator típico de reações em fase líquida em produção contínua. A
-        agitação e a camisa (ou uma serpentina) facilitam o controle de temperatura, o
-        que pesa em reações muito exotérmicas: a alimentação é diluída na massa do tanque
-        e o calor sai por uma superfície de troca bem molhada.
-
-        O mesmo modelo descreve equipamentos de outras áreas. O quimiostato, de
-        fermentação contínua, é um CSTR. Tanques de aeração de lodo ativado, no
-        tratamento de efluentes, costumam ser modelados como de mistura completa.
-
-        Quando é preciso mais conversão do que um tanque dá, usam-se vários CSTRs em
-        série. Com muitos tanques, o conjunto se aproxima do reator tubular (PFR).
+    blocos:
+      - lista:
+          - {pt: "**Reações em fase líquida em produção contínua.** É o reator típico desse caso."}
+          - {pt: "**Reações muito exotérmicas.** A alimentação é diluída na massa do tanque, e a camisa ou a serpentina tira o calor por uma superfície bem molhada; a temperatura fica fácil de controlar."}
+          - {pt: "**Fermentação contínua.** O quimiostato é um CSTR."}
+          - {pt: "**Tratamento de efluentes.** Tanques de aeração de lodo ativado costumam ser modelados como de mistura completa."}
+      - texto: {pt: "Quando um tanque só não dá a conversão necessária, usam-se vários CSTRs em série. Com muitos tanques, o conjunto se aproxima do reator tubular (PFR)."}
 
   - titulo: {pt: "Vantagens e limitações"}
-    texto:
-      pt: |
-        **Vantagens.** Temperatura uniforme e fácil de controlar. Operação contínua, com
-        produto de qualidade constante. Equipamento simples de instrumentar, de limpar e
-        de inspecionar. A concentração baixa do reagente favorece a seletividade quando a
-        reação indesejada tem ordem maior no reagente do que a desejada.
-
-        **Limitações.** Toda a reação acontece na concentração de saída, a mais baixa.
-        Para reações de ordem positiva, isso significa velocidade menor e, para a mesma
-        conversão, volume maior do que o de um PFR. Conversões altas custam caro: pela
-        equação de 1ª ordem, \(X\) só chega a 1 com \(\tau\) infinito. Parte do fluido sai
-        logo depois de entrar, porque os tempos de residência se espalham; e o agitador
-        consome energia o tempo todo.
+    blocos:
+      - texto: {pt: "**Vantagens**"}
+      - lista:
+          - {pt: "Temperatura uniforme e fácil de controlar."}
+          - {pt: "Operação contínua, com produto de qualidade constante."}
+          - {pt: "Equipamento simples de instrumentar, de limpar e de inspecionar."}
+          - {pt: "A concentração baixa do reagente favorece a seletividade quando a reação indesejada tem ordem maior no reagente do que a desejada."}
+      - texto: {pt: "**Limitações**"}
+      - lista:
+          - {pt: "Toda a reação acontece na concentração de saída, a mais baixa do processo. Para reações de ordem positiva, a velocidade é menor e, para a mesma conversão, o volume é maior do que o de um PFR."}
+          - {pt: "Conversões altas custam caro: como mostra o número de Damköhler, cada ponto perto da conversão completa exige muito mais tempo espacial."}
+          - {pt: "Parte do fluido sai logo depois de entrar, porque os tempos de residência se espalham."}
+          - {pt: "O agitador consome energia o tempo todo."}
+      - caixa: atencao
+        titulo: {pt: "Erro comum"}
+        blocos:
+          - texto: {pt: "Usar a concentração de entrada na velocidade de reação do CSTR. No tanque, a concentração é a de saída; com a de entrada, o volume calculado sai pequeno demais."}
 
 equacoes: []
 
 exemplos:
-  - enunciado: {pt: "Reação de 1ª ordem, densidade constante: isole a conversão \\(X\\) em \\(\\tau = \\frac{X}{k(1 - X)}\\)."}
+  - enunciado: {pt: "Reação de 1ª ordem, densidade constante: isole a conversão \\(X\\)."}
     equacao: '\tau = \frac{X}{k(1 - X)}'
     simbolos:
       - {simbolo: '\tau', grandeza: tempo_espacial}
@@ -106,6 +134,18 @@ exemplos:
       - {simbolo: 'C_{A0}', grandeza: concentracao_molar}
     pede: X
     esperado: ['X = \frac{C_{A0} V k}{C_{A0} V k + F_{A0}}']
+  - enunciado: {pt: "Número de Damköhler para 90 % de conversão."}
+    equacao: '\frac{9}{10} = \frac{D}{1 + D}'
+    simbolos:
+      - {simbolo: D, grandeza: numero_adimensional}
+    pede: D
+    esperado: ['D = 9']
+  - enunciado: {pt: "Número de Damköhler para 50 % de conversão."}
+    equacao: '\frac{1}{2} = \frac{D}{1 + D}'
+    simbolos:
+      - {simbolo: D, grandeza: numero_adimensional}
+    pede: D
+    esperado: ['D = 1']
 
 animacao: null
 

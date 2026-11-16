@@ -299,7 +299,7 @@ def _data_valida(v: Any) -> bool:
 
 _COMUNS = {"id", "tipo", "versao", "estado", "area", "titulo", "referencias", "relacionadas",
            "animacao", "revisao"}
-_CONCEITO = _COMUNS | {"resumo", "secoes", "equacoes", "exemplos", "tipos", "grupo", "ordem"}
+_CONCEITO = _COMUNS | {"resumo", "secoes", "variaveis", "equacoes", "exemplos", "tipos", "grupo", "ordem"}
 _EQUACAO = _COMUNS | {"equacao", "variaveis", "hipoteses", "validade", "demonstracao", "exemplo"}
 
 
@@ -401,9 +401,13 @@ def _validar_referencias(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool, v
 
 
 def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> None:
+    from amsior.biblioteca.blocos import validar_blocos, verificar_texto_corrido
+
     d = f.dados
-    tem_resumo = v.multilingue(d, "resumo")
-    if pronta and not tem_resumo:
+    # o resumo é a resposta em poucas linhas, em caixa no topo: também é uma lista de blocos
+    if d.get("resumo") is not None:
+        validar_blocos(d["resumo"], "resumo", v.erro, b.raiz, profundidade=1)
+    elif pronta:
         v.erro("resumo", "obrigatório fora de rascunho")
     secoes = v.lista(d, "secoes")
     if pronta and not secoes:
@@ -413,15 +417,23 @@ def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> N
         if not isinstance(s, dict):
             v.erro(campo, "esperado um mapa")
             continue
-        v.chaves(s, {"titulo", "texto", "figura"}, campo)
-        sv = _Validador(f.arquivo, campo, v.saida)
-        sv.multilingue(s, "titulo", obrigatorio=True)
-        sv.multilingue(s, "texto", obrigatorio=True)
-        fig = s.get("figura")
-        if fig is not None and (not isinstance(fig, str) or not fig.endswith(".svg")):
-            v.erro(f"{campo}.figura", "caminho de um .svg da pasta de figuras")
-        elif fig is not None and b.raiz is not None and not (b.raiz / "figuras" / fig).is_file():
-            v.erro(f"{campo}.figura", f"figura ausente: figuras/{fig}")
+        v.chaves(s, {"titulo", "blocos"}, campo)
+        _Validador(f.arquivo, campo, v.saida).multilingue(s, "titulo", obrigatorio=True)
+        validar_blocos(s.get("blocos"), f"{campo}.blocos", v.erro, b.raiz)
+    # tabela de variáveis: símbolo e grandeza; nome e unidade vêm do glossário
+    for i, var in enumerate(v.lista(d, "variaveis")):
+        campo = f"variaveis[{i}]"
+        if not isinstance(var, dict) or not isinstance(var.get("simbolo"), str):
+            v.erro(campo, "esperado {simbolo, grandeza}")
+            continue
+        v.chaves(var, {"simbolo", "grandeza", "nome", "nota"}, campo)
+        if b.glossario is not None and var.get("grandeza") not in b.glossario:
+            v.erro(f"{campo}.grandeza", f"grandeza fora do glossário: {var.get('grandeza')}")
+        for chave in ("nome", "nota"):
+            if chave in var:
+                _Validador(f.arquivo, campo, v.saida).multilingue(var, chave, obrigatorio=True)
+                if isinstance(var[chave], dict) and isinstance(var[chave].get("pt"), str):
+                    verificar_texto_corrido(var[chave]["pt"], f"{campo}.{chave}", v.erro)
     for i, e in enumerate(v.lista(d, "equacoes")):
         _ligacao(b, f, v, f"equacoes[{i}]", e, "equacao")
     for i, ex in enumerate(v.lista(d, "exemplos")):
@@ -432,6 +444,8 @@ def _validar_conceito(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool) -> N
         v.chaves(ex, {"enunciado", "usa", "equacao", "simbolos", "dados", "pede", "esperado",
                       "passos", "tolerancia_rel"}, campo)
         _Validador(f.arquivo, campo, v.saida).multilingue(ex, "enunciado", obrigatorio=True)
+        if isinstance(ex.get("enunciado"), dict) and isinstance(ex["enunciado"].get("pt"), str):
+            verificar_texto_corrido(ex["enunciado"]["pt"], f"{campo}.enunciado", v.erro)
         # a conta vem de uma ficha de equação (usa) ou é uma equação escrita na própria ficha
         if ("usa" in ex) == ("equacao" in ex):
             v.erro(campo, "exatamente um de usa (ficha de equação) ou equacao (LaTeX)")
