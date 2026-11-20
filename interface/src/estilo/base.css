@@ -363,45 +363,52 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .opcao-dica { color: var(--cor-texto-2); font-size: var(--tam-pequeno); line-height: var(--entrelinha-texto); }
 
 /* ------------------------------------------------------------ ficha de conceito (3.5, 8.6) */
+/* Tamanhos em em, a partir de --tam-ficha: a ficha inteira escala junto com a tela e com o
+   tamanho de letra escolhido nas preferências. */
 
-.ficha { align-items: center; }
-.ficha-barra { width: 100%; max-width: calc(var(--medida-texto) + 12em); display: flex; }
+.ficha { align-items: center; font-size: var(--tam-ficha); padding-top: 0; gap: var(--esp-4); }
+/* barra fixa no topo ao rolar: ocupa a largura toda da área central, com o botão
+   alinhado à margem esquerda da ficha */
+.ficha-barra {
+  position: sticky; top: 0; z-index: 2; flex: 0 0 auto; align-self: stretch; display: flex;
+  margin: 0 calc(-1 * var(--esp-6)); padding: var(--esp-3) max(var(--esp-6), calc((100% - var(--largura-ficha)) / 2));
+  background: var(--cor-fundo); border-bottom: 1px solid var(--cor-linha-suave);
+}
+.ficha-barra .botao-simbolo { font-size: var(--tam-base); }
 .ficha-papel {
-  width: 100%; max-width: calc(var(--medida-texto) + 12em); background: var(--cor-superficie);
-  border: 1px solid var(--cor-linha); border-radius: var(--raio); padding: 0 var(--esp-6) var(--esp-6);
-  font-size: var(--tam-texto); line-height: var(--entrelinha-texto); overflow: hidden;
+  flex: 0 0 auto; /* cresce com o conteúdo e a folha rola; nunca espremer na altura da tela */
+  width: 100%; max-width: var(--largura-ficha); background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha); border-radius: var(--raio); padding: 0 2em 2em;
+  line-height: var(--entrelinha-texto); overflow: hidden; margin-bottom: var(--esp-6);
 }
-.ficha-cabeca {
-  margin: 0 calc(-1 * var(--esp-6)) var(--esp-5); padding: var(--esp-4) var(--esp-6);
-  background: var(--cor-acento); color: var(--cor-sobre-acento);
-}
-.ficha-cabeca-topo { display: flex; justify-content: space-between; align-items: center; font-size: var(--tam-pequeno); }
-.ficha-cabeca .selo { background: var(--cor-superficie); }
-.ficha-cabeca h1 { margin: var(--esp-1) 0 0; font-size: calc(var(--tam-titulo) * 1.5); font-weight: 600; line-height: 1.25; }
+.ficha-cabeca { margin: 0 -2em 1.5em; padding: 1.1em 2em 1em; background: var(--cor-acento); color: var(--cor-sobre-acento); }
+.ficha-cabeca-topo { display: flex; justify-content: space-between; align-items: center; font-size: 0.85em; }
+.ficha-cabeca .selo { background: var(--cor-superficie); font-size: 0.95em; }
+.ficha-cabeca h1 { margin: 0.25em 0 0; font-size: 1.65em; font-weight: 600; line-height: 1.25; }
 .ficha-secao-titulo {
-  display: flex; align-items: center; gap: var(--esp-3); margin: var(--esp-6) 0 var(--esp-3); padding-bottom: var(--esp-2);
-  font-size: calc(var(--tam-titulo) * 1.1); font-weight: 600; border-bottom: 2px solid var(--cor-acento);
+  display: flex; align-items: center; gap: 0.6em; margin: 2em 0 0.8em; padding-bottom: 0.4em;
+  font-size: 1.2em; font-weight: 600; border-bottom: 2px solid var(--cor-acento);
 }
 .ficha-secao-num {
-  display: inline-grid; place-items: center; min-width: 1.7em; height: 1.7em; border-radius: var(--raio-selo);
-  background: var(--cor-acento); color: var(--cor-sobre-acento); font-size: var(--tam-pequeno);
+  display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em; border-radius: var(--raio-selo);
+  background: var(--cor-acento); color: var(--cor-sobre-acento); font-size: 0.75em;
 }
-.ficha-texto { margin: var(--esp-3) 0; max-width: var(--medida-texto); }
-.ficha-eq { display: flex; align-items: center; gap: var(--esp-3); margin: var(--esp-4) 0; }
-.ficha-eq-corpo { flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; text-align: center; font-size: var(--tam-mat); }
-.ficha-eq-destaque .ficha-eq-corpo { flex: 0 1 auto; margin: 0 auto; padding: var(--esp-2) var(--esp-5);
+.ficha-texto { margin: 0.75em 0; }
+.ficha-eq { display: flex; align-items: center; gap: 0.75em; margin: 1em 0; }
+.ficha-eq-corpo { flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; text-align: center; font-size: 1.3em; }
+.ficha-eq-destaque .ficha-eq-corpo { flex: 0 1 auto; margin: 0 auto; padding: 0.35em 1em;
   border: 1.5px solid var(--cor-texto); border-radius: var(--raio-selo); }
-.ficha-eq-num { flex: 0 0 auto; min-width: 2.5em; text-align: right; color: var(--cor-texto-2); font-size: var(--tam-pequeno); }
-.ficha-eq-nota { margin: calc(-1 * var(--esp-2)) auto var(--esp-3); text-align: center; color: var(--cor-texto-2); font-size: var(--tam-pequeno); max-width: var(--medida-texto); }
-.ficha-onde { margin: 0 0 var(--esp-4); font-size: var(--tam-base); }
+.ficha-eq-num { flex: 0 0 auto; min-width: 2.5em; text-align: right; color: var(--cor-texto-2); font-size: 0.85em; }
+.ficha-eq-nota { margin: -0.4em auto 0.9em; text-align: center; color: var(--cor-texto-2); font-size: 0.88em; }
+.ficha-onde { margin: 0 0 1em; font-size: 0.95em; }
 .ficha-onde .rotulo { font-weight: 600; }
-.ficha-onde ul { margin: var(--esp-1) 0 0; padding-left: var(--esp-5); }
-.ficha-onde li { margin: var(--esp-1) 0; }
-.ficha-lista { margin: var(--esp-3) 0; padding-left: var(--esp-5); max-width: var(--medida-texto); }
-.ficha-lista li { margin: var(--esp-2) 0; }
-.ficha-caixa { margin: var(--esp-5) 0; border: 1px solid var(--cor-linha); border-radius: var(--raio); overflow: hidden; }
-.ficha-caixa-titulo { padding: var(--esp-2) var(--esp-4); font-weight: 600; font-size: var(--tam-base); }
-.ficha-caixa-corpo { padding: var(--esp-1) var(--esp-4); }
+.ficha-onde ul { margin: 0.25em 0 0; padding-left: 1.4em; }
+.ficha-onde li { margin: 0.25em 0; }
+.ficha-lista { margin: 0.75em 0; padding-left: 1.4em; }
+.ficha-lista li { margin: 0.45em 0; }
+.ficha-caixa { margin: 1.4em 0; border: 1px solid var(--cor-linha); border-radius: var(--raio); overflow: hidden; }
+.ficha-caixa-titulo { padding: 0.5em 1em; font-weight: 600; font-size: 0.95em; }
+.ficha-caixa-corpo { padding: 0.15em 1em; }
 .ficha-caixa-resumo { border-color: var(--cor-acento); }
 .ficha-caixa-resumo .ficha-caixa-titulo { background: var(--cor-acento); color: var(--cor-sobre-acento); }
 .ficha-caixa-resumo .ficha-caixa-corpo { background: var(--cor-acento-suave); }
@@ -410,21 +417,23 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .ficha-caixa-atencao, .ficha-caixa-hipoteses { border-color: var(--cor-aviso); }
 .ficha-caixa-atencao .ficha-caixa-titulo, .ficha-caixa-hipoteses .ficha-caixa-titulo { background: var(--cor-aviso); color: var(--cor-superficie); }
 .ficha-caixa-atencao .ficha-caixa-corpo, .ficha-caixa-hipoteses .ficha-caixa-corpo { background: var(--cor-aviso-suave); }
-.ficha-passos { list-style: none; margin: var(--esp-4) 0; padding: 0; display: flex; flex-direction: column; gap: var(--esp-3); }
+.ficha-passos { list-style: none; margin: 1em 0; padding: 0; display: flex; flex-direction: column; gap: 0.75em; }
 .ficha-passo { border: 1px solid var(--cor-linha); border-radius: var(--raio); overflow: hidden; }
-.ficha-passo-titulo { padding: var(--esp-2) var(--esp-4); font-weight: 600; color: var(--cor-acento-texto);
+.ficha-passo-titulo { padding: 0.5em 1em; font-weight: 600; color: var(--cor-acento-texto);
   background: var(--cor-acento-suave); border-bottom: 1px solid var(--cor-linha); }
-.ficha-passo-corpo { padding: 0 var(--esp-4); }
-.ficha-tabela { margin: var(--esp-3) 0; }
+.ficha-passo-corpo { padding: 0 1em; }
+.ficha-tabela { margin: 0.75em 0; font-size: 0.92em; }
 .ficha-simbolo { text-align: center; }
-.ficha-figura { margin: var(--esp-4) auto; max-width: 30em; color: var(--cor-texto); }
+.ficha-figura { margin: 1em auto; max-width: 30em; color: var(--cor-texto); }
 .ficha-figura-svg svg { display: block; width: 100%; height: auto; }
-.ficha-figura figcaption { margin-top: var(--esp-2); text-align: center; color: var(--cor-texto-2); font-size: var(--tam-pequeno); }
-.ficha-exemplos { list-style: decimal; padding-left: var(--esp-5); display: flex; flex-direction: column; gap: var(--esp-3); }
-.ficha-exemplo { padding: var(--esp-2) 0; border-bottom: 1px solid var(--cor-linha-suave); }
-.ficha-exemplo-texto { margin-bottom: var(--esp-1); }
-.ficha-exemplo-eq { display: block; margin: var(--esp-2) 0; font-size: var(--tam-mat); overflow-x: auto; }
-.ficha-relacionadas { padding-left: var(--esp-5); }
+.ficha-figura figcaption { margin-top: 0.5em; text-align: center; color: var(--cor-texto-2); font-size: 0.88em; }
+.ficha-exemplos { list-style: decimal; padding-left: 1.4em; display: flex; flex-direction: column; gap: 0.75em; }
+.ficha-exemplo { padding: 0.5em 0; border-bottom: 1px solid var(--cor-linha-suave); }
+.ficha-exemplo-texto { margin-bottom: 0.25em; }
+.ficha-exemplo-eq { display: block; margin: 0.5em 0; font-size: 1.2em; overflow-x: auto; }
+.ficha-exemplo .botao-simbolo { font-size: var(--tam-base); }
+.ficha-relacionadas { padding-left: 1.4em; }
+.ficha .nota { font-size: 0.88em; }
 .ficha-link { border: 0; padding: 0; background: transparent; color: var(--cor-acento-texto); text-decoration: underline; cursor: pointer; font: inherit; }
 .adendo-tipo .ficha-link { margin-left: var(--esp-2); font-size: var(--tam-pequeno); }
 .ficha-referencias li { margin: var(--esp-2) 0; }

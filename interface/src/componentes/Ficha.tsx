@@ -4,7 +4,7 @@
 // destaque, atenção e hipóteses. Abre no centro, no lugar da folha. Os exemplos
 // abrem na folha, onde o motor refaz a conta com os passos verificados.
 
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import type { Bloco, FichaApi, ReferenciaFicha, TextoML } from "../api";
 import { useEstado } from "../estado";
@@ -161,6 +161,9 @@ export function Ficha({ id }: { id: string }) {
   const abrir = useEstado((s) => s.abrirFicha);
   const carregar = useEstado((s) => s.carregarExemplo);
   const nums = useMemo(() => (f ? numerarEquacoes(f) : new Map<Bloco, number>()), [f]);
+  // outra ficha aberta (pelo painel ou por "Veja também"): volta ao topo
+  const rolagem = useRef<HTMLElement>(null);
+  useEffect(() => { rolagem.current?.scrollTo?.({ top: 0 }); }, [id]);
   if (!f) return null;
 
   // numeração das seções na ordem em que aparecem (chamada aqui, não num componente filho)
@@ -170,7 +173,7 @@ export function Ficha({ id }: { id: string }) {
   );
 
   return (
-    <article className="folha ficha" aria-labelledby="ficha-titulo">
+    <article ref={rolagem} className="folha ficha" aria-labelledby="ficha-titulo">
       <div className="ficha-barra">
         <button type="button" className="botao-simbolo" onClick={() => abrir(null)}>
           <IconeFechar /> {t("ui.ficha.voltar")}

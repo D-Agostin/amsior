@@ -25,6 +25,9 @@
   --entrelinha: 1.45;
   --entrelinha-texto: 1.6;
   --medida-texto: 70ch;
+  /* fichas: leitura longa; a letra acompanha a largura da tela (15 px num notebook, 18 px numa tela grande) */
+  --tam-ficha: clamp(15px, 0.35vw + 10px, 18px);
+  --largura-ficha: 50em;
 
   --esp-1: 4px;
   --esp-2: 8px;
@@ -64,6 +67,8 @@
   --entrelinha: 1.55;
   --entrelinha-texto: 1.65;
   --medida-texto: 66ch;
+  --tam-ficha: clamp(17px, 0.35vw + 12px, 20px);
+  --largura-ficha: 48em;
 
   --altura-barra: 54px;
   --altura-controle: 38px;

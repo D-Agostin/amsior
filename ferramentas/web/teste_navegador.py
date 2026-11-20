@@ -41,7 +41,14 @@ def biblioteca(pg: Page) -> dict[str, Any]:
     pg.get_by_role("button", name="Biblioteca", exact=True).click()
     pg.locator(".arvore-item", has_text="Equação racional").click()
     pg.wait_for_selector(".ficha-papel", timeout=30_000)
+    # a ficha é mais alta que a tela: a área central tem de rolar até as referências
+    rola = pg.locator("article.ficha").evaluate(
+        "e => { const antes = e.scrollHeight > e.clientHeight + 200; e.scrollTo(0, e.scrollHeight);"
+        " const ref = e.querySelector('.ficha-referencias').getBoundingClientRect();"
+        " const caixa = e.getBoundingClientRect(); e.scrollTo(0, 0);"
+        " return antes && ref.top < caixa.bottom; }")
     r: dict[str, Any] = {
+        "rola_ate_o_fim": rola,
         "equacoes": pg.locator(".ficha-eq-num").count(),
         "passos_da_deducao": pg.locator(".ficha-passo").count(),
         "caixas": pg.locator(".ficha-caixa").count(),
@@ -106,7 +113,7 @@ def main(url: str) -> dict[str, Any]:
                   for r in (rel["com_internet"], rel["sem_internet"]))
           and rel["biblioteca"]["equacoes"] >= 10 and rel["biblioteca"]["caixas"] >= 3
           and 0 < rel["biblioteca"]["exemplo_passos"] == rel["biblioteca"]["exemplo_certificados"]
-          and rel["biblioteca"]["volta_pela_etiqueta"])
+          and rel["biblioteca"]["volta_pela_etiqueta"] and rel["biblioteca"]["rola_ate_o_fim"])
     rel["ok"] = ok
     return rel
 
