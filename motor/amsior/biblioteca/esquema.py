@@ -300,7 +300,8 @@ def _data_valida(v: Any) -> bool:
 _COMUNS = {"id", "tipo", "versao", "estado", "area", "titulo", "referencias", "relacionadas",
            "animacao", "revisao"}
 _CONCEITO = _COMUNS | {"resumo", "secoes", "variaveis", "equacoes", "exemplos", "tipos", "grupo", "ordem"}
-_EQUACAO = _COMUNS | {"equacao", "variaveis", "hipoteses", "validade", "demonstracao", "exemplo"}
+_EQUACAO = _COMUNS | {"equacao", "variaveis", "hipoteses", "validade", "demonstracao", "exemplo",
+                      "resumo", "secoes", "nao_isolaveis", "grupo", "ordem"}
 
 
 def validar(b: Biblioteca) -> list[Problema]:
@@ -508,7 +509,8 @@ def _validar_equacao(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool, verif
         if not isinstance(var, dict):
             v.erro(campo, "esperado um mapa")
             continue
-        v.chaves(var, {"simbolo", "grandeza", "unidade_si", "faixa", "constante", "nome"}, campo)
+        v.chaves(var, {"simbolo", "grandeza", "unidade_si", "faixa", "constante", "nome", "nota",
+                       "funcao_de"}, campo)
         if not isinstance(var.get("simbolo"), str) or not var["simbolo"].strip():
             v.erro(f"{campo}.simbolo", "obrigatório")
         g = str(var.get("grandeza"))
@@ -519,17 +521,80 @@ def _validar_equacao(b: Biblioteca, f: Ficha, v: _Validador, pronta: bool, verif
             v.erro(f"{campo}.unidade_si", f"o glossário dá {b.glossario[g].unidade_si} para {g}")
     if isinstance(latex, str) and latex.strip() and variaveis:
         _conferir_equacao(b, v, latex, variaveis)
+    from amsior.biblioteca.blocos import validar_blocos, verificar_texto_corrido
+
+    # texto da ficha de equação: mesmo formato de blocos das fichas de conceito (seção 8.6)
+    if d.get("resumo") is not None:
+        validar_blocos(d["resumo"], "resumo", v.erro, b.raiz, profundidade=1)
+    for i, sec in enumerate(v.lista(d, "secoes")):
+        campo = f"secoes[{i}]"
+        if not isinstance(sec, dict):
+            v.erro(campo, "esperado um mapa")
+            continue
+        v.chaves(sec, {"titulo", "blocos"}, campo)
+        _Validador(f.arquivo, campo, v.saida).multilingue(sec, "titulo", obrigatorio=True)
+        validar_blocos(sec.get("blocos"), f"{campo}.blocos", v.erro, b.raiz)
+    for i, nome in enumerate(v.lista(d, "nao_isolaveis")):
+        if not isinstance(nome, str):
+            v.erro(f"nao_isolaveis[{i}]", "símbolo em LaTeX")
     dem = d.get("demonstracao")
     if isinstance(dem, dict):
-        v.chaves(dem, {"parte_de", "passos"}, "demonstracao")
+        v.chaves(dem, {"parte_de", "inicio", "simbolos", "passos"}, "demonstracao")
         for i, p in enumerate(v.lista(dem, "parte_de")):
             _ligacao(b, f, v, f"demonstracao.parte_de[{i}]", p, None)
+        ini = dem.get("inicio")
+        if not isinstance(ini, dict) or not isinstance(ini.get("equacao"), str):
+            v.erro("demonstracao.inicio", "esperado {equacao, texto, tipo}")
+        else:
+            v.chaves(ini, {"equacao", "texto", "tipo", "titulo"}, "demonstracao.inicio")
+            if ini.get("tipo", "principio") not in ("principio", "aproximacao"):
+                v.erro("demonstracao.inicio.tipo", "a partida é um princípio ou uma aproximação")
+            if isinstance(ini.get("texto"), dict) and isinstance(ini["texto"].get("pt"), str):
+                verificar_texto_corrido(ini["texto"]["pt"], "demonstracao.inicio.texto", v.erro)
+        for i, sim in enumerate(v.lista(dem, "simbolos")):
+            c = f"demonstracao.simbolos[{i}]"
+            if not isinstance(sim, dict) or not isinstance(sim.get("simbolo"), str):
+                v.erro(c, "esperado {simbolo, grandeza, funcao_de?}")
+                continue
+            v.chaves(sim, {"simbolo", "grandeza", "funcao_de", "nome", "constante"}, c)
+            if b.glossario is not None and sim.get("grandeza") not in b.glossario:
+                v.erro(f"{c}.grandeza", f"grandeza fora do glossário: {sim.get('grandeza')}")
+        passos = v.lista(dem, "passos")
+        if pronta and not passos:
+            v.erro("demonstracao.passos", "pelo menos um passo")
+        from amsior.biblioteca.equacoes import TIPOS_DE_PASSO
+        from amsior.verify.operacoes import OPERACOES
+
+        for i, p in enumerate(passos):
+            c = f"demonstracao.passos[{i}]"
+            if not isinstance(p, dict):
+                v.erro(c, "esperado um mapa")
+                continue
+            v.chaves(p, {"titulo", "texto", "tipo", "usa", "operacao", "relacao", "condicoes",
+                         "depois"}, c)
+            if not isinstance(p.get("depois"), str):
+                v.erro(f"{c}.depois", "LaTeX da equação depois do passo")
+            if p.get("tipo", "algebra") not in TIPOS_DE_PASSO:
+                v.erro(f"{c}.tipo", f"fora de {list(TIPOS_DE_PASSO)}")
+            if p.get("relacao", "equivalente") not in ("equivalente", "implica"):
+                v.erro(f"{c}.relacao", "equivalente ou implica")
+            op = p.get("operacao")
+            if not isinstance(op, dict) or op.get("nome") not in OPERACOES:
+                v.erro(f"{c}.operacao", "esperado {nome: <operação do verificador>, ...}")
+            else:
+                v.chaves(op, {"nome", "argumento", "lado", "simbolo", "origem", "identidade",
+                              "limites"}, f"{c}.operacao")
+            for k in ("titulo", "texto"):
+                if p.get(k) is not None:
+                    _Validador(f.arquivo, c, v.saida).multilingue(p, k, obrigatorio=True)
+                    if isinstance(p[k], dict) and isinstance(p[k].get("pt"), str):
+                        verificar_texto_corrido(p[k]["pt"], f"{c}.{k}", v.erro)
     elif dem is not None:
         v.erro("demonstracao", "esperado um mapa")
     ex = d.get("exemplo")
     if isinstance(ex, dict):
-        v.chaves(ex, {"dados", "origem_dos_dados", "pede", "esperado", "tolerancia_rel",
-                      "comparacao_independente"}, "exemplo")
+        v.chaves(ex, {"enunciado", "dados", "funcoes", "origem_dos_dados", "pede", "unidade",
+                      "esperado", "tolerancia_rel", "comparacao_independente"}, "exemplo")
         if pronta and not isinstance(ex.get("pede"), str):
             v.erro("exemplo.pede", "símbolo pedido")
         if verificada and ex.get("esperado") is None:

@@ -1,0 +1,3 @@
+# Amsior — fonte independente para conferir os exemplos das fichas (seção 8.4, V6).
+# Só nos testes: o CoolProp (licença MIT) não vai para o site nem para o motor.
+CoolProp==8.0.0

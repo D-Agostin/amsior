@@ -98,6 +98,49 @@ export interface ReferenciaFicha {
   conferido: boolean;
 }
 
+export interface HipoteseFicha { id: string; enunciado: TextoML }
+
+/** Passo da demonstração já verificado na montagem do site (seção 8.4). */
+export interface PassoDemonstracao {
+  titulo: TextoML | null;
+  texto: TextoML | null;
+  tipo: string;
+  relacao: "equivalente" | "implica" | string;
+  depois: string;
+  condicoes: string[];
+  usa: HipoteseFicha | null;
+  usa_ficha: string | null;
+  estado: "aprovado" | "pendente" | "reprovado";
+  metodo: string;
+}
+
+export interface ExemploEquacao {
+  enunciado: TextoML;
+  dados: { simbolo: string; valor: string }[];
+  funcoes: { simbolo: string; de: string[]; expressao: string }[];
+  origem_dos_dados: TextoML | null;
+  pede: string;
+  resultado: string;
+  valor: number;
+  unidade: string;
+  comparacao: { fonte: string; valor: number; desvio_rel: number } | null;
+}
+
+export interface EquacaoDaFicha {
+  latex: string;
+  simbolos: { id: string; grandeza: string; papel: string }[];
+  hipoteses: HipoteseFicha[];
+  validade: TextoML | null;
+  /** variáveis que o motor isola com passos verificados */
+  isolaveis: string[];
+  nao_isolaveis: string[];
+  demonstracao: {
+    inicio: { tipo: string; titulo?: TextoML; texto?: TextoML; equacao: string };
+    passos: PassoDemonstracao[];
+  } | null;
+  exemplo: ExemploEquacao | null;
+}
+
 export interface FichaApi {
   id: string;
   area: string;
@@ -112,6 +155,9 @@ export interface FichaApi {
   exemplos: ExemploFicha[];
   referencias: ReferenciaFicha[];
   relacionadas: string[];
+  tipo?: "conceito" | "equacao";
+  /** só nas fichas de equação */
+  equacao?: EquacaoDaFicha | null;
 }
 
 export interface BibliotecaApi {

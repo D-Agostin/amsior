@@ -48,7 +48,9 @@ from amsior.verify.modelo import (
     RELACOES, Certificado, Condicao, Contexto, EstadoCert, MetodoCert, Motivo, Operacao, Passo,
     Relacao,
 )
-from amsior.verify.operacoes import OPERACOES, OPERACOES_DE_CALCULO, EfeitoOperacao, Exigencia
+from amsior.verify.operacoes import (
+    OPERACOES, OPERACOES_DE_CALCULO, EfeitoOperacao, Exigencia, integrar_definido,
+)
 
 provavel = por_suposicao  # nome antigo, mantido para quem importa do pacote
 _DESIGUALDADES = (Ne, Gt, Ge, Lt, Le)
@@ -180,8 +182,29 @@ class Verificador:
                 "simbolo": sid, "expressao": para_latex(op.argumento),
                 "origem": f"origem.{op.origem or 'hipotese'}"}))
 
-        if op.nome in ("reescrever", "substituir") or R is None:
+        # nomear: P(T₂) passa a se chamar P₂ em toda parte; vale por definição, exibida
+        if op.nome == "nomear":
+            assert op.argumento is not None
+            if op.simbolo is None or op.simbolo.id in livres(passo.antes):
+                st.falha("verif.substituicao_incompleta")
+                return self._fechar(passo, st, (), "nao_executado", "nao_executado")
+            if not any(n == op.argumento for n in percorrer(passo.antes)):
+                st.falha("verif.nome_sem_alvo", expressao=para_latex(op.argumento))
+                return self._fechar(passo, st, (), "nao_executado", "nao_executado")
+            L = trocar_subarvore(L, op.argumento, op.simbolo)
+            R = trocar_subarvore(R, op.argumento, op.simbolo) if R is not None else None
+            st.hipotese(Motivo("hipotese.substituicao", {
+                "simbolo": op.simbolo.id, "expressao": para_latex(op.argumento),
+                "origem": "origem.definicao"}))
+
+        if op.nome in ("reescrever", "substituir", "nomear") or R is None:
             ef = EfeitoOperacao(L, R if R is not None else L)
+        elif op.nome == "integrar_definido_ambos":
+            ef = integrar_definido(L, R, op.argumento, op.limites)
+            if ef.erro:
+                st.falha(ef.erro, operacao=op.nome,
+                         argumento="" if op.argumento is None else para_latex(op.argumento))
+                return self._fechar(passo, st, (), "nao_executado", "nao_executado")
         else:
             ef = funcao(L, R, op.argumento)
             if ef.erro:

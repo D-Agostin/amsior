@@ -42,9 +42,10 @@ class ParaSympy:
         return self._cache[id_]
 
     def valor_simbolo(self, id_: str) -> Any:
-        """Símbolo, ou função aplicada se o símbolo declara dependências."""
+        """Símbolo, ou função aplicada se o símbolo declara dependências (``P`` vira ``P(T)``;
+        com papel de função, ``P(T_2)`` vira ``Func`` e as duas formas usam o mesmo nome)."""
         s = self.tabela.obter(id_)
-        if s is not None and s.depende_de and s.papel != "funcao":
+        if s is not None and s.depende_de:
             f = sp.Function(id_, **suposicoes_sympy(s.suposicoes))
             return f(*[self.simbolo(d) for d in s.depende_de])
         return self.simbolo(id_)
@@ -162,7 +163,7 @@ def de_sympy(x: Any, tabela: TabelaDeSimbolos | None = None) -> Expr:  # noqa: C
     if isinstance(x, AppliedUndef):
         nome = type(x).__name__
         s = tab.obter(nome)
-        if s is not None and s.depende_de and s.papel != "funcao":
+        if s is not None and s.depende_de:
             return Sym(nome)
         return Func(nome, tuple(d(a) for a in x.args))
     if x.is_Add:

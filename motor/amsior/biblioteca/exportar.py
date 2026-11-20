@@ -55,6 +55,80 @@ def _ficha(b: Biblioteca, f: Ficha, visiveis: dict[str, Ficha]) -> dict[str, Any
         "exemplos": [_exemplo(e) for e in d.get("exemplos") or () if "equacao" in e],
         "referencias": [_referencia(b, r) for r in d.get("referencias") or ()],
         "relacionadas": [r for r in d.get("relacionadas") or () if r in visiveis],
+        "tipo": f.tipo,
+        "equacao": _equacao(b, f) if f.tipo == "equacao" else None,
+    }
+
+
+def _equacao(b: Biblioteca, f: Ficha) -> dict[str, Any]:
+    """Ficha de equação já verificada: passos com o certificado de cada um, o que o motor
+    isola com passos e o exemplo com o valor calculado na montagem (seção 8.4)."""
+    import importlib.util
+
+    from amsior.biblioteca.equacoes import (
+        _simbolos_para_api,
+        tabela_da_ficha,
+        verificar_ficha_equacao,
+    )
+
+    referencia = importlib.util.find_spec("CoolProp") is not None
+    r = verificar_ficha_equacao(b, f, referencia=referencia)
+    if r.problemas:
+        raise ValueError(f"ficha {f.id} não passa na verificação: "
+                         + "; ".join(map(str, r.problemas[:5])))
+    d = f.dados
+    tab = tabela_da_ficha(b, f)
+    dem = d.get("demonstracao")
+    return {
+        "latex": d["equacao"],
+        "simbolos": _simbolos_para_api(d["equacao"], tab),
+        "hipoteses": [{"id": h, "enunciado": b.hipoteses[h].enunciado}
+                      for h in d.get("hipoteses") or ()],
+        "validade": (d.get("validade") or {}).get("texto"),
+        "isolaveis": [s for s, e in r.corpus.items() if e == "com_passos"],
+        "nao_isolaveis": [s for s, e in r.corpus.items() if e == "nao_isolavel"],
+        "demonstracao": None if not dem else {
+            "inicio": dem["inicio"],
+            # a equação de cada passo vai como o autor escreveu (\,\mathrm{d}T e afins)
+            "passos": [_passo(b, p, str(escrito["depois"]))
+                       for p, escrito in zip(r.passos, dem.get("passos") or (), strict=True)],
+        },
+        "exemplo": _exemplo_de_equacao(b, d.get("exemplo"), r.exemplo,
+                                       {s.id: s.depende_de for s in tab if s.depende_de}),
+    }
+
+
+def _passo(b: Biblioteca, p: Any, depois: str) -> dict[str, Any]:
+    cert = p.certificado
+    usa = p.usa if isinstance(p.usa, str) else None
+    hip = b.hipoteses.get(usa.removeprefix("hipotese.")) if usa and usa.startswith("hipotese.") else None
+    return {
+        "titulo": p.titulo, "texto": p.texto, "tipo": p.tipo, "relacao": p.relacao,
+        "depois": depois, "condicoes": p.condicoes,
+        "usa": None if hip is None else {"id": hip.id, "enunciado": hip.enunciado},
+        "usa_ficha": usa if usa and not usa.startswith("hipotese.") and usa != "definicao" else None,
+        "estado": cert["estado"], "metodo": cert["metodo"],
+    }
+
+
+def _exemplo_de_equacao(b: Biblioteca, ex: dict[str, Any] | None, res: dict[str, Any] | None,
+                        dependencias: dict[str, tuple[str, ...]]) -> dict[str, Any] | None:
+    if not ex or not res:
+        return None
+    comp = ex.get("comparacao_independente") or {}
+    fonte = b.fontes.get(str(comp.get("fonte"))) if comp else None
+    return {
+        "enunciado": ex["enunciado"],
+        "dados": [{"simbolo": k, "valor": str(v)} for k, v in (ex.get("dados") or {}).items()],
+        "funcoes": [{"simbolo": k, "de": list(dependencias.get(k, ())), "expressao": str(v)}
+                    for k, v in (ex.get("funcoes") or {}).items()],
+        "origem_dos_dados": ex.get("origem_dos_dados"),
+        "pede": res["pede"],
+        "resultado": res["resultado"],
+        "valor": res["valor"],
+        "unidade": res["unidade"],
+        "comparacao": None if "referencia" not in res or fonte is None else {
+            "fonte": fonte.titulo, "valor": res["referencia"], "desvio_rel": res["desvio_rel"]},
     }
 
 

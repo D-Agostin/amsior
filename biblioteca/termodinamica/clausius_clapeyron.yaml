@@ -1,0 +1,145 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de equação (Termodinâmica). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo (seção 8.7 da especificação).
+
+id: termodinamica.clausius_clapeyron
+versao: 1
+estado: auto_verificada
+area: termodinamica
+ordem: 5
+titulo: {pt: "Equação de Clausius-Clapeyron (forma integrada)"}
+equacao: '\ln\frac{P_{2}}{P_{1}} = -\frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{2}} - \frac{1}{T_{1}}\right)'
+
+variaveis:
+  - {simbolo: 'P_{1}', grandeza: pressao_saturacao, nome: {pt: "pressão de vapor na temperatura \\(T_{1}\\)"}}
+  - {simbolo: 'P_{2}', grandeza: pressao_saturacao, nome: {pt: "pressão de vapor na temperatura \\(T_{2}\\)"}}
+  - {simbolo: '\Delta H_{\mathrm{vap}}', grandeza: entalpia_vaporizacao_molar, nome: {pt: "entalpia molar de vaporização"}}
+  - {simbolo: R, grandeza: constante_gases, constante: true, nome: {pt: "constante dos gases"}}
+  - {simbolo: 'T_{1}', grandeza: temperatura_absoluta, nome: {pt: "temperatura do ponto conhecido"}}
+  - {simbolo: 'T_{2}', grandeza: temperatura_absoluta, nome: {pt: "temperatura do ponto procurado"}}
+
+hipoteses: [substancia_pura, equilibrio_liquido_vapor, vapor_gas_ideal, volume_liquido_desprezivel, dhvap_constante]
+
+validade:
+  texto: {pt: "Substância pura, longe do ponto crítico (onde o volume do líquido deixa de ser desprezível e o vapor deixa de ser ideal), num intervalo de temperatura curto o bastante para a entalpia de vaporização ficar praticamente constante. Para intervalos largos, prefira uma correlação ajustada, como a de Antoine."}
+  limites: []
+
+resumo:
+  - texto: {pt: "Conhecida a pressão de vapor numa temperatura, a equação estima a pressão de vapor em outra temperatura próxima, a partir só da entalpia de vaporização:"}
+  - equacao: '\ln\frac{P_{2}}{P_{1}} = -\frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{2}} - \frac{1}{T_{1}}\right)'
+    destaque: true
+  - texto: {pt: "Num gráfico de \\(\\ln P\\) contra \\(1/T\\), a equação é uma reta de inclinação \\(-\\Delta H_{\\mathrm{vap}}/R\\). É assim que se mede a entalpia de vaporização a partir de pressões de vapor."}
+
+secoes:
+  - titulo: {pt: "De onde vem"}
+    blocos:
+      - texto: {pt: "No equilíbrio líquido-vapor de uma substância pura, a pressão de vapor depende só da temperatura. A equação de Clapeyron, exata, dá a inclinação dessa curva:"}
+      - equacao: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{T \Delta V_{\mathrm{vap}}}'
+      - texto: {pt: "Clausius tornou a equação utilizável com três aproximações, todas listadas nas hipóteses: o volume do líquido é desprezível, o vapor é gás ideal e a entalpia de vaporização não muda no intervalo. A demonstração abaixo mostra onde cada uma entra."}
+
+  - titulo: {pt: "Como usar"}
+    blocos:
+      - passos:
+          - titulo: {pt: "Escolha o ponto conhecido"}
+            blocos:
+              - texto: {pt: "Um par temperatura e pressão de vapor medido, de preferência perto da temperatura procurada. O ponto de ebulição normal (pressão de 1 atm) é o mais comum."}
+          - titulo: {pt: "Use temperaturas absolutas"}
+            blocos:
+              - texto: {pt: "A equação tem \\(1/T\\): em °C o resultado sai errado sem nenhum aviso."}
+          - titulo: {pt: "Confira as unidades da entalpia"}
+            blocos:
+              - texto: {pt: "Com \\(R\\) em J/(mol·K), a entalpia vai em J/mol. A razão \\(\\Delta H_{\\mathrm{vap}}/R\\) tem unidade de temperatura."}
+      - caixa: atencao
+        titulo: {pt: "Extrapolação"}
+        blocos:
+          - texto: {pt: "Quanto mais longe do ponto conhecido, maior o erro, porque a entalpia de vaporização diminui com a temperatura e se anula no ponto crítico."}
+
+demonstracao:
+  parte_de: []
+  simbolos:
+    - {simbolo: T, grandeza: temperatura_absoluta}
+    - {simbolo: P, grandeza: pressao_saturacao, funcao_de: T, nome: {pt: "pressão de vapor como função da temperatura"}}
+    - {simbolo: '\Delta V_{\mathrm{vap}}', grandeza: volume_molar, nome: {pt: "variação de volume molar na vaporização"}}
+    - {simbolo: 'V_{g}', grandeza: volume_molar, nome: {pt: "volume molar do vapor saturado"}}
+    - {simbolo: 'V_{l}', grandeza: volume_molar, nome: {pt: "volume molar do líquido saturado"}}
+  inicio:
+    tipo: principio
+    titulo: {pt: "Equação de Clapeyron"}
+    texto: {pt: "No equilíbrio de fases de uma substância pura, a inclinação da curva de pressão de vapor é dada exatamente por:"}
+    equacao: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{T \Delta V_{\mathrm{vap}}}'
+  passos:
+    - titulo: {pt: "Escrever a variação de volume"}
+      texto: {pt: "A variação de volume na vaporização é o volume do vapor menos o do líquido."}
+      tipo: substituicao
+      operacao: {nome: substituir, simbolo: '\Delta V_{\mathrm{vap}}', argumento: 'V_{g} - V_{l}', origem: definicao}
+      condicoes: ['V_{g} - V_{l} \neq 0']
+      depois: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{T \left(V_{g} - V_{l}\right)}'
+    - titulo: {pt: "Desprezar o volume do líquido"}
+      texto: {pt: "Longe do ponto crítico, o vapor ocupa centenas de vezes o volume do líquido."}
+      tipo: substituicao
+      usa: hipotese.volume_liquido_desprezivel
+      operacao: {nome: substituir, simbolo: 'V_{l}', argumento: '0', origem: hipotese}
+      relacao: implica
+      depois: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{T V_{g}}'
+    - titulo: {pt: "Tratar o vapor como gás ideal"}
+      tipo: substituicao
+      usa: hipotese.vapor_gas_ideal
+      operacao: {nome: substituir, simbolo: 'V_{g}', argumento: '\frac{R T}{P}', origem: hipotese}
+      depois: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{T \frac{R T}{P}}'
+    - titulo: {pt: "Simplificar"}
+      tipo: algebra
+      operacao: {nome: reescrever, lado: direito}
+      depois: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}} P}{R T^{2}}'
+    - titulo: {pt: "Separar as variáveis"}
+      texto: {pt: "Dividir por \\(P\\) deixa a pressão só do lado esquerdo e a temperatura só do direito."}
+      tipo: algebra
+      operacao: {nome: dividir_ambos, argumento: P}
+      depois: '\frac{1}{P}\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{R T^{2}}'
+    - titulo: {pt: "Integrar de \\(T_{1}\\) a \\(T_{2}\\)"}
+      tipo: calculo
+      operacao: {nome: integrar_definido_ambos, argumento: T, limites: ['T_{1}', 'T_{2}']}
+      relacao: implica
+      depois: '\int_{T_{1}}^{T_{2}} \frac{1}{P}\frac{\mathrm{d}P}{\mathrm{d}T} \,\mathrm{d}T = \int_{T_{1}}^{T_{2}} \frac{\Delta H_{\mathrm{vap}}}{R T^{2}} \,\mathrm{d}T'
+    - titulo: {pt: "Calcular as integrais"}
+      texto: {pt: "À esquerda, o integrando é a derivada de \\(\\ln P\\). À direita, a entalpia de vaporização sai da integral por ser constante no intervalo."}
+      tipo: calculo
+      usa: hipotese.dhvap_constante
+      operacao: {nome: reescrever}
+      depois: '\ln\frac{P(T_{2})}{P(T_{1})} = \frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{1}} - \frac{1}{T_{2}}\right)'
+    - titulo: {pt: "Dar nome à pressão em \\(T_{2}\\)"}
+      tipo: algebra
+      operacao: {nome: nomear, argumento: 'P(T_{2})', simbolo: 'P_{2}'}
+      depois: '\ln\frac{P_{2}}{P(T_{1})} = \frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{1}} - \frac{1}{T_{2}}\right)'
+    - titulo: {pt: "Dar nome à pressão em \\(T_{1}\\)"}
+      tipo: algebra
+      operacao: {nome: nomear, argumento: 'P(T_{1})', simbolo: 'P_{1}'}
+      depois: '\ln\frac{P_{2}}{P_{1}} = \frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{1}} - \frac{1}{T_{2}}\right)'
+    - titulo: {pt: "Pôr na forma usual"}
+      tipo: algebra
+      operacao: {nome: reescrever, lado: direito}
+      depois: '\ln\frac{P_{2}}{P_{1}} = -\frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{2}} - \frac{1}{T_{1}}\right)'
+
+exemplo:
+  enunciado: {pt: "A água ferve a 373,15 K sob 101,418 kPa, com entalpia de vaporização de 40,65 kJ/mol. Estime a pressão de vapor a 393,15 K."}
+  dados: {'P_{1}': "101418 Pa", '\Delta H_{\mathrm{vap}}': "40650 J/mol", 'T_{1}': "373,15 K", 'T_{2}': "393,15 K"}
+  origem_dos_dados: {pt: "Pressão de vapor e entalpia de vaporização da água a 373,15 K calculadas pelo CoolProp 8.0.0 (formulação IAPWS-95). O resultado é comparado com a pressão de vapor a 393,15 K da mesma formulação."}
+  pede: 'P_{2}'
+  unidade: kPa
+  esperado: null
+  tolerancia_rel: 1.0e-6
+  comparacao_independente: {fonte: coolprop, fluido: Water, propriedade: P, entradas: {T: 'T_{2}', Q: 0}, desvio_aceito_rel: 0.02}
+
+referencias:
+  - fonte: svna
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: coolprop
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [termodinamica.antoine, termodinamica.gas_ideal]
+revisao: {automatica: null, humana: null, externo: null}

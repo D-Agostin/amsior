@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de equação (Termodinâmica). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo (seção 8.7 da especificação).
+
+id: termodinamica.antoine
+versao: 1
+estado: auto_verificada
+area: termodinamica
+ordem: 6
+titulo: {pt: "Equação de Antoine"}
+equacao: '\log_{10}\frac{P}{P^{\circ}} = A - \frac{B}{T + C}'
+
+variaveis:
+  - {simbolo: P, grandeza: pressao_saturacao, nome: {pt: "pressão de vapor"}}
+  - {simbolo: 'P^{\circ}', grandeza: pressao_absoluta, nome: {pt: "pressão de referência da tabela de parâmetros"}, nota: {pt: "Não é um parâmetro físico: é a unidade de pressão em que a tabela foi ajustada (1 bar, 1 mmHg, 1 kPa…)."}}
+  - {simbolo: A, grandeza: adimensional, nome: {pt: "parâmetro de Antoine A"}}
+  - {simbolo: B, grandeza: diferenca_temperatura, nome: {pt: "parâmetro de Antoine B"}}
+  - {simbolo: C, grandeza: diferenca_temperatura, nome: {pt: "parâmetro de Antoine C"}}
+  - {simbolo: T, grandeza: temperatura_absoluta, nome: {pt: "temperatura"}}
+
+hipoteses: [substancia_pura, equilibrio_liquido_vapor]
+
+validade:
+  texto: {pt: "Só dentro da faixa de temperatura em que os parâmetros foram ajustados, que a tabela de origem sempre informa. Fora dela, o erro cresce depressa. Cada conjunto de parâmetros vale para uma substância, uma base de logaritmo e um par de unidades de pressão e temperatura."}
+  limites: []
+
+resumo:
+  - texto: {pt: "Correlação empírica de três parâmetros para a pressão de vapor de uma substância pura em função da temperatura:"}
+  - equacao: '\log_{10}\frac{P}{P^{\circ}} = A - \frac{B}{T + C}'
+    destaque: true
+  - texto: {pt: "Sem o parâmetro \\(C\\), ela tem a mesma forma da equação de Clausius-Clapeyron: o logaritmo da pressão fica linear no inverso da temperatura. O parâmetro \\(C\\) corrige a curvatura que a variação da entalpia de vaporização produz."}
+
+secoes:
+  - titulo: {pt: "Ler a tabela de parâmetros"}
+    blocos:
+      - texto: {pt: "Os valores de \\(A\\), \\(B\\) e \\(C\\) não têm sentido sozinhos: dependem de quatro escolhas da tabela de origem."}
+      - tabela:
+          colunas: [{pt: "Escolha"}, {pt: "Opções comuns"}, {pt: "Efeito se trocada"}]
+          linhas:
+            - [{pt: "Base do logaritmo"}, {pt: "10 ou e"}, {pt: "A e B mudam por um fator de 2,303"}]
+            - [{pt: "Unidade de pressão"}, {pt: "bar, kPa, mmHg"}, {pt: "só A muda"}]
+            - [{pt: "Unidade de temperatura"}, {pt: "K ou °C"}, {pt: "só C muda, de 273,15"}]
+            - [{pt: "Faixa de ajuste"}, {pt: "informada na tabela"}, {pt: "fora dela, extrapolação"}]
+      - caixa: atencao
+        titulo: {pt: "Erro mais comum"}
+        blocos:
+          - texto: {pt: "Usar parâmetros ajustados com temperatura em °C e entrar com a temperatura em K, ou o contrário. O resultado sai com a ordem de grandeza errada e nenhum aviso. Esta ficha usa a temperatura absoluta; para tabelas em °C, converta \\(C\\) somando 273,15."}
+
+demonstracao: null
+
+exemplo:
+  enunciado: {pt: "Qual a pressão de vapor da água a 320 K?"}
+  dados: {T: "320 K", 'P^{\circ}': "1 bar", A: "5,20389", B: "1733,926 K", C: "-39,485 K"}
+  origem_dos_dados: {pt: "Parâmetros da água no NIST Chemistry WebBook (logaritmo decimal, pressão em bar, temperatura em K, faixa de 304 a 333 K). O resultado é comparado com a pressão de vapor do CoolProp 8.0.0 (formulação IAPWS-95) na mesma temperatura."}
+  pede: P
+  unidade: kPa
+  esperado: null
+  tolerancia_rel: 1.0e-6
+  comparacao_independente: {fonte: coolprop, fluido: Water, propriedade: P, entradas: {T: T, Q: 0}, desvio_aceito_rel: 0.005}
+
+referencias:
+  - fonte: nist_webbook
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: svna
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [termodinamica.clausius_clapeyron]
+revisao: {automatica: null, humana: null, externo: null}

@@ -253,3 +253,51 @@ fontes:
     ano: null
     isbn: null
     conferido: {por: null, em: null}
+
+  # Dados de referência para exemplos numéricos (V6) e comparação independente
+  coolprop:
+    papel: apoio
+    area: geral
+    uso: citacao
+    titulo: "CoolProp: biblioteca de propriedades termofísicas"
+    autores: [I. H. Bell, J. Wronski, S. Quoilin, V. Lemort]
+    editora: projeto CoolProp (código aberto, licença MIT)
+    idioma: en
+    url: https://coolprop.org
+    versao: {publicada: null, repositorio: "8.0.0"}
+    nota: Usada nos testes como fonte independente; equações de estado de referência (água pela IAPWS-95, nitrogênio por Span e outros, 2000).
+    edicao: null
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+
+  janaf:
+    papel: apoio
+    area: termodinamica
+    uso: citacao
+    titulo: "NIST-JANAF Thermochemical Tables"
+    autores: [M. W. Chase Jr.]
+    editora: National Institute of Standards and Technology
+    idioma: en
+    url: https://janaf.nist.gov
+    edicao: 4
+    ano: 1998
+    nota: Tabelas consultadas pela versão em linha (janaf.nist.gov), tabela do N2, em 20/11/2026.
+    isbn: null
+    conferido: {por: null, em: null}
+
+  nist_webbook:
+    papel: apoio
+    area: termodinamica
+    uso: citacao
+    titulo: "NIST Chemistry WebBook, SRD 69"
+    autores: [P. J. Linstrom (ed.), W. G. Mallard (ed.)]
+    editora: National Institute of Standards and Technology
+    idioma: en
+    url: https://webbook.nist.gov/chemistry/
+    nota: Parâmetros de Antoine da água (faixa de 304 a 333 K) lidos na transcrição do LibreTexts que cita o WebBook, em 20/11/2026; conferir na página do WebBook.
+    edicao: null
+    ano: null
+    isbn: null
+    conferido: {por: null, em: null}
+

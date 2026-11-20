@@ -1,0 +1,78 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de equação (Termodinâmica). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo (seção 8.7 da especificação).
+
+id: termodinamica.primeira_lei_sistema_fechado
+versao: 1
+estado: auto_verificada
+area: termodinamica
+ordem: 2
+titulo: {pt: "1ª lei da termodinâmica para sistema fechado"}
+equacao: '\Delta U = Q + W'
+
+variaveis:
+  - {simbolo: '\Delta U', grandeza: energia, nome: {pt: "variação da energia interna do sistema"}}
+  - {simbolo: Q, grandeza: energia, nome: {pt: "calor recebido pelo sistema"}, nota: {pt: "positivo quando entra no sistema"}}
+  - {simbolo: W, grandeza: energia, nome: {pt: "trabalho feito sobre o sistema"}, nota: {pt: "positivo quando feito sobre o sistema (convenção IUPAC)"}}
+
+hipoteses: [sistema_fechado, energias_cinetica_potencial_desprezaveis]
+
+validade:
+  texto: {pt: "Qualquer processo de um sistema fechado, reversível ou não, desde que as variações de energia cinética e potencial do sistema como um todo sejam desprezíveis; se não forem, elas entram somadas à energia interna."}
+  limites: []
+
+resumo:
+  - texto: {pt: "A energia de um sistema fechado só muda por calor e por trabalho trocados com a vizinhança. Com a convenção da IUPAC, em que calor e trabalho são positivos quando **entram** no sistema:"}
+  - equacao: '\Delta U = Q + W'
+    destaque: true
+
+secoes:
+  - titulo: {pt: "O que a equação diz"}
+    blocos:
+      - texto: {pt: "A 1ª lei é um princípio: a conservação da energia, aplicada a um sistema que não troca massa com a vizinhança. Ela não se deduz de nada mais simples; é confirmada por toda a experiência."}
+      - texto: {pt: "Energia interna é uma **função de estado**: a variação dela só depende dos estados inicial e final. Calor e trabalho **não** são: dependem do caminho. A 1ª lei diz que a soma dos dois, no entanto, não depende."}
+
+  - titulo: {pt: "A convenção de sinais"}
+    blocos:
+      - texto: {pt: "O Amsior usa a convenção da IUPAC em todas as fichas: tudo o que entra no sistema é positivo. Alguns livros de engenharia, como o de Felder e o de Fogler, contam o trabalho como positivo quando é feito **pelo** sistema. A equação muda de cara, mas diz a mesma coisa:"}
+      - tabela:
+          colunas: [{pt: "Convenção"}, {pt: "Trabalho positivo quando"}, {pt: "1ª lei"}]
+          linhas:
+            - [{pt: "IUPAC (Amsior)"}, {pt: "é feito **sobre** o sistema"}, {pt: "\\(\\Delta U = Q + W\\)"}]
+            - [{pt: "Engenharia clássica"}, {pt: "é feito **pelo** sistema"}, {pt: "\\(\\Delta U = Q - W\\)"}]
+      - caixa: atencao
+        titulo: {pt: "Erro comum"}
+        blocos:
+          - texto: {pt: "Misturar as convenções: usar a forma de um livro com o sinal do trabalho tirado de outro. Antes de qualquer conta, confira qual convenção a fonte usa."}
+
+  - titulo: {pt: "Casos particulares"}
+    blocos:
+      - lista:
+          - {pt: "**Processo adiabático:** sem calor, a variação de energia é todo o trabalho."}
+          - {pt: "**Volume constante, sem outro trabalho:** sem trabalho, a variação de energia é todo o calor."}
+          - {pt: "**Ciclo:** o sistema volta ao estado inicial e a energia interna não muda; o calor recebido é igual, em módulo, ao trabalho cedido."}
+      - equacao: 'Q = 0 \;\Longrightarrow\; \Delta U = W \qquad\qquad W = 0 \;\Longrightarrow\; \Delta U = Q \qquad\qquad \Delta U = 0 \;\Longrightarrow\; Q = -W'
+
+exemplo:
+  enunciado: {pt: "Um gás num cilindro recebe 500 J de calor e, ao se expandir, faz 200 J de trabalho sobre o pistão. Qual a variação da energia interna?"}
+  dados: {Q: "500 J", W: "-200 J"}
+  origem_dos_dados: {pt: "Dados escolhidos para o exemplo. O trabalho entra negativo porque é feito pelo sistema."}
+  pede: '\Delta U'
+  unidade: J
+  esperado: null
+  tolerancia_rel: 1.0e-12
+
+referencias:
+  - fonte: svna
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: felder
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [termodinamica.gas_ideal, termodinamica.calor_sensivel]
+revisao: {automatica: null, humana: null, externo: null}

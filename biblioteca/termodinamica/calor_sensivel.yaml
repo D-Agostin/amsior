@@ -1,0 +1,119 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de equação (Termodinâmica). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo (seção 8.7 da especificação).
+
+id: termodinamica.calor_sensivel
+versao: 1
+estado: auto_verificada
+area: termodinamica
+ordem: 4
+titulo: {pt: "Calor sensível com capacidade calorífica variável"}
+equacao: 'Q = n \int_{T_{1}}^{T_{2}} C_{p} \,\mathrm{d}T'
+
+variaveis:
+  - {simbolo: Q, grandeza: energia, nome: {pt: "calor recebido pelo sistema"}}
+  - {simbolo: n, grandeza: quantidade_materia, nome: {pt: "quantidade de matéria aquecida"}}
+  - {simbolo: 'C_{p}', grandeza: capacidade_calorifica_molar, funcao_de: T, nome: {pt: "capacidade calorífica molar a pressão constante, função da temperatura"}}
+  - {simbolo: 'T_{1}', grandeza: temperatura_absoluta, nome: {pt: "temperatura inicial"}}
+  - {simbolo: 'T_{2}', grandeza: temperatura_absoluta, nome: {pt: "temperatura final"}}
+
+hipoteses: [sistema_fechado, pressao_constante, so_trabalho_de_expansao, sem_mudanca_de_fase, sem_reacao]
+
+nao_isolaveis: ['T_{1}', 'T_{2}']
+
+validade:
+  texto: {pt: "Aquecimento ou resfriamento a pressão constante, sem mudança de fase nem reação, com a capacidade calorífica conhecida em toda a faixa de temperatura. Fora da faixa de ajuste da correlação de \\(C_{p}\\), o resultado é extrapolação."}
+  limites: []
+
+resumo:
+  - texto: {pt: "Quando a capacidade calorífica muda com a temperatura, o calor para aquecer um sistema fechado a pressão constante é a área sob a curva de \\(C_{p}\\) entre as duas temperaturas, vezes a quantidade de matéria:"}
+  - equacao: 'Q = n \int_{T_{1}}^{T_{2}} C_{p} \,\mathrm{d}T'
+    destaque: true
+  - texto: {pt: "Com \\(C_{p}\\) constante, a integral vira o produto conhecido \\(n\\,C_{p}\\,(T_{2} - T_{1})\\)."}
+
+secoes:
+  - titulo: {pt: "Por que integrar"}
+    blocos:
+      - texto: {pt: "A capacidade calorífica diz quanta energia é preciso para subir a temperatura em 1 K. Para quase todas as substâncias, ela cresce com a temperatura: aquecer de 900 para 901 K custa mais que de 300 para 301 K. Somar essas pequenas parcelas ao longo do aquecimento é integrar."}
+      - texto: {pt: "As correlações de \\(C_{p}\\) dos livros costumam ser polinômios na temperatura, e aí a integral sai termo a termo:"}
+      - equacao: '\int_{T_{1}}^{T_{2}} \left(a + b T + c T^{2}\right) \mathrm{d}T = a\,(T_{2} - T_{1}) + \frac{b}{2}\,(T_{2}^{2} - T_{1}^{2}) + \frac{c}{3}\,(T_{2}^{3} - T_{1}^{3})'
+      - caixa: atencao
+        titulo: {pt: "Unidades da correlação"}
+        blocos:
+          - texto: {pt: "Cada livro usa uma convenção: temperatura em K ou em °C, coeficientes com potências de 10 embutidas, base molar ou mássica. Antes de integrar, confira as unidades de cada coeficiente na tabela de origem."}
+
+  - titulo: {pt: "Calor e entalpia"}
+    blocos:
+      - texto: {pt: "A pressão constante e só com trabalho de expansão, a 1ª lei para o sistema fechado fica"}
+      - equacao: 'Q = \Delta H'
+      - texto: {pt: "Por isso a dedução abaixo parte da entalpia, cuja derivada em relação à temperatura, a pressão constante, define a capacidade calorífica."}
+
+demonstracao:
+  parte_de: []
+  simbolos:
+    - {simbolo: T, grandeza: temperatura_absoluta}
+    - {simbolo: H, grandeza: energia, funcao_de: T, nome: {pt: "entalpia do sistema, ao longo do caminho a pressão constante"}}
+    - {simbolo: '\Delta H', grandeza: energia}
+  inicio:
+    tipo: principio
+    titulo: {pt: "Definição de capacidade calorífica a pressão constante"}
+    texto: {pt: "Ao longo de um caminho a pressão constante, a derivada da entalpia do sistema em relação à temperatura é a quantidade de matéria vezes a capacidade calorífica molar:"}
+    equacao: 'n C_{p} = \frac{\mathrm{d}H}{\mathrm{d}T}'
+  passos:
+    - titulo: {pt: "Trocar os lados"}
+      tipo: algebra
+      operacao: {nome: trocar_lados}
+      depois: '\frac{\mathrm{d}H}{\mathrm{d}T} = n C_{p}'
+    - titulo: {pt: "Integrar de \\(T_{1}\\) a \\(T_{2}\\)"}
+      texto: {pt: "A igualdade vale em todo o caminho, então vale também a integral dos dois lados entre as temperaturas inicial e final."}
+      tipo: calculo
+      operacao: {nome: integrar_definido_ambos, argumento: T, limites: ['T_{1}', 'T_{2}']}
+      relacao: implica
+      depois: '\int_{T_{1}}^{T_{2}} \frac{\mathrm{d}H}{\mathrm{d}T} \,\mathrm{d}T = \int_{T_{1}}^{T_{2}} n C_{p} \,\mathrm{d}T'
+    - titulo: {pt: "Calcular a integral da esquerda"}
+      texto: {pt: "A integral de uma derivada é a diferença dos valores nas pontas. Na direita, a quantidade de matéria sai da integral porque, num sistema fechado, não muda com a temperatura."}
+      tipo: calculo
+      operacao: {nome: reescrever}
+      depois: 'H(T_{2}) - H(T_{1}) = n \int_{T_{1}}^{T_{2}} C_{p} \,\mathrm{d}T'
+    - titulo: {pt: "Chamar a diferença de \\(\\Delta H\\)"}
+      tipo: algebra
+      operacao: {nome: nomear, argumento: 'H(T_{2}) - H(T_{1})', simbolo: '\Delta H'}
+      depois: '\Delta H = n \int_{T_{1}}^{T_{2}} C_{p} \,\mathrm{d}T'
+    - titulo: {pt: "Trocar a variação de entalpia pelo calor"}
+      texto: {pt: "A pressão constante, sem trabalho de eixo nem elétrico, o calor recebido é igual à variação de entalpia."}
+      tipo: substituicao
+      usa: hipotese.pressao_constante
+      operacao: {nome: substituir, simbolo: '\Delta H', argumento: Q, origem: hipotese}
+      depois: 'Q = n \int_{T_{1}}^{T_{2}} C_{p} \,\mathrm{d}T'
+
+exemplo:
+  enunciado: {pt: "Um mol de nitrogênio é aquecido de 300 K a 500 K a pressão constante. Quanto calor recebe?"}
+  dados: {n: "1 mol", 'T_{1}': "300 K", 'T_{2}': "500 K"}
+  funcoes:
+    'C_{p}': '29.9899 - 0.0059646 T + 0.000010286 T^{2}'
+  origem_dos_dados: {pt: "Capacidade calorífica \\(C_{p}\\) do nitrogênio: polinômio de 2º grau ajustado pelo Amsior aos valores tabelados do NIST-JANAF de 300 a 500 K (coeficientes em J/(mol·K), T em K). O calor calculado é comparado com a variação de entalpia da mesma tabela, de 300 a 500 K."}
+  pede: Q
+  unidade: kJ
+  esperado: null
+  tolerancia_rel: 1.0e-6
+  comparacao_independente: {fonte: janaf, valor: "5857 J", desvio_aceito_rel: 0.005}
+
+referencias:
+  - fonte: felder
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: svna
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: janaf
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [termodinamica.primeira_lei_sistema_fechado, termodinamica.gas_ideal]
+revisao: {automatica: null, humana: null, externo: null}

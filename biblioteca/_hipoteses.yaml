@@ -48,6 +48,9 @@ hipoteses:
   sem_reacao:
     enunciado: {pt: "Não ocorre reação química."}
     areas: [termodinamica, balancos]
+  so_trabalho_de_expansao:
+    enunciado: {pt: "O único trabalho trocado é o de expansão ou compressão da fronteira; não há trabalho de eixo nem elétrico."}
+    areas: [termodinamica, balancos]
 
   # Substâncias e fases
   substancia_pura:
@@ -62,11 +65,11 @@ hipoteses:
     areas: [termodinamica, operacoes_unitarias]
   vapor_gas_ideal:
     enunciado: {pt: "A fase vapor se comporta como gás ideal."}
-    consequencia: 'PV^{V} = RT'
+    consequencia: 'P V_{g} = R T'
     areas: [termodinamica, operacoes_unitarias]
   volume_liquido_desprezivel:
     enunciado: {pt: "O volume molar do líquido é desprezível diante do volume molar do vapor."}
-    consequencia: '\Delta V_{vap} \approx V^{V}'
+    consequencia: '\Delta V_{\mathrm{vap}} \approx V_{g}'
     areas: [termodinamica]
   dhvap_constante:
     enunciado: {pt: "A entalpia de vaporização não varia no intervalo de temperatura considerado."}

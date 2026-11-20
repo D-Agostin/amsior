@@ -59,3 +59,54 @@ describe("ficha de conceito", () => {
       'ficha-secao-num">1<', 'ficha-secao-num">2<', 'ficha-secao-num">3<', 'ficha-secao-num">4<']);
   });
 });
+
+const EQUACAO: FichaApi = {
+  ...FICHA, id: "termodinamica.teste", area: "termodinamica", tipos: [], tipo: "equacao", exemplos: [], secoes: [],
+  equacao: {
+    latex: "P V = n R T",
+    simbolos: [{ id: "P", grandeza: "pressao_absoluta", papel: "variavel" }],
+    hipoteses: [{ id: "gas_ideal", enunciado: { pt: "Gás ideal." } }],
+    validade: { pt: "Pressões baixas." },
+    isolaveis: ["P", "V"], nao_isolaveis: ["T_{1}"],
+    demonstracao: {
+      inicio: { tipo: "principio", titulo: { pt: "Partida" }, equacao: "a = b" },
+      passos: [
+        { titulo: { pt: "Integrar" }, texto: null, tipo: "calculo", relacao: "implica", depois: "c = d", condicoes: ["x \\neq 0"],
+          usa: { id: "gas_ideal", enunciado: { pt: "Gás ideal." } }, usa_ficha: null, estado: "aprovado", metodo: "simbolico" },
+        { titulo: null, texto: null, tipo: "aproximacao", relacao: "equivalente", depois: "e = f", condicoes: [],
+          usa: null, usa_ficha: null, estado: "pendente", metodo: "revisao_humana" },
+      ],
+    },
+    exemplo: { enunciado: { pt: "Calcule." }, dados: [{ simbolo: "n", valor: "1 mol" }], funcoes: [], origem_dos_dados: null,
+      pede: "P", resultado: "P = \\frac{n R T}{V}", valor: 101.3958, unidade: "kPa",
+      comparacao: { fonte: "CoolProp", valor: 101.378, desvio_rel: 0.000177 } },
+  },
+};
+
+describe("ficha de equação", () => {
+  it("formata números com vírgula para o KaTeX", async () => {
+    const { numeroTex } = await import("../componentes/Ficha");
+    expect(numeroTex(197.50676)).toBe("197{,}5");
+    expect(numeroTex(10535.8)).toBe("10540");
+    expect(numeroTex(300)).toBe("300");
+  });
+
+  it("desenha usar na folha, hipóteses, demonstração com selos e o exemplo", () => {
+    carregarTextos({ "ui.ficha.passo": "Passo {n}", "ui.ficha.passo_ok": "Verificado", "ui.ficha.passo_pendente": "Revisão humana",
+      "ui.ficha.comparacao": "Fonte {fonte}, desvio {desvio}:", "ui.ficha.usar": "Usar na folha" });
+    useEstado.setState({ biblioteca: { areas: [], fichas: { [EQUACAO.id]: EQUACAO }, tipos: {} } });
+    const el = document.createElement("div");
+    const raiz = createRoot(el);
+    flushSync(() => raiz.render(<Ficha id={EQUACAO.id} />));
+    const html = el.innerHTML;
+    const botoes = el.querySelectorAll(".ficha-usar-botoes button").length;
+    raiz.unmount();
+    expect(html).toContain("Usar na folha");
+    expect(botoes).toBe(2);
+    expect(html).toContain("ficha-caixa-hipoteses");
+    expect(html).toContain("Verificado");
+    expect(html).toContain("Revisão humana");
+    expect(html).toContain("⇒");
+    expect(html).toContain("Fonte CoolProp, desvio 0,018 %");
+  });
+});

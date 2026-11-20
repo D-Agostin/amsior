@@ -17,8 +17,8 @@ Uma seção de ficha é uma lista de blocos, cada um com um papel só:
 
 A regra que motivou o formato: **nenhuma equação no texto corrido**. Relação
 (=, <, ≤, ≈, ⇒...) dentro de ``\\( \\)`` num texto é erro de esquema; ela vai
-para um bloco ``equacao``. Isso vale também para resumo, enunciados, itens de
-lista e células de tabela.
+para um bloco ``equacao``. Isso vale também para resumo, enunciados e itens de
+lista. A exceção são as células de tabela, que não são texto corrido.
 """
 
 from __future__ import annotations
@@ -137,7 +137,8 @@ def validar_blocos(blocos: Any, campo: str, erro: Erro, raiz: Path | None,
                     erro(f"{c}.tabela.linhas[{k}]", f"esperadas {len(cols)} células")
                     continue
                 for j, cel in enumerate(ln):
-                    _texto(cel, f"{c}.tabela.linhas[{k}][{j}]", erro)
+                    # célula de tabela não é texto corrido: pode trazer uma equação curta
+                    _texto(cel, f"{c}.tabela.linhas[{k}][{j}]", erro, corrido=False)
         elif tipo == "figura":
             fig = bl["figura"]
             if not isinstance(fig, str) or not fig.endswith(".svg"):
@@ -160,14 +161,14 @@ _EXTRAS: dict[str, set[str]] = {
 }
 
 
-def _texto(v: Any, campo: str, erro: Erro) -> None:
+def _texto(v: Any, campo: str, erro: Erro, corrido: bool = True) -> None:
     if not isinstance(v, dict) or not isinstance(v.get("pt"), str) or not v["pt"].strip():
         erro(campo, "esperado {pt: \"...\"} não vazio")
         return
     for idioma, t in v.items():
         if idioma not in ("pt", "en"):
             erro(campo, f"idioma desconhecido: {idioma}")
-        elif isinstance(t, str):
+        elif isinstance(t, str) and corrido:
             verificar_texto_corrido(t, f"{campo}.{idioma}", erro)
 
 

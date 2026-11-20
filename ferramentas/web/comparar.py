@@ -8,7 +8,9 @@ justificativas e certificados. Diferença é falha (especificação, seção 10.
   node interface/ferramentas/motor-node.mjs pedidos.json > pyodide.json   (em interface/)
   python ferramentas/web/comparar.py comparar pedidos.json pyodide.json [relatorio.json]
 
-Os pedidos são os exemplos da interface e todas as variáveis do corpus de isolar.
+Os pedidos são os exemplos da interface, todas as variáveis do corpus de isolar e, da
+biblioteca montada (dados.json), os exemplos das fichas e cada "Usar na folha" das fichas
+de equação.
 """
 
 from __future__ import annotations
@@ -43,6 +45,17 @@ def gerar_pedidos() -> list[dict[str, Any]]:
             if s["papel"] != "constante":
                 pedidos.append({"origem": f"corpus {eq.nome} → {s['id']}", "rota": "isolar",
                                 "dados": {"latex": eq.latex, "alvo": s["id"], "simbolos": simbolos}})
+    dados = RAIZ / "interface" / "public" / "motor" / "dados.json"
+    if dados.exists():
+        fichas = json.loads(dados.read_text(encoding="utf-8"))["biblioteca"]["fichas"]
+        for fid, f in sorted(fichas.items()):
+            for i, ex in enumerate(f.get("exemplos") or (), 1):
+                pedidos.append({"origem": f"ficha {fid} exemplo {i}", "rota": "isolar",
+                                "dados": {"latex": ex["equacao"], "alvo": ex["pede"], "simbolos": ex["simbolos"]}})
+            eq = f.get("equacao")
+            for alvo in (eq or {}).get("isolaveis") or ():
+                pedidos.append({"origem": f"ficha {fid} → {alvo}", "rota": "isolar",
+                                "dados": {"latex": eq["latex"], "alvo": alvo, "simbolos": eq["simbolos"]}})
     return pedidos
 
 

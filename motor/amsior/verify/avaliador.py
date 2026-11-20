@@ -64,6 +64,7 @@ def _somar(valores: list[Any]) -> Any:
 
 LIMITE_ARGUMENTO = mp.mpf(10) ** 7  # |argumento| de exp e de potência real
 LIMITE_TRIG = mp.mpf(10) ** 20
+DPS_QUADRATURA = 50
 
 
 def _semente(*partes: str) -> int:
@@ -87,12 +88,26 @@ class _FuncaoSorteada:
         self.positiva = bool(suposicoes & {"positivo", "nao_negativo", "nao_nulo"})
 
     def __call__(self, *xs: Any) -> Any:
+        # o argumento entra por asinh: a função varia devagar em qualquer escala (de 10⁻⁹ a
+        # 10⁹), e a integral numérica de f e de f' sobre um intervalo largo continua precisa
+        us = [mp.asinh(x) for x in xs]
         g = self.c0
-        for (a, b, p, d, e), x in zip(self.termos, xs, strict=True):
-            g += a * mp.sin(b * x + p) + d * mp.tanh(e * x)
+        for (a, b, p, d, e), u in zip(self.termos, us, strict=True):
+            g += a * mp.sin(b * u + p) + d * mp.tanh(e * u)
         if len(xs) > 1:
-            g += self.cruzado * mp.sin(xs[0] * xs[1] / 3)
+            g += self.cruzado * mp.sin(us[0] * us[1] / 3)
         return self.escala * (mp.exp(g) if self.positiva else g)
+
+    def derivada(self, x: Any) -> Any:
+        """f'(x) exata, para uma variável só: mp.diff dentro de uma integral numérica
+        custava dezenas de segundos por passo."""
+        (a, b, p, d, e), = self.termos
+        u = mp.asinh(x)
+        dg = a * b * mp.cos(b * u + p) + d * e * mp.sech(e * u) ** 2
+        du = 1 / mp.sqrt(1 + x * x)
+        if self.positiva:
+            return self(x) * dg * du
+        return self.escala * dg * du
 
 
 class Avaliador:
@@ -145,7 +160,7 @@ class Avaliador:
             if e.id == "\\infty":
                 return mp.inf
             s = self.tabela.obter(e.id)
-            if s is not None and s.depende_de and s.papel != "funcao" and e.id not in env:
+            if s is not None and s.depende_de and e.id not in env:
                 args = [env[d] for d in s.depende_de]
                 return self.funcao(e.id, len(args))(*args)
             return env[e.id]
@@ -208,6 +223,9 @@ class Avaliador:
                 raise ForaDoDominio  # opaco: tratado antes de chegar aqui
             var = e.var.id
             x0 = env[var]
+            nome = self._funcao_simples(e.f, var, env) if e.ordem == 1 else None
+            if nome is not None:
+                return self.funcao(nome, 1).derivada(x0)
             g = self._funcao_de(e.f, env, var)
             return mp.diff(g, x0, e.ordem)
         if isinstance(e, Integral):
@@ -217,6 +235,16 @@ class Avaliador:
             return {Eq: a == b, Ne: a != b, Gt: a > b, Ge: a >= b, Lt: a < b,
                     Le: a <= b}[type(e)]
         raise TypeError(f"nó sem avaliação: {type(e).__name__}")
+
+    def _funcao_simples(self, f: Expr, var: str, env: dict[str, Any]) -> str | None:
+        """Nome da função sorteada quando ``f`` é f(var) direto: P(T) ou P com depende_de T."""
+        if isinstance(f, Func) and len(f.args) == 1 and f.args[0] == Sym(var):
+            return f.nome
+        if isinstance(f, Sym) and f.id not in env:
+            s = self.tabela.obter(f.id)
+            if s is not None and tuple(s.depende_de) == (var,):
+                return f.id
+        return None
 
     def _funcao_de(self, f: Expr, env: dict[str, Any], var: str) -> Callable[[Any], Any]:
         def g(s: Any) -> Any:
@@ -275,7 +303,14 @@ class Avaliador:
         sinal = 1
         if lo > hi:
             lo, hi, sinal = hi, lo, -1
-        return sinal * mp.quad(g, _pontos(lo, hi))
+        # A quadratura roda com no máximo DPS_QUADRATURA dígitos: o resíduo aceito é de
+        # 10⁻³⁰, e pedir 120 dígitos à tanh-sinh multiplicava o custo sem mudar a decisão.
+        # Se a estimativa de erro não chega a 10⁻⁴⁰, o ponto é descartado (Instavel).
+        with mp.workdps(min(mp.mp.dps, DPS_QUADRATURA)):
+            val, err = mp.quad(g, _pontos(lo, hi), method="gauss-legendre", error=True)
+            if err > mp.mpf(10) ** -40 * abs(val) and err > mp.mpf(10) ** -(DPS_QUADRATURA - 5):
+                raise Instavel
+        return sinal * +val
 
     def _intervalo_ok(self, e: Integral, env: dict[str, Any], lo: Any, hi: Any) -> bool:
         """O integrando existe em todo o intervalo [lo, hi]?"""

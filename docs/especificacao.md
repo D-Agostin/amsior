@@ -1,6 +1,6 @@
 # Amsior — Especificação de Arquitetura (Fase 0)
 
-13/11/2026 · v1.12 em 16/11/2026
+13/11/2026 · v1.13 em 20/11/2026
 
 O Amsior foi idealizado por Ruan D'Agostin como ferramenta livre para fomento à ciência e à engenharia, com fins educacionais e gratuitos.
 
@@ -222,47 +222,73 @@ Regras de cálculo da folha:
 Uma ficha por arquivo, validada por esquema. Exemplo resumido:
 
 ```yaml
-id: termo.clausius_clapeyron_integrada
+id: termodinamica.clausius_clapeyron
 versao: 1
-estado: rascunho            # rascunho | auto_verificada | verificada
+estado: auto_verificada     # rascunho | auto_verificada | verificada
 area: termodinamica
+ordem: 5
 titulo: {pt: "Equação de Clausius-Clapeyron (forma integrada)"}
-equacao: '\ln\frac{P_2}{P_1} = -\frac{\Delta H_{vap}}{R}\left(\frac{1}{T_2}-\frac{1}{T_1}\right)'
-variaveis:
-  - {simbolo: P_1, grandeza: pressao_saturacao, unidade_si: Pa, faixa: null}
-  - {simbolo: T_1, grandeza: temperatura_absoluta, unidade_si: K}
-  - {simbolo: "\\Delta H_{vap}", grandeza: entalpia_vaporizacao_molar, unidade_si: J/mol}
+equacao: '\ln\frac{P_{2}}{P_{1}} = -\frac{\Delta H_{\mathrm{vap}}}{R}\left(\frac{1}{T_{2}} - \frac{1}{T_{1}}\right)'
+variaveis:                  # unidade e nome da grandeza vêm do glossário
+  - {simbolo: 'P_{1}', grandeza: pressao_saturacao, nome: {pt: "..."}}
+  - {simbolo: '\Delta H_{\mathrm{vap}}', grandeza: entalpia_vaporizacao_molar}
   - {simbolo: R, grandeza: constante_gases, constante: true}
+  # C_p(T): {simbolo: 'C_{p}', grandeza: ..., funcao_de: T}
 hipoteses: [substancia_pura, equilibrio_liquido_vapor, vapor_gas_ideal,
             volume_liquido_desprezivel, dhvap_constante]
+nao_isolaveis: []           # variáveis que o motor ainda não isola com passos (conferida nos dois sentidos)
 validade:
-  texto: {pt: "Intervalos curtos de temperatura, longe do ponto crítico."}
+  texto: {pt: "..."}
   limites: []               # desigualdades verificáveis, quando houver
-demonstracao:
-  parte_de: [termo.clapeyron]
-  passos:
-    - {tipo: substituicao, usa: hipotese.volume_liquido_desprezivel, depois: '...'}
-    - {tipo: substituicao, usa: termo.gas_ideal, depois: '...'}
-    - {tipo: algebra, regra: separar_variaveis, depois: '...'}
-    - {tipo: calculo, regra: integrar_ambos_lados, depois: '...'}
-referencias:
-  - fonte: svna               # definida em _fontes.yaml, com a última edição
-    capitulo: null
-    secao: null
-    equacao: null
-    pagina: null
-    conferido: {por: null, em: null}
+resumo: [...]               # blocos, como na ficha de conceito (seção 8.6)
+secoes: [...]
+demonstracao:               # null numa correlação empírica (Antoine)
+  parte_de: []
+  simbolos:                 # símbolos que só aparecem na demonstração
+    - {simbolo: P, grandeza: pressao_saturacao, funcao_de: T}
+    - {simbolo: 'V_{g}', grandeza: volume_molar}
+  inicio:                   # ponto de partida: princípio ou aproximação (V7)
+    tipo: principio
+    titulo: {pt: "Equação de Clapeyron"}
+    equacao: '\frac{\mathrm{d}P}{\mathrm{d}T} = \frac{\Delta H_{\mathrm{vap}}}{T \Delta V_{\mathrm{vap}}}'
+  passos:                   # cada passo é certificado pelo verificador (V1, V5)
+    - titulo: {pt: "Desprezar o volume do líquido"}
+      tipo: substituicao
+      usa: hipotese.volume_liquido_desprezivel   # tem de estar em hipoteses
+      operacao: {nome: substituir, simbolo: 'V_{l}', argumento: '0', origem: hipotese}
+      relacao: implica
+      depois: '...'
+    - titulo: {pt: "Integrar de \\(T_{1}\\) a \\(T_{2}\\)"}
+      tipo: calculo
+      operacao: {nome: integrar_definido_ambos, argumento: T, limites: ['T_{1}', 'T_{2}']}
+      relacao: implica
+      depois: '...'
+    - titulo: {pt: "Dar nome à pressão em \\(T_{2}\\)"}
+      tipo: algebra
+      operacao: {nome: nomear, argumento: 'P(T_{2})', simbolo: 'P_{2}'}
+      depois: '...'
 exemplo:
-  dados: {P_1: "101325 Pa", T_1: "373,15 K", T_2: "393,15 K", "\\Delta H_{vap}": "40,66 kJ/mol"}
-  origem_dos_dados: null     # origem declarada de cada propriedade (seção 7.5); os valores acima são ilustrativos
-  pede: P_2
-  esperado: null             # calculado e conferido na revisão
-  tolerancia_rel: 1e-6
-  comparacao_independente: {fonte: coolprop, grandeza: pressao_saturacao, desvio_aceito_rel: 0.05}
-relacionadas: [termo.clapeyron, termo.antoine]
-animacao: null
+  enunciado: {pt: "..."}
+  dados: {'P_{1}': "101418 Pa", '\Delta H_{\mathrm{vap}}': "40650 J/mol", 'T_{1}': "373,15 K", 'T_{2}': "393,15 K"}
+  # funcoes: {'C_{p}': '29.9899 - 0.0059646 T + 0.000010286 T^{2}'}   # para funções declaradas
+  origem_dos_dados: {pt: "..."}   # origem de cada propriedade (seção 7.5)
+  pede: 'P_{2}'
+  unidade: kPa
+  esperado: null             # congelado na revisão humana
+  tolerancia_rel: 1.0e-6
+  comparacao_independente:   # CoolProp ou valor publicado ({fonte: janaf, valor: "5857 J"})
+    {fonte: coolprop, fluido: Water, propriedade: P, entradas: {T: 'T_{2}', Q: 0}, desvio_aceito_rel: 0.02}
+referencias:
+  - {fonte: svna, uso: citacao, capitulo: null, secao: null, conferido: {por: null, em: null}}
+relacionadas: [termodinamica.antoine, termodinamica.gas_ideal]
 revisao: {automatica: null, humana: null, externo: null}
 ```
+
+O verificador das fichas de equação (`amsior.biblioteca.equacoes`) refaz, na integração contínua e na montagem do site:
+
+1. **Demonstração:** parte de `inicio.equacao` e certifica cada passo com a operação declarada (V1, V5). A cadeia tem de terminar na equação da ficha. Todo `usa: hipotese.X` tem de estar em `hipoteses`.
+2. **Corpus:** isola cada variável da equação (fora constantes e variáveis de integração). Ou isola com passos, ou está em `nao_isolaveis`; uma variável da lista que passou a isolar também é erro.
+3. **Exemplo (V6):** isola `pede`, converte os dados para o SI, substitui as funções declaradas pela expressão de `exemplo.funcoes`, calcula e confere `esperado` dentro de `tolerancia_rel`. Com `comparacao_independente`, compara com o CoolProp (só nos testes e na montagem, nunca no site) ou com o valor publicado, dentro de `desvio_aceito_rel`.
 
 Campos obrigatórios para o estado `verificada`: todos os de `referencias` preenchidos e conferidos, `exemplo.esperado`, pelo menos uma hipótese do vocabulário controlado e todos os passos com certificado aprovado.
 
@@ -444,6 +470,8 @@ A semente do sorteio é fixa por passo, para que o resultado seja reprodutível.
 Derivadas parciais com variáveis mantidas, derivadas de variáveis sem dependência declarada e integrais indefinidas viram objetos opacos, iguais dos dois lados: carregá-los é verificável, “calculá-los” reprova.
 
 **Domínio.** Cada nó que só existe em parte dos reais gera uma obrigação (denominador ≠ 0, argumento de ln > 0, radicando de raiz par ≥ 0, base de potência não inteira > 0, integrando definido no intervalo). Obrigação nova em “depois” exige condição declarada; obrigação de “antes” que some em “depois” limita a relação a `implica`; obrigação falsa com certeza reprova. V2 confere as obrigações da equação original na solução.
+
+**Demonstrações com integrais definidas.** `integrar_definido_ambos` integra os dois lados entre limites declarados; quando um fator sai da integral (ΔH_vap em Clausius-Clapeyron), o certificado registra a hipótese de que ele não depende da variável de integração. `nomear` troca uma subexpressão por um nome novo (P(T₂) passa a ser P₂), valendo por definição; o nome não pode já aparecer na equação. Na via numérica, a derivada de uma função sorteada é calculada pela fórmula exata, e a quadratura (Gauss-Legendre) roda com até 50 dígitos e estimativa de erro abaixo de 10⁻⁴⁰; acima disso o ponto é descartado.
 
 Operações dos dois lados (somar, multiplicar, aplicar função) são certificadas lado a lado: o verificador aplica a operação declarada a cada lado de “antes” e exige identidade com o lado correspondente de “depois”. Reescritas de um lado só (fatorar, combinar logaritmos) exigem identidade direta. Substituições exigem identidade após aplicar a definição ou a ficha citada em `usa`.
 
@@ -674,6 +702,8 @@ Quando sai edição nova de uma fonte, as fichas e as tabelas de propriedades qu
 
 Qualquer alteração de conteúdo numa ficha verificada a devolve para `rascunho` e incrementa a versão.
 
+Uma ficha com passo pendente (princípio ou aproximação sem revisão) pode ficar `auto_verificada`, e o passo aparece com o selo "Revisão humana"; para `verificada`, a revisão humana tem de estar registrada em `revisao.humana`.
+
 Na etapa automática, V6 confere que o exemplo calcula, que as unidades fecham e que o resultado fica dentro do desvio aceito em relação à fonte independente. O valor esperado é congelado na revisão humana e passa a servir de teste de regressão. Passos de princípio e de aproximação ficam pendentes até essa revisão. Lista de conferência da revisão humana:
 
 - [ ] A equação coincide com a da fonte, consideradas a notação e a convenção de sinais.
@@ -696,7 +726,7 @@ De obras abertas com licença compatível (CC BY-SA 4.0 ou CC BY 4.0, como o REA
 Padrão de apresentação das fichas de conceito (revisão de Ruan em 15/11/2026, a partir de deduções de referência que ele forneceu), imposto pelo esquema de blocos (`amsior.biblioteca.blocos`):
 
 - **Resposta primeiro:** o resumo abre a ficha, em caixa, com o resultado central em destaque.
-- **Nenhuma equação no texto corrido:** toda relação (=, ≠, <, ≤, ≈, ⇒...) fica num bloco `equacao`, em linha própria e numerada. No texto entram só símbolos e expressões curtas. Uma relação dentro de `\( \)` em qualquer texto da ficha (parágrafo, lista, nota, resumo, enunciado) é erro de esquema.
+- **Nenhuma equação no texto corrido:** toda relação (=, ≠, <, ≤, ≈, ⇒...) fica num bloco `equacao`, em linha própria e numerada. No texto entram só símbolos e expressões curtas. Uma relação dentro de `\( \)` em qualquer texto da ficha (parágrafo, lista, nota, resumo, enunciado) é erro de esquema. A exceção são as células de tabela, que já isolam cada relação na sua célula (a tabela das convenções de sinal da 1ª lei).
 - **Símbolos explicados onde aparecem:** a equação que introduz símbolos traz `onde:`, um por linha; a ficha pode ter uma tabela de variáveis, com unidade e grandeza tiradas do glossário.
 - **Dedução em passos:** cada passo tem título e uma ideia só, com as equações em blocos; o resultado de cada etapa importante vai em destaque (caixa em volta).
 - **Caixas com papel fixo:** `resumo`, `destaque` (a ideia central ou o sentido físico), `atencao` (pegadinha, erro comum, limite de validade) e `hipoteses` (premissas adotadas). Caixa não fica dentro de caixa nem de passo.
@@ -704,7 +734,7 @@ Padrão de apresentação das fichas de conceito (revisão de Ruan em 15/11/2026
 
 ### 8.7 Lista candidata de fichas
 
-São 56 candidatas; a lista final (cerca de 50) fecha no início da fase 2. As cinco primeiras, em negrito, servem de modelo.
+São 56 candidatas; a lista final (cerca de 50) fecha no início da fase 2. As cinco primeiras, em negrito, servem de modelo; estão escritas e passam na verificação por máquina desde 20/11/2026, com exemplos conferidos contra o CoolProp 8.0.0 (gás ideal, Clausius-Clapeyron, Antoine) e contra as tabelas NIST-JANAF (calor sensível).
 
 | Área | Fichas |
 | --- | --- |
@@ -748,7 +778,7 @@ A interface tem três regiões fixas: a folha no centro, a tabela de variáveis 
 - **Bloco de equação**: campo MathLive. Clicar numa variável da equação renderizada abre as ações: isolar, derivar em relação a, integrar em relação a.
 - **Bloco de resolução**: passos numerados, cada um com a equação (KaTeX), a justificativa, o selo e as condições; subpassos recolhíveis; chave completo/resumido; o termo alterado em cada passo vem destacado.
 - **Tabela de variáveis**: sempre visível; símbolo, nome, valor, unidade (trocável), origem; avisos de faixa e de unidade na própria linha.
-- **Biblioteca**: busca por nome, área, grandeza e hipótese; a ficha abre em painel com equação, hipóteses, demonstração, referência, exemplo e o botão “usar na folha”. Uma aba separada lista os pacotes de propriedades dos livros, com liga e desliga e a ordem de preferência (seção 7.5).
+- **Biblioteca**: busca por nome, área, grandeza e hipótese; a ficha abre no centro com equação, hipóteses e validade, demonstração (com o selo do verificador em cada passo), exemplo calculado com a conferência pela fonte independente, referência e “usar na folha”, que abre a equação na folha isolando a variável escolhida. Uma aba separada lista os pacotes de propriedades dos livros, com liga e desliga e a ordem de preferência (seção 7.5).
 - **Arquivo**: novo, abrir, salvar, salvamento automático, desfazer e refazer; exportar para PDF (folha de estilo de impressão) e HTML autossuficiente. As folhas ficam no armazenamento do navegador (IndexedDB), no dispositivo do usuário; "baixar" e "abrir" trocam arquivos `.amsior` com o disco. Como limpar os dados do navegador apaga as folhas, a interface avisa e oferece baixar uma cópia.
 - **Sem internet**: depois da primeira visita, tudo funciona desligado da rede; a barra de estado mostra quando há versão nova pronta.
 - **Sobre**: autoria e propósito do projeto, licenças (AGPL-3.0 do código, CC BY-SA 4.0 do conteúdo) e ligação para o código-fonte. As obras abertas adaptadas aparecem com crédito na própria ficha e na lista do Sobre.
@@ -863,3 +893,4 @@ Modelos: Opus executa as fases; Fable revisa o desenho do verificador ao fim da 
 | 1.10 | 15/11/2026 | Isolar do 2º grau com passos (seção 4.2, itens 4 e 7), exigido pelas fichas de Matemática: completar o quadrado, raiz dupla, recusa por discriminante negativo, passo de cálculo do valor exato. Correção: equações que chegavam ao 2º grau eram recusadas com "não há forma fechada elementar", o que era falso; a recusa agora distingue falta de regra de falta de forma fechada |
 | 1.11 | 15/11/2026 | Fichas de conceito em blocos estruturados (seções 3.5 e 8.6): resumo em caixa, equações numeradas em linha própria, `onde:`, dedução em passos, caixas de destaque, atenção e hipóteses, tabela de variáveis. Nenhuma equação no texto corrido, conferido pelo esquema. Pedido de Ruan na revisão das fichas-modelo |
 | 1.12 | 16/11/2026 | Motor (seção 4.2, itens 4 e 6): radical com o alvo dos dois lados (eleva ao quadrado sob condição), raízes estranhas descartadas com o motivo, alvo que some ao simplificar; sinais e coeficientes literais mais limpos no 2º grau. Painel da biblioteca no site (seção 9.1) |
+| 1.13 | 20/11/2026 | Fichas de equação (seções 3.4, 5.1, 8.5 a 8.7 e 9.1): formato real com `demonstracao.inicio`, `simbolos`, operações declaradas e `nao_isolaveis`; verificador da demonstração, do corpus e do exemplo com fonte independente; operações `integrar_definido_ambos` e `nomear`; as cinco fichas-modelo de Termodinâmica escritas e verificadas; no site, demonstração com selos, exemplo calculado e "usar na folha". Relações em células de tabela passam a ser aceitas |

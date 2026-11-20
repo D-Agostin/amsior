@@ -33,10 +33,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-lock.txt
+          python -m pip install -r requirements-referencia.txt
           python -m pip install -e . --no-deps
       - name: Tipos (mypy estrito)
         run: python -m mypy
-      - name: Testes (unidade, corpus, ataque, propriedades)
+      - name: Testes (unidade, corpus, ataque, propriedades, fichas com referência)
+        env:
+          AMSIOR_REFERENCIA: "1"
         run: python -m pytest -q
       - name: Relatório de aceite da fase 1A
         run: python ../ferramentas/aceite_1a.py
@@ -111,6 +114,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r motor/requirements-lock.txt
+          python -m pip install -r motor/requirements-referencia.txt
           python -m pip install -e motor --no-deps
       - name: Montar o motor para o navegador
         env:

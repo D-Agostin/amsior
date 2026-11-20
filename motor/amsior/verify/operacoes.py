@@ -123,6 +123,19 @@ def _integrar(L: Expr, R: Expr, v: Expr | None) -> EfeitoOperacao:
     return EfeitoOperacao(Integral(L, v), Integral(R, v), "implica")
 
 
+def integrar_definido(L: Expr, R: Expr, v: Expr | None,
+                      limites: tuple[Expr, Expr] | None) -> EfeitoOperacao:
+    """Integral definida dos dois lados, de ``a`` a ``b`` na variável ``v``."""
+    if not isinstance(v, Sym) or v.id in ("\\pi", "\\infty") or limites is None:
+        return EfeitoOperacao(L, R, erro="verif.argumento_invalido")
+    a, b = limites
+    return EfeitoOperacao(Integral(L, v, a, b), Integral(R, v, a, b), "implica")
+
+
+def _nao_usar(L: Expr, R: Expr, _a: Expr | None) -> EfeitoOperacao:  # tratadas no certificador
+    return EfeitoOperacao(L, R, erro="verif.argumento_invalido")
+
+
 Funcao = Callable[[Expr, Expr, Expr | None], EfeitoOperacao]
 
 # nome → (função, exige argumento)
@@ -142,6 +155,10 @@ OPERACOES: dict[str, tuple[Funcao, bool]] = {
     "substituir": (_reescrever, True),
     "derivar_ambos": (_derivar, True),
     "integrar_ambos": (_integrar, True),
+    # integral definida dos dois lados (limites na operação) e nome para uma subexpressão
+    # (P(T₂) passa a se chamar P₂): as duas são tratadas no certificador
+    "integrar_definido_ambos": (_nao_usar, True),
+    "nomear": (_nao_usar, True),
 }
 
-OPERACOES_DE_CALCULO = frozenset({"derivar_ambos", "integrar_ambos"})
+OPERACOES_DE_CALCULO = frozenset({"derivar_ambos", "integrar_ambos", "integrar_definido_ambos"})

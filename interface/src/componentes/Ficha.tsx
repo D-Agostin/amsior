@@ -1,12 +1,13 @@
 // Amsior — Copyright (c) 2026 Ruan D'Agostin. SPDX-License-Identifier: AGPL-3.0-only
-// Ficha de conceito (especificação 3.5 e 8.6): resumo em caixa, seções numeradas,
-// equações em linha própria e numeradas, "onde:", dedução em passos, caixas de
-// destaque, atenção e hipóteses. Abre no centro, no lugar da folha. Os exemplos
-// abrem na folha, onde o motor refaz a conta com os passos verificados.
+// Ficha de conceito e de equação (especificação 3.4, 3.5 e 8.6): resumo em caixa,
+// seções numeradas, equações em linha própria e numeradas, "onde:", dedução em
+// passos, caixas de destaque, atenção e hipóteses. Abre no centro, no lugar da folha.
+// A ficha de equação traz ainda as hipóteses, a demonstração com o selo do
+// verificador em cada passo, o exemplo calculado e "Usar na folha".
 
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
-import type { Bloco, FichaApi, ReferenciaFicha, TextoML } from "../api";
+import type { Bloco, EquacaoDaFicha, ExemploEquacao, FichaApi, PassoDemonstracao, ReferenciaFicha, TextoML } from "../api";
 import { useEstado } from "../estado";
 import { Mat, Texto } from "../mat";
 import { t } from "../textos";
@@ -155,6 +156,135 @@ function Referencia({ r }: { r: ReferenciaFicha }) {
   );
 }
 
+/** Número no estilo do português (vírgula decimal), pronto para o KaTeX. */
+export function numeroTex(v: number, digitos = 4): string {
+  return v.toLocaleString("pt-BR", { maximumSignificantDigits: digitos, useGrouping: false }).replace(",", "{,}");
+}
+
+function porcento(v: number): string {
+  return `${(100 * v).toLocaleString("pt-BR", { maximumSignificantDigits: 2 })} %`;
+}
+
+function unidadeTex(u: string): string {
+  return u ? `\\ \\mathrm{${u.replace(/\^(\d)/g, "^{$1}")}}` : "";
+}
+
+function UsarNaFolha({ f, eq }: { f: FichaApi; eq: EquacaoDaFicha }) {
+  const carregar = useEstado((s) => s.carregarExemplo);
+  return (
+    <aside className="ficha-usar" aria-label={t("ui.ficha.usar")}>
+      <div className="ficha-usar-titulo">{t("ui.ficha.usar")}</div>
+      <p className="nota">{t("ui.ficha.usar_nota")}</p>
+      <div className="ficha-usar-botoes">
+        {eq.isolaveis.map((v) => (
+          <button key={v} type="button" className="botao-simbolo"
+            aria-label={t("ui.ficha.isolar_aria", { variavel: v })}
+            onClick={() => carregar({ id: `${f.id}@${v}`, area: f.area, latex: eq.latex, alvo: v, simbolos: eq.simbolos })}>
+            <Mat tex={v} />
+          </button>
+        ))}
+      </div>
+      {eq.nao_isolaveis.length ? (
+        <p className="nota">
+          {t("ui.ficha.usar_sem_passos")}{" "}
+          {eq.nao_isolaveis.map((v, i) => <Fragment key={v}>{i ? ", " : ""}<Mat tex={v} /></Fragment>)}.
+        </p>
+      ) : null}
+    </aside>
+  );
+}
+
+function Passo({ p, n }: { p: PassoDemonstracao; n: number }) {
+  const ok = p.estado === "aprovado";
+  return (
+    <li className="ficha-passo">
+      <div className="ficha-passo-titulo ficha-passo-titulo-selo">
+        <span>{t("ui.ficha.passo", { n })}{p.titulo ? <> — <Rico texto={p.titulo} /></> : null}</span>
+        <span className={`selo ${ok ? "selo-ok" : "selo-aviso"}`}
+          title={ok ? t("ui.ficha.passo_dica") : t("ui.ficha.passo_pendente_dica")}>
+          {ok ? t("ui.ficha.passo_ok") : t("ui.ficha.passo_pendente")}
+        </span>
+      </div>
+      <div className="ficha-passo-corpo">
+        {p.texto ? <p className="ficha-texto"><Rico texto={p.texto} /></p> : null}
+        {p.usa ? <p className="ficha-passo-usa"><strong>{t("ui.ficha.usa_hipotese")}</strong> <Rico texto={p.usa.enunciado} /></p> : null}
+        <div className="ficha-eq ficha-eq-passo">
+          {p.relacao === "implica" ? <span className="ficha-eq-rel" title={t("ui.ficha.implica_dica")}>⇒</span> : null}
+          <span className="ficha-eq-corpo"><Mat tex={p.depois} exibicao /></span>
+        </div>
+        {p.condicoes.length ? (
+          <p className="ficha-eq-nota">
+            {t("ui.ficha.condicao")}{" "}
+            {p.condicoes.map((c, i) => <Fragment key={i}>{i ? "; " : ""}<Mat tex={c} /></Fragment>)}
+          </p>
+        ) : null}
+      </div>
+    </li>
+  );
+}
+
+function Demonstracao({ dem }: { dem: NonNullable<EquacaoDaFicha["demonstracao"]> }) {
+  const ini = dem.inicio;
+  return (
+    <>
+      <p className="nota">{t("ui.ficha.demonstracao_nota")}</p>
+      <aside className="ficha-caixa ficha-caixa-destaque">
+        <div className="ficha-caixa-titulo">
+          {t("ui.ficha.ponto_de_partida")}{ini.titulo ? <> — <Rico texto={ini.titulo} /></> : null}
+          <span className="selo selo-neutro">{t(`ui.ficha.inicio.${ini.tipo}`)}</span>
+        </div>
+        <div className="ficha-caixa-corpo">
+          {ini.texto ? <p className="ficha-texto"><Rico texto={ini.texto} /></p> : null}
+          <div className="ficha-eq ficha-eq-passo"><span className="ficha-eq-corpo"><Mat tex={ini.equacao} exibicao /></span></div>
+        </div>
+      </aside>
+      <ol className="ficha-passos ficha-demonstracao">
+        {dem.passos.map((p, i) => <Passo key={i} p={p} n={i + 1} />)}
+      </ol>
+    </>
+  );
+}
+
+function ExemploDeEquacao({ f, eq, ex }: { f: FichaApi; eq: EquacaoDaFicha; ex: ExemploEquacao }) {
+  const carregar = useEstado((s) => s.carregarExemplo);
+  const resultado = `${ex.pede} = ${numeroTex(ex.valor)}${unidadeTex(ex.unidade)}`;
+  return (
+    <div className="ficha-exemplo-equacao">
+      <p className="ficha-texto"><Rico texto={ex.enunciado} /></p>
+      <table className="tabela ficha-tabela ficha-dados">
+        <caption>{t("ui.ficha.dados")}</caption>
+        <thead><tr><th scope="col">{t("ui.ficha.col.simbolo")}</th><th scope="col">{t("ui.ficha.col.valor")}</th></tr></thead>
+        <tbody>
+          {ex.dados.map((d) => (
+            <tr key={d.simbolo}><td className="ficha-simbolo"><Mat tex={d.simbolo} /></td><td className="tabela-unidade">{d.valor}</td></tr>
+          ))}
+        </tbody>
+      </table>
+      {ex.funcoes.map((fn) => (
+        <div key={fn.simbolo} className="ficha-eq ficha-eq-passo">
+          <span className="ficha-eq-corpo"><Mat tex={`${fn.simbolo}(${fn.de.join(", ")}) = ${fn.expressao.replace(/(\d)\.(\d)/g, "$1{,}$2")}`} exibicao /></span>
+        </div>
+      ))}
+      {ex.origem_dos_dados ? <p className="nota"><Rico texto={ex.origem_dos_dados} /></p> : null}
+      <div className="ficha-passo-titulo">{t("ui.ficha.resultado")}</div>
+      <div className="ficha-eq ficha-eq-passo"><span className="ficha-eq-corpo"><Mat tex={ex.resultado} exibicao /></span></div>
+      <div className="ficha-eq ficha-eq-destaque ficha-eq-passo"><span className="ficha-eq-corpo"><Mat tex={resultado} exibicao /></span></div>
+      {ex.comparacao ? (
+        <p className="nota">
+          {t("ui.ficha.comparacao", { fonte: ex.comparacao.fonte, desvio: porcento(ex.comparacao.desvio_rel) })}{" "}
+          <Mat tex={`${numeroTex(ex.comparacao.valor)}${unidadeTex(ex.unidade)}`} />.
+        </p>
+      ) : null}
+      {eq.isolaveis.includes(ex.pede) ? (
+        <button type="button" className="botao-simbolo"
+          onClick={() => carregar({ id: `${f.id}@${ex.pede}`, area: f.area, latex: eq.latex, alvo: ex.pede, simbolos: eq.simbolos })}>
+          {t("ui.ficha.abrir_na_folha")}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export function Ficha({ id }: { id: string }) {
   const f = useEstado((s) => s.biblioteca.fichas[id]);
   const fichas = useEstado((s) => s.biblioteca.fichas);
@@ -165,6 +295,7 @@ export function Ficha({ id }: { id: string }) {
   const rolagem = useRef<HTMLElement>(null);
   useEffect(() => { rolagem.current?.scrollTo?.({ top: 0 }); }, [id]);
   if (!f) return null;
+  const eq = f.equacao ?? null;
 
   // numeração das seções na ordem em que aparecem (chamada aqui, não num componente filho)
   let secao = 0;
@@ -194,8 +325,30 @@ export function Ficha({ id }: { id: string }) {
           <div className="ficha-caixa-corpo"><Blocos blocos={f.resumo} nums={nums} /></div>
         </aside>
 
+        {eq ? <UsarNaFolha f={f} eq={eq} /> : null}
+
         {f.variaveis.length ? (
           <section>{titulo(t("ui.ficha.variaveis"))}<Variaveis f={f} /></section>
+        ) : null}
+
+        {eq && (eq.hipoteses.length || eq.validade) ? (
+          <section>
+            {titulo(t("ui.ficha.hipoteses"))}
+            {eq.hipoteses.length ? (
+              <aside className="ficha-caixa ficha-caixa-hipoteses">
+                <div className="ficha-caixa-titulo">{t("ui.ficha.caixa.hipoteses")}</div>
+                <div className="ficha-caixa-corpo">
+                  <ul className="ficha-lista">{eq.hipoteses.map((h) => <li key={h.id}><Rico texto={h.enunciado} /></li>)}</ul>
+                </div>
+              </aside>
+            ) : null}
+            {eq.validade ? (
+              <aside className="ficha-caixa ficha-caixa-atencao">
+                <div className="ficha-caixa-titulo">{t("ui.ficha.validade")}</div>
+                <div className="ficha-caixa-corpo"><p className="ficha-texto"><Rico texto={eq.validade} /></p></div>
+              </aside>
+            ) : null}
+          </section>
         ) : null}
 
         {f.secoes.map((s, i) => (
@@ -204,6 +357,14 @@ export function Ficha({ id }: { id: string }) {
             <Blocos blocos={s.blocos} nums={nums} />
           </section>
         ))}
+
+        {eq?.demonstracao ? (
+          <section>{titulo(t("ui.ficha.demonstracao"))}<Demonstracao dem={eq.demonstracao} /></section>
+        ) : null}
+
+        {eq?.exemplo ? (
+          <section>{titulo(t("ui.ficha.exemplo"))}<ExemploDeEquacao f={f} eq={eq} ex={eq.exemplo} /></section>
+        ) : null}
 
         {f.exemplos.length ? (
           <section>

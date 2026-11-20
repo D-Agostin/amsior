@@ -34,6 +34,12 @@ Em desenvolvimento; ainda não há versão pública para uso.
   Levenspiel. Os exemplos de cada ficha são refeitos pelo motor nos testes.
   O motor passou a resolver equações do 2º grau com passos e a descartar
   raízes estranhas com o motivo.
+  As cinco fichas-modelo de equação, de Termodinâmica, estão escritas e
+  verificadas por máquina: gás ideal, 1ª lei para sistema fechado, calor
+  sensível com C_p(T), Clausius-Clapeyron e Antoine. Cada passo da
+  demonstração é certificado, cada variável é isolada com passos e o exemplo
+  é conferido contra uma fonte independente (CoolProp ou tabelas NIST-JANAF).
+  No site, cada uma mostra a demonstração com selos e abre na folha.
 
 ## O que existe
 
@@ -48,11 +54,13 @@ Em desenvolvimento; ainda não há versão pública para uso.
 - `motor/amsior/i18n`: catálogo de textos (pt-BR).
 - `interface/`: interface em React e TypeScript.
 - `biblioteca/_glossario.yaml`: 60 grandezas com unidade SI e suposições.
-- `motor/amsior/biblioteca`: leitura e validação das fichas.
+- `motor/amsior/biblioteca`: leitura e validação das fichas, e verificação
+  das fichas de equação (demonstração, corpus e exemplo).
 - `biblioteca/_fontes.yaml`: livros-base e de apoio, na última edição, com o
   estado da conferência.
 - `biblioteca/_hipoteses.yaml`: vocabulário controlado de hipóteses.
 - `biblioteca/matematica/` e `biblioteca/reatores/`: fichas de conceito.
+- `biblioteca/termodinamica/`: fichas de equação.
 
 ## Como rodar (desenvolvimento)
 

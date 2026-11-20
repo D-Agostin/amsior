@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Amsior — Ficha de equação (Termodinâmica). Copyright (c) 2026 Ruan D'Agostin.
+# Ficha-modelo (seção 8.7 da especificação).
+
+id: termodinamica.gas_ideal
+versao: 1
+estado: auto_verificada
+area: termodinamica
+ordem: 1
+titulo: {pt: "Equação do gás ideal"}
+equacao: 'P V = n R T'
+
+variaveis:
+  - {simbolo: P, grandeza: pressao_absoluta, nome: {pt: "pressão absoluta"}}
+  - {simbolo: V, grandeza: volume, nome: {pt: "volume ocupado pelo gás"}}
+  - {simbolo: n, grandeza: quantidade_materia, nome: {pt: "quantidade de matéria"}}
+  - {simbolo: R, grandeza: constante_gases, constante: true, nome: {pt: "constante dos gases"}}
+  - {simbolo: T, grandeza: temperatura_absoluta, nome: {pt: "temperatura absoluta"}}
+
+hipoteses: [gas_ideal]
+
+validade:
+  texto: {pt: "Gases a pressões baixas e temperaturas bem acima da temperatura crítica. Quanto mais perto da condensação ou do ponto crítico, maior o desvio; o fator de compressibilidade mede esse desvio."}
+  limites: []
+
+resumo:
+  - texto: {pt: "Num gás ideal, pressão, volume, quantidade de matéria e temperatura absoluta se ligam por uma equação só, a mesma para qualquer gás:"}
+  - equacao: 'P V = n R T'
+    destaque: true
+  - texto: {pt: "A constante dos gases \\(R\\) é a mesma para todos os gases; o que muda de um gás para outro é só a massa molar."}
+
+secoes:
+  - titulo: {pt: "O que a equação diz"}
+    blocos:
+      - texto: {pt: "No modelo de gás ideal, as moléculas não interagem e o volume delas é desprezível diante do volume do recipiente. A pressão vem só dos choques com as paredes, e a equação reúne três observações clássicas:"}
+      - lista:
+          - {pt: "**Boyle:** a temperatura e quantidade fixas, a pressão é inversamente proporcional ao volume."}
+          - {pt: "**Charles e Gay-Lussac:** a pressão e quantidade fixas, o volume é proporcional à temperatura absoluta."}
+          - {pt: "**Avogadro:** a pressão e temperatura fixas, o volume é proporcional à quantidade de matéria."}
+      - caixa: atencao
+        titulo: {pt: "Temperatura e pressão absolutas"}
+        blocos:
+          - texto: {pt: "A equação só vale com temperatura em kelvin e pressão absoluta. Pressão manométrica, lida num manômetro, precisa da pressão atmosférica somada antes."}
+
+  - titulo: {pt: "Formas úteis"}
+    blocos:
+      - texto: {pt: "Dividindo pela quantidade de matéria, sai o volume molar, que não depende do gás:"}
+      - equacao: '\frac{V}{n} = \frac{R T}{P}'
+      - texto: {pt: "Com a massa molar \\(M\\), a quantidade de matéria é a massa dividida por ela, e a massa específica fica"}
+      - equacao: '\rho = \frac{m}{V} = \frac{P M}{R T}'
+        onde:
+          - {simbolo: '\rho', texto: {pt: "massa específica do gás"}}
+          - {simbolo: 'M', texto: {pt: "massa molar"}}
+
+  - titulo: {pt: "Quando o modelo falha"}
+    blocos:
+      - texto: {pt: "O desvio do comportamento ideal é medido pelo fator de compressibilidade:"}
+      - equacao: 'Z = \frac{P V}{n R T}'
+      - texto: {pt: "No gás ideal, ele vale exatamente 1. Em gases reais, se afasta de 1 quando as moléculas ficam próximas: pressão alta, temperatura baixa, perto da condensação. Aí entram equações de estado como a de van der Waals ou as cúbicas modernas."}
+
+exemplo:
+  enunciado: {pt: "Um mol de nitrogênio ocupa 24,6 L a 300 K. Qual a pressão?"}
+  dados: {n: "1 mol", V: "0,0246 m³", T: "300 K"}
+  origem_dos_dados: {pt: "Dados escolhidos para o exemplo; a pressão é comparada com a equação de estado de referência do nitrogênio (Span e outros, 2000) no CoolProp 8.0.0."}
+  pede: P
+  unidade: kPa
+  esperado: null
+  tolerancia_rel: 1.0e-6
+  comparacao_independente: {fonte: coolprop, fluido: Nitrogen, propriedade: P, entradas: {T: T, Dmolar: '\frac{n}{V}'}, desvio_aceito_rel: 0.01}
+
+referencias:
+  - fonte: svna
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+  - fonte: felder
+    uso: citacao
+    capitulo: null
+    secao: null
+    conferido: {por: null, em: null}
+
+relacionadas: [termodinamica.primeira_lei_sistema_fechado, termodinamica.clausius_clapeyron]
+revisao: {automatica: null, humana: null, externo: null}

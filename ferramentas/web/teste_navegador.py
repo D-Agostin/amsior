@@ -62,6 +62,27 @@ def biblioteca(pg: Page) -> dict[str, Any]:
     return r
 
 
+def ficha_de_equacao(pg: Page) -> dict[str, Any]:
+    """Ficha de Clausius-Clapeyron: um selo por passo da demonstração, o exemplo calculado
+    e "Usar na folha" isolando T₂ com passos verificados."""
+    item = pg.locator(".arvore-item", has_text="Clausius-Clapeyron (forma integrada)")
+    if item.count() == 0:
+        pg.get_by_role("button", name="Biblioteca", exact=True).click()
+    item.click()
+    pg.wait_for_selector(".ficha-demonstracao", timeout=30_000)
+    r: dict[str, Any] = {
+        "passos": pg.locator(".ficha-demonstracao .ficha-passo").count(),
+        "passos_verificados": pg.locator(".ficha-demonstracao .ficha-passo .selo-ok").count(),
+        "exemplo_com_valor": "197,5" in pg.locator(".ficha-exemplo-equacao").inner_text(),
+        "botoes_usar": pg.locator(".ficha-usar-botoes button").count(),
+    }
+    pg.get_by_role("button", name="Isolar T_{2} na folha").click()
+    pg.wait_for_selector(".resultado", timeout=120_000)
+    r["isolar_passos"] = pg.locator(".passo:not(.passo-cabeca):not(.passo-dada)").count()
+    r["isolar_certificados"] = pg.locator(".passo .selo-ok").count()
+    return r
+
+
 def main(url: str) -> dict[str, Any]:
     rel: dict[str, Any] = {"url": url, "erros": [], "pedidos_para_fora": []}
     origem = url.split("#")[0].rstrip("/")
@@ -106,6 +127,7 @@ def main(url: str) -> dict[str, Any]:
         rel["controlada_pelo_sw"] = pg.evaluate("!!navigator.serviceWorker.controller")
         rel["sem_internet"] = isolar_exemplo(pg, "Arrhenius")
         rel["biblioteca"] = biblioteca(pg)
+        rel["ficha_de_equacao"] = ficha_de_equacao(pg)
         nav.close()
 
     ok = (not rel["erros"] and not rel["pedidos_para_fora"] and rel["controlada_pelo_sw"]
@@ -113,7 +135,10 @@ def main(url: str) -> dict[str, Any]:
                   for r in (rel["com_internet"], rel["sem_internet"]))
           and rel["biblioteca"]["equacoes"] >= 10 and rel["biblioteca"]["caixas"] >= 3
           and 0 < rel["biblioteca"]["exemplo_passos"] == rel["biblioteca"]["exemplo_certificados"]
-          and rel["biblioteca"]["volta_pela_etiqueta"] and rel["biblioteca"]["rola_ate_o_fim"])
+          and rel["biblioteca"]["volta_pela_etiqueta"] and rel["biblioteca"]["rola_ate_o_fim"]
+          and 0 < rel["ficha_de_equacao"]["passos"] == rel["ficha_de_equacao"]["passos_verificados"]
+          and rel["ficha_de_equacao"]["exemplo_com_valor"] and rel["ficha_de_equacao"]["botoes_usar"] == 5
+          and 0 < rel["ficha_de_equacao"]["isolar_passos"] == rel["ficha_de_equacao"]["isolar_certificados"])
     rel["ok"] = ok
     return rel
 

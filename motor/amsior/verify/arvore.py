@@ -93,7 +93,7 @@ def variaveis_de_amostragem(exprs: list[Expr], tabela: TabelaDeSimbolos) -> list
     while fila:
         n = fila.pop()
         s = tabela.obter(n)
-        if s is not None and s.depende_de and s.papel != "funcao":
+        if s is not None and s.depende_de:
             for d in s.depende_de:
                 if d not in out and d not in fila:
                     fila.append(d)

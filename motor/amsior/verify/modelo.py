@@ -52,6 +52,8 @@ class Operacao:
     origem: Literal["definicao", "hipotese"] | None = None
     identidade: bool = False
     """Derivar ou integrar: a equação vale para todo valor da variável (hipótese exibida)."""
+    limites: tuple[Expr, Expr] | None = None
+    """Integral definida dos dois lados: limites inferior e superior."""
 
     def para_json(self) -> dict[str, Any]:
         return {
@@ -61,6 +63,7 @@ class Operacao:
             "simbolo": None if self.simbolo is None else para_json(self.simbolo),
             "origem": self.origem,
             "identidade": self.identidade,
+            "limites": None if self.limites is None else [para_json(x) for x in self.limites],
         }
 
     @staticmethod
@@ -71,6 +74,7 @@ class Operacao:
             d["nome"],
             None if d.get("argumento") is None else de_json(d["argumento"]),
             d.get("lado"), simb, d.get("origem"), bool(d.get("identidade", False)),
+            None if d.get("limites") is None else (de_json(d["limites"][0]), de_json(d["limites"][1])),
         )
 
 

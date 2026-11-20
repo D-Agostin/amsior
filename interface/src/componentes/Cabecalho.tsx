@@ -18,6 +18,8 @@ function Marca() {
 
 /** Exemplo do painel (chave do catálogo) ou de uma ficha ("<ficha>#<n>"). */
 export function tituloDoExemplo(id: string, fichas: Record<string, { titulo: { pt: string } }>): string {
+  const [fichaUsada, alvo] = id.split("@");
+  if (alvo !== undefined && fichas[fichaUsada]) return t("ui.ficha.usar_titulo", { ficha: fichas[fichaUsada].titulo.pt });
   const [ficha, n] = id.split("#");
   if (n && fichas[ficha]) return t("ui.ficha.exemplo_titulo", { ficha: fichas[ficha].titulo.pt, n });
   return t(`ui.exemplo.${id}`);
